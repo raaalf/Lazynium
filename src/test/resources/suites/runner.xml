@@ -1,0 +1,14 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="Google tests">
+    <parameter name="browser" value="chrome"/>
+
+    <test name="Google tests">
+        <parameter name="features" value="src/test/resources/features"/>
+        <parameter name="glue" value="com.malski.google.glue"/>
+        <parameter name="tags" value="@search"/>
+
+        <classes>
+            <class name="com.malski.core.cucumber.CucumberNG" />
+        </classes>
+    </test>
+</suite>
