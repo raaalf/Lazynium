@@ -1,8 +1,8 @@
 package com.malski.core.web.factory;
 
 import com.malski.core.web.elements.Element;
-import com.malski.core.web.elements.ElementsList;
-import com.malski.core.web.elements.ElementsListImpl;
+import com.malski.core.web.elements.Elements;
+import com.malski.core.web.elements.ElementsImpl;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 
 public class ElementListHandler implements InvocationHandler {
     private final LazyLocator locator;
-    private final Class<? extends Element> wrappingType;
+    private final Class<? extends Element> wrappingInterface;
 
     /* Generates a handler to retrieve the WebElement from a locator for
        a given WebElement interface descendant. */
@@ -20,17 +20,16 @@ public class ElementListHandler implements InvocationHandler {
         if (!Element.class.isAssignableFrom(interfaceType)) {
             throw new RuntimeException("interface not assignable to Element.");
         }
-        this.wrappingType = (Class<? extends Element>) interfaceType;
+        this.wrappingInterface = (Class<? extends Element>) interfaceType;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Object invoke(Object object, Method method, Object[] objects) throws Throwable {
-        //TODO new lazy element init
-        ElementsList elements = new ElementsListImpl<>(locator, wrappingType);
+        Elements<? extends Element> wrappedList = new ElementsImpl<>(locator, wrappingInterface);
         try {
-            return method.invoke(elements, objects);
+            return method.invoke(wrappedList, objects);
         } catch (InvocationTargetException e) {
-            // Unwrap the underlying exception
             throw e.getCause();
         }
     }

@@ -1,30 +1,27 @@
 package com.malski.google.web.pages;
 
-import com.malski.core.web.Browser;
-import com.malski.core.web.elements.Input;
+import com.malski.core.web.annotations.Module;
+import com.malski.core.web.annotations.PageInfo;
+import com.malski.core.web.elements.Element;
+import com.malski.core.web.elements.Elements;
 import com.malski.core.web.page.Page;
 import com.malski.google.web.api.SearchWithGoogle;
 import com.malski.google.web.modules.SearchForm;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.FindBys;
 
-public class ResultsPAge extends Page implements SearchWithGoogle {
-    @FindBy(id = "lst-ib")
-    private Input searchInput;
+import java.util.List;
 
-    @FindBy(css = "input[type='submit'][jsaction='sf.chk']")
-    private Input searchButton;
+@PageInfo(check = "https://www.google\\.com/\\?gfe_rd\\=cr\\&ei\\=")
+public class ResultsPage extends Page implements SearchWithGoogle {
 
+    @FindBys({@FindBy(xpath = "//div[@id='rso']//div[@class='rc']/*[@class='r']/a")})
+    private Elements<Element> results;
+
+    @Module
     private SearchForm searchForm;
 
-    public ResultsPAge(Browser browser) {
-        super(browser);
-        searchForm = new SearchForm(browser);
-    }
-
-    @Override
-    public void waitToLoad() {
-        getWait().until(ExpectedConditions.presenceOfElementLocated(searchInput.getBy()));
+    public ResultsPage() {
     }
 
     public SearchForm getSearchForm() {
@@ -32,7 +29,16 @@ public class ResultsPAge extends Page implements SearchWithGoogle {
     }
 
     @Override
-    public void searchFor(String phrase) {
-        searchInput.fill(phrase);
+    public ResultsPage searchFor(String phrase) {
+        getSearchForm().searchFor(phrase);
+        return this;
+    }
+
+    public void waitForResults() {
+        results.waitUntilAnyVisible();
+    }
+
+    public List<String> getResultTitles() {
+        return results.getTexts();
     }
 }

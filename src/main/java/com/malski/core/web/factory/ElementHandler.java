@@ -28,7 +28,6 @@ public class ElementHandler implements InvocationHandler {
 
     @Override
     public Object invoke(Object object, Method method, Object[] objects) throws Throwable {
-        //TODO new lazy element init
         Constructor cons = wrappingType.getConstructor(LazyLocator.class);
         Object thing = cons.newInstance(locator);
         try {

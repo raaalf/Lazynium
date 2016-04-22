@@ -1,11 +1,31 @@
 package com.malski.core.web.elements;
 
 public interface ElementsWait {
-    void waitUntilVisible();
+    void waitUntilAllPresent();
 
-    void waitUntilDisappear();
+    void waitUntilAnyPresent();
 
-    void waitUntilEnabled();
+    void waitUntilAllVisible();
 
-    void waitUntilDisabled();
+    void waitUntilAnyVisible();
+
+    void waitUntilAllDisappear();
+
+    void waitUntilAnyDisappear();
+
+    void waitUntilAllEnabled();
+
+    void waitUntilAnyEnabled();
+
+    void waitUntilAllDisabled();
+
+    void waitUntilAnyDisabled();
+
+//    void waitUntilAllSelected();
+//
+//    void waitUntilAnySelected();
+//
+//    void waitUntilAllUnselected();
+//
+//    void waitUntilAnyUnselected();
 }

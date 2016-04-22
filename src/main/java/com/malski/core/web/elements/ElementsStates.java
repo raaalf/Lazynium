@@ -1,7 +1,25 @@
 package com.malski.core.web.elements;
 
-/**
- * Created by rmalski on 2016-04-13.
- */
-public class ElementsStates {
+public interface ElementsStates {
+    boolean areAllVisible();
+
+    boolean isAnyVisible();
+
+    boolean areAllPresent();
+
+    boolean isAnyPresent();
+
+    boolean areAllEnabled();
+
+    boolean isAnyEnabled();
+
+    boolean hasAnyFocus();
+
+    boolean areAllSelected();
+
+    boolean isAnySelected();
+
+    boolean areAllUnselected();
+
+    boolean isAnyUnselected();
 }

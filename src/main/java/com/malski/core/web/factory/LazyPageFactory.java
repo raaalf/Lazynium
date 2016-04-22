@@ -1,12 +1,11 @@
 package com.malski.core.web.factory;
 
 import com.malski.core.web.Browser;
-import com.malski.core.web.elements.Element;
-import com.malski.core.web.page.Module;
 import com.malski.core.web.page.Page;
 import com.malski.core.web.page.WebComponent;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 import org.openqa.selenium.support.pagefactory.FieldDecorator;
 
@@ -22,11 +21,11 @@ public class LazyPageFactory extends org.openqa.selenium.support.PageFactory {
         return page;
     }
 
-    public static <T extends Module> T initElements(Browser browser, Class<T> moduleClassToProxy, Element rootElement) {
-        T page = instantiateModule(browser, moduleClassToProxy, rootElement);
-        initElements(browser, page);
-        return page;
-    }
+//    public static <T extends Module> T initElements(Browser browser, Class<T> moduleClassToProxy, Element rootElement) {
+//        T module = instantiateModule(browser, moduleClassToProxy, rootElement);
+//        initElements(browser, module);
+//        return module;
+//    }
 
     public static <T extends WebComponent> void initElements(WebDriver driver, T webComponent) {
         initElements(new LocatorFactory(driver), webComponent);
@@ -41,7 +40,14 @@ public class LazyPageFactory extends org.openqa.selenium.support.PageFactory {
         initElements(new ElementDecorator(factory), webComponent);
     }
 
-    public static <T extends Page> T instantiatePage(Browser browser, Class<T> pageClassToProxy) {
+    public static <T extends WebComponent> void initElements(FieldDecorator decorator, T webComponent) {
+        for(Class proxyIn = webComponent.getClass(); proxyIn != Object.class; proxyIn = proxyIn.getSuperclass()) {
+            proxyFields(decorator, webComponent, proxyIn);
+        }
+//        PageFactory.initElements(decorator, webComponent);
+    }
+
+    private static <T extends Page> T instantiatePage(Browser browser, Class<T> pageClassToProxy) {
         try {
             try {
                 Constructor<T> constructor = pageClassToProxy.getConstructor(Browser.class);
@@ -54,24 +60,18 @@ public class LazyPageFactory extends org.openqa.selenium.support.PageFactory {
         }
     }
 
-    private static <T extends Module> T instantiateModule(Browser browser, Class<T> moduleClassToProxy, Element rootElement) {
-        try {
-            try {
-                Constructor<T> constructor = moduleClassToProxy.getConstructor(Browser.class, Element.class);
-                return constructor.newInstance(browser, rootElement);
-            } catch (NoSuchMethodException e) {
-                return moduleClassToProxy.newInstance();
-            }
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static <T extends WebComponent> void initElements(FieldDecorator decorator, T webComponent) {
-        for(Class proxyIn = webComponent.getClass(); proxyIn != Object.class; proxyIn = proxyIn.getSuperclass()) {
-            proxyFields(decorator, webComponent, proxyIn);
-        }
-    }
+//    private static <T extends Module> T instantiateModule(Browser browser, Class<T> moduleClassToProxy, Element rootElement) {
+//        try {
+//            try {
+//                Constructor<T> constructor = moduleClassToProxy.getConstructor(Browser.class, Element.class);
+//                return constructor.newInstance(browser, rootElement);
+//            } catch (NoSuchMethodException e) {
+//                return moduleClassToProxy.newInstance();
+//            }
+//        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     private static void proxyFields(FieldDecorator decorator, Object page, Class<?> proxyIn) {
         for(Field field : proxyIn.getDeclaredFields()) {

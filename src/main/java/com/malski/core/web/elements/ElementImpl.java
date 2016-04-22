@@ -1,7 +1,9 @@
 package com.malski.core.web.elements;
 
+import com.malski.core.cucumber.TestContext;
 import com.malski.core.web.factory.LazyLocator;
 import com.malski.core.web.factory.Locator;
+import com.malski.core.web.factory.Selector;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.internal.Locatable;
@@ -9,6 +11,8 @@ import org.openqa.selenium.internal.Locatable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+
+import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 public class ElementImpl implements Element {
 
@@ -30,6 +34,7 @@ public class ElementImpl implements Element {
 
     public ElementImpl(By by, WebElement element) {
         this.locator = new Locator(element, by);
+        this.element = element;
     }
 
     @Override
@@ -68,8 +73,33 @@ public class ElementImpl implements Element {
     }
 
     @Override
+    public boolean isDisplayed() {
+        return getWrappedElement().isDisplayed();
+    }
+
+    @Override
+    public boolean isVisible() {
+        return getWrappedElement().isDisplayed();
+    }
+
+    @Override
+    public boolean isPresent() {
+        try {
+            refresh();
+            return true;
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    @Override
     public boolean isEnabled() {
         return getWrappedElement().isEnabled();
+    }
+
+    @Override
+    public boolean hasFocus() {
+        return getWrappedElement().equals(TestContext.getBrowser().switchTo().activeElement());
     }
 
     @Override
@@ -85,11 +115,6 @@ public class ElementImpl implements Element {
     @Override
     public WebElement findElement(By by) {
         return getWrappedElement().findElement(by);
-    }
-
-    @Override
-    public boolean isDisplayed() {
-        return getWrappedElement().isDisplayed();
     }
 
     @Override
@@ -112,9 +137,14 @@ public class ElementImpl implements Element {
         return getWrappedElement().getCssValue(s);
     }
 
+//    @Override
+//    public By getBy() {
+//        return locator.getBy();
+//    }
+
     @Override
-    public By getBy() {
-        return locator.getBy();
+    public Selector getSelector() {
+        return locator.getSelector();
     }
 
     @Override
@@ -161,27 +191,27 @@ public class ElementImpl implements Element {
     }
 
     @Override
-    public ElementsList<Element> getElements(By by) {
-        return new ElementsListImpl<>(by, getWrappedElement(), Element.class);
+    public Elements<Element> getElements(By by) {
+        return new ElementsImpl<>(by, getWrappedElement(), Element.class);
     }
 
     @Override
-    public ElementsList<Element> $$(String css) {
+    public Elements<Element> $$(String css) {
         return this.getElements(By.cssSelector(css));
     }
 
     @Override
-    public ElementsList<Element> $$n(String name) {
+    public Elements<Element> $$n(String name) {
         return this.getElements(By.name(name));
     }
 
     @Override
-    public ElementsList<Element> $$i(String id) {
+    public Elements<Element> $$i(String id) {
         return this.getElements(By.id(id));
     }
 
     @Override
-    public ElementsList<Element> $$x(String xpath) {
+    public Elements<Element> $$x(String xpath) {
         return this.getElements(By.xpath(xpath));
     }
 
@@ -201,10 +231,10 @@ public class ElementImpl implements Element {
     }
 
     @Override
-    public <T extends Element> T as(Class<T> inteface) {
+    public <T extends Element> T as(Class<T> iface) {
         try {
             @SuppressWarnings("unchecked")
-            Class<T> clazz = (Class<T>) Class.forName(inteface.getCanonicalName()+"Impl");
+            Class<T> clazz = (Class<T>) Class.forName(iface.getCanonicalName()+"Impl");
             Constructor<T> constructor = clazz.getConstructor(LazyLocator.class);
             return constructor.newInstance(getLocator());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
@@ -220,6 +250,31 @@ public class ElementImpl implements Element {
 
     @Override
     public void refresh() {
-        element = locator.findElement();
+        element = getLocator().findElement();
+    }
+
+    @Override
+    public void waitUntilPresent() {
+        TestContext.getBrowser().getWait().until(presenceOfElementLocated(getLocator().getSelector().getBy()));
+    }
+
+    @Override
+    public void waitUntilVisible() {
+        TestContext.getBrowser().getWait().until(visibilityOfElementLocated(getLocator().getSelector().getBy()));
+    }
+
+    @Override
+    public void waitUntilDisappear() {
+        TestContext.getBrowser().getWait().until(invisibilityOfElementLocated(getLocator().getSelector().getBy()));
+    }
+
+    @Override
+    public void waitUntilEnabled() {
+        TestContext.getBrowser().getWait().until(elementToBeClickable(getLocator().getSelector().getBy()));
+    }
+
+    @Override
+    public void waitUntilDisabled() {
+        TestContext.getBrowser().getWait().until(not(elementToBeClickable(getLocator().getSelector().getBy())));
     }
 }

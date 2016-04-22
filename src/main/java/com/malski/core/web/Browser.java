@@ -2,17 +2,17 @@ package com.malski.core.web;
 
 import com.malski.core.web.elements.Element;
 import com.malski.core.web.elements.ElementImpl;
-import com.malski.core.web.elements.ElementsList;
-import com.malski.core.web.elements.ElementsListImpl;
-import io.github.bonigarcia.wdm.ChromeDriverManager;
+import com.malski.core.web.elements.Elements;
+import com.malski.core.web.elements.ElementsImpl;
+import io.github.bonigarcia.wdm.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.MarionetteDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
@@ -24,16 +24,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class Browser implements WebDriver {
     private WebDriver driver;
-    private String baseUrl;
-    private Wait<WebDriver> wait;
+    private FluentWait<WebDriver> wait;
 
-    private static final long TIMEOUT_SECONDS = 60;
+    private static final long TIMEOUT_SECONDS = 30;
 
-    public Browser(String browserType, String baseUrl) {
+    public Browser(String browserType) {
         this.driver = initializeWebDriver(browserType.toLowerCase());
-        this.baseUrl = baseUrl;
         this.setDefaultWaitTimeout();
-        get(baseUrl);
     }
 
     @Override
@@ -105,12 +102,8 @@ public class Browser implements WebDriver {
         return new ElementImpl(by, getWebDriver());
     }
 
-    public ElementsList<Element> getElements(By by) {
-        return new ElementsListImpl<>(by, getWebDriver(), Element.class);
-    }
-
-    public String getUrl() {
-        return baseUrl;
+    public Elements<Element> getElements(By by) {
+        return new ElementsImpl<>(by, getWebDriver(), Element.class);
     }
 
     public WebDriver getWebDriver() {
@@ -118,27 +111,24 @@ public class Browser implements WebDriver {
     }
 
     public FluentWait<WebDriver> getWait() {
-        return getWait(TIMEOUT_SECONDS);
+        return wait;
     }
 
-    public FluentWait<WebDriver> getWait(long timeout) {
-        return new WebDriverWait(getWebDriver(), timeout);
+    public FluentWait<WebDriver> getWait(long seconds) {
+        setWaitTimeout(seconds);
+        return wait;
     }
 
     public void setDefaultWaitTimeout() {
-        this.wait = new WebDriverWait(this.driver, 30L);
+        this.wait = new WebDriverWait(this.driver, TIMEOUT_SECONDS);
     }
 
-    public void setWaitTimeout(long milliseconds) {
-        this.wait = new WebDriverWait(getWebDriver(), milliseconds / 1000L);
+    public void setWaitTimeout(long seconds) {
+        this.wait = new WebDriverWait(getWebDriver(), seconds);
     }
 
     public Object executeScript(String script, Object... objects) {
         return ((JavascriptExecutor) getWebDriver()).executeScript(script, objects);
-    }
-
-    public void scrollIntoView(WebElement element) {
-        executeScript("arguments[0].scrollIntoView(true);", element);
     }
 
     public boolean elementExists(By locator) {
@@ -156,7 +146,11 @@ public class Browser implements WebDriver {
             switch (browser) {
                 case "chrome":
                 case "ch":
-                    ChromeDriverManager.getInstance().setup();
+                    try {
+                        ChromeDriverManager.getInstance().setup();
+                    } catch (Exception e) {
+                        System.setProperty("webdriver.chrome.driver", getDriversDirPath()+"chromedriver.exe");
+                    }
                     driver = new ChromeDriver();
                     break;
                 case "firefox":
@@ -164,20 +158,32 @@ public class Browser implements WebDriver {
                     driver = new FirefoxDriver();
                     break;
                 case "edge":
+                    EdgeDriverManager.getInstance().setup();
                     driver = new EdgeDriver();
                     break;
                 case "internet_explorer":
                 case "ie":
+                    InternetExplorerDriverManager.getInstance().setup();
                     driver = new InternetExplorerDriver();
                     break;
+                case "marionette":
+                    MarionetteDriverManager.getInstance().setup();
+                    driver = new MarionetteDriver();
+                    break;
+                case "phantom_js":
                 default:
+                    PhantomJsDriverManager.getInstance().setup();
                     driver = new PhantomJSDriver();
             }
             driver.manage().window().maximize();
-            driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+            driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
             return driver;
         } catch (IllegalArgumentException ex) {
             return null;
         }
+    }
+
+    private String getDriversDirPath() {
+        return System.getProperty("user.dir")+"\\src\\resources\\drivers\\";
     }
 }

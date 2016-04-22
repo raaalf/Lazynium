@@ -1,7 +1,7 @@
-@LoggedIn
-Feature: Logged in customer should have item on promo correctly accrued.
+@search
+Feature: As a user I'm able to search in Google.
 
-  Scenario: Add items from Offers page to basket
-    Given a logged in customer
-    When Offers page is displayed
-    Then add items met promo conditions to trolley
+  Scenario: Search for phrase in Google
+    Given I open google main page
+    When I search for "Facebook"
+    Then verify that page "Facebook" is in results

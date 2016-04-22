@@ -1,9 +1,10 @@
 package com.malski.core.web.page;
 
+import com.malski.core.cucumber.TestContext;
 import com.malski.core.web.Browser;
 import com.malski.core.web.elements.Element;
-import com.malski.core.web.elements.ElementsList;
-import com.malski.core.web.factory.PageElementsFactory;
+import com.malski.core.web.elements.Elements;
+import com.malski.core.web.factory.LazyPageFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -13,12 +14,18 @@ import org.openqa.selenium.support.ui.FluentWait;
  */
 public abstract class Module implements WebComponent{
     protected final Browser browser;
-    protected Element rootElement;
+    protected final Element rootElement;
 
-    public Module(Browser browser, Element rootElement) {
-        this.browser = browser;
+    public Module(By locator) {
+        this.browser = TestContext.getBrowser();
+        this.rootElement = getBrowser().getElement(locator);
+        LazyPageFactory.initElements(getRoot(), this);
+    }
+
+    public Module(Element rootElement) {
+        this.browser = TestContext.getBrowser();
         this.rootElement = rootElement;
-        this.initElements();
+        LazyPageFactory.initElements(getRoot(), this);
     }
 
     @Override
@@ -57,33 +64,28 @@ public abstract class Module implements WebComponent{
     }
 
     @Override
-    public ElementsList<Element> getElements(By by) {
+    public Elements<Element> getElements(By by) {
         return getRoot().getElements(by);
     }
 
     @Override
-    public ElementsList<Element> $$(String css) {
+    public Elements<Element> $$(String css) {
         return getRoot().$$(css);
     }
 
     @Override
-    public ElementsList<Element> $$i(String id) {
+    public Elements<Element> $$i(String id) {
         return getRoot().$$i(id);
     }
 
     @Override
-    public ElementsList<Element> $$n(String name) {
+    public Elements<Element> $$n(String name) {
         return getRoot().$$n(name);
     }
 
     @Override
-    public ElementsList<Element> $$x(String xpath) {
+    public Elements<Element> $$x(String xpath) {
         return getRoot().$$x(xpath);
-    }
-
-    @Override
-    public void initElements() {
-        PageElementsFactory.initElements(getRoot(), this);
     }
 
     public Element getRoot() {

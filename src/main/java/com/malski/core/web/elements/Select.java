@@ -38,4 +38,7 @@ public interface Select extends Element {
 
     org.openqa.selenium.support.ui.Select getWrappedSelect();
 
+    void waitUntilSelected();
+
+    void waitUntilUnselected();
 }

@@ -1,7 +1,12 @@
 package com.malski.google.validator;
 
-/**
- * Created by rmalski on 2016-04-04.
- */
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
+
 public class GoogleValidator {
+
+    public void checkResultsText(List<String> results, String texts) {
+        assertThat(results).contains(texts);
+    }
 }

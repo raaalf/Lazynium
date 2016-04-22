@@ -1,5 +1,7 @@
 package com.malski.google.web.api;
 
+import com.malski.core.web.page.Page;
+
 public interface SearchWithGoogle {
-    void searchFor(String phrase);
+    Page searchFor(String phrase);
 }

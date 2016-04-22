@@ -2,7 +2,7 @@ package com.malski.core.web.page;
 
 import com.malski.core.web.Browser;
 import com.malski.core.web.elements.Element;
-import com.malski.core.web.elements.ElementsList;
+import com.malski.core.web.elements.Elements;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -22,17 +22,13 @@ public interface WebComponent {
 
     Element $x(String xpath);
 
-    ElementsList<Element> getElements(By by);
+    Elements<Element> getElements(By by);
 
-    ElementsList<Element> $$(String css);
+    Elements<Element> $$(String css);
 
-    ElementsList<Element> $$i(String id);
+    Elements<Element> $$i(String id);
 
-    ElementsList<Element> $$n(String name);
+    Elements<Element> $$n(String name);
 
-    ElementsList<Element> $$x(String xpath);
-
-    void initElements();
-
-    void checkUrl(String url2Check);
+    Elements<Element> $$x(String xpath);
 }

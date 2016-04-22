@@ -1,25 +1,26 @@
 package com.malski.core.web.elements;
 
+import com.malski.core.cucumber.TestContext;
+import com.malski.core.web.conditions.WaitConditions;
 import com.malski.core.web.factory.LazyLocator;
 import com.malski.core.web.factory.Locator;
-import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 public class ElementsImpl<T extends Element> implements Elements<T> {
     private LazyLocator locator;
     private List<T> elements;
     private Class elemClass;
-
-    /*public ElementsImpl(By by, SearchContext context, final Class<T> elemClass) {
-        this.locator = new Locator(context, by);
-        setElemClass(elemClass);
-    }*/
 
     public ElementsImpl(LazyLocator locator, final Class<T> elemClass) {
         this.locator = locator;
@@ -33,15 +34,10 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
 
     protected void setElemClass(Class<T> clazz) {
         try {
-            this.elemClass = Class.forName(clazz.getCanonicalName()+"Impl");
+            this.elemClass = Class.forName(clazz.getCanonicalName() + "Impl");
         } catch (ClassNotFoundException e) {
             this.elemClass = ElementImpl.class;
         }
-    }
-
-    @Override
-    public By getBy() {
-        return locator.getBy();
     }
 
     @Override
@@ -89,6 +85,11 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
     }
 
     @Override
+    public void forEach(Consumer<? super T> action) {
+        getWrappedElements().forEach(action);
+    }
+
+    @Override
     public Object[] toArray() {
         return getWrappedElements().toArray();
     }
@@ -129,8 +130,23 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
     }
 
     @Override
+    public boolean removeIf(Predicate<? super T> filter) {
+        return getWrappedElements().removeIf(filter);
+    }
+
+    @Override
     public boolean retainAll(Collection<?> c) {
         return getWrappedElements().retainAll(c);
+    }
+
+    @Override
+    public void replaceAll(UnaryOperator<T> operator) {
+        getWrappedElements().replaceAll(operator);
+    }
+
+    @Override
+    public void sort(Comparator<? super T> c) {
+        getWrappedElements().sort(c);
     }
 
     @Override
@@ -183,6 +199,21 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
         return getWrappedElements().subList(fromIndex, toIndex);
     }
 
+    @Override
+    public Spliterator<T> spliterator() {
+        return getWrappedElements().spliterator();
+    }
+
+    @Override
+    public Stream<T> stream() {
+        return getWrappedElements().stream();
+    }
+
+    @Override
+    public Stream<T> parallelStream() {
+        return getWrappedElements().parallelStream();
+    }
+
     public List<String> getTexts() {
         return elements.stream().map(Element::getText).collect(Collectors.toList());
     }
@@ -195,10 +226,191 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
         return elements.stream().map(Element::getId).collect(Collectors.toList());
     }
 
-    protected List<T> getWrappedElements() {
-        if(elements == null) {
+    public List<T> getWrappedElements() {
+        if (elements == null) {
             refresh();
         }
         return elements;
+    }
+
+    @Override
+    public void waitUntilAllPresent() {
+        TestContext.getBrowser().getWait().until(presenceOfAllElementsLocatedBy(locator.getSelector().getBy()));
+    }
+
+    @Override
+    public void waitUntilAnyPresent() {
+        TestContext.getBrowser().getWait().until(presenceOfElementLocated(locator.getSelector().getBy()));
+    }
+
+    @Override
+    public void waitUntilAllVisible() {
+        TestContext.getBrowser().getWait().until(visibilityOfAllElementsLocatedBy(locator.getSelector().getBy()));
+    }
+
+    @Override
+    public void waitUntilAnyVisible() {
+        TestContext.getBrowser().getWait().until(visibilityOfElementLocated(locator.getSelector().getBy()));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void waitUntilAllDisappear() {
+        TestContext.getBrowser().getWait().until(WaitConditions.invisibilityOfAllElements(getWrappedElements()));
+    }
+
+    @Override
+    public void waitUntilAnyDisappear() {
+        TestContext.getBrowser().getWait().until(invisibilityOfElementLocated(locator.getSelector().getBy()));
+    }
+
+    @Override
+    public void waitUntilAllEnabled() {
+        TestContext.getBrowser().getWait().until(WaitConditions.elementsToBeClickable(locator.getSelector().getBy()));
+    }
+
+    @Override
+    public void waitUntilAnyEnabled() {
+        TestContext.getBrowser().getWait().until(elementToBeClickable(locator.getSelector().getBy()));
+    }
+
+    @Override
+    public void waitUntilAllDisabled() {
+        TestContext.getBrowser().getWait().until(not(WaitConditions.elementsToBeClickable(locator.getSelector().getBy())));
+    }
+
+    @Override
+    public void waitUntilAnyDisabled() {
+        TestContext.getBrowser().getWait().until(not(elementToBeClickable(locator.getSelector().getBy())));
+    }
+
+//    @Override
+//    public void waitUntilAllSelected() {
+//        TestContext.getBrowser().getWait().until(elementToBeSelected(this));
+//    }
+//
+//    @Override
+//    public void waitUntilAnySelected() {
+//        TestContext.getBrowser().getWait().until(elementToBeSelected(this));
+//    }
+//
+//    @Override
+//    public void waitUntilAllUnselected() {
+//        TestContext.getBrowser().getWait().until(elementSelectionStateToBe(this, false));
+//    }
+//
+//    @Override
+//    public void waitUntilAnyUnselected() {
+//        TestContext.getBrowser().getWait().until(elementSelectionStateToBe(this, false));
+//    }
+
+    @Override
+    public boolean areAllVisible() {
+        for (T element : getWrappedElements()) {
+            if (!element.isVisible()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isAnyVisible() {
+        for (T element : getWrappedElements()) {
+            if (element.isVisible()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean areAllPresent() {
+        for (T element : getWrappedElements()) {
+            if (!element.isPresent()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isAnyPresent() {
+        for (T element : getWrappedElements()) {
+            if (element.isPresent()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean areAllEnabled() {
+        for (T element : getWrappedElements()) {
+            if (!element.isEnabled()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isAnyEnabled() {
+        for (T element : getWrappedElements()) {
+            if (element.isEnabled()) {
+                return true;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean hasAnyFocus() {
+        for (T element : getWrappedElements()) {
+            if (element.hasFocus()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean areAllSelected() {
+        for (T element : getWrappedElements()) {
+            if (!element.isSelected()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isAnySelected() {
+        for (T element : getWrappedElements()) {
+            if (element.isSelected()) {
+                return true;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean areAllUnselected() {
+        for (T element : getWrappedElements()) {
+            if (element.isSelected()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isAnyUnselected() {
+        for (T element : getWrappedElements()) {
+            if (!element.isSelected()) {
+                return true;
+            }
+        }
+        return true;
     }
 }

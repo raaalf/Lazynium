@@ -1,13 +1,12 @@
 package com.malski.google.web.pages;
 
-import com.malski.core.web.Browser;
+import com.malski.core.web.annotations.PageInfo;
 import com.malski.core.web.elements.Input;
 import com.malski.core.web.page.Page;
 import com.malski.google.web.api.SearchWithGoogle;
-import com.malski.google.web.modules.SearchForm;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
+@PageInfo(url = "https://www.google.com")
 public class MainPage extends Page implements SearchWithGoogle {
     @FindBy(id = "lst-ib")
     private Input searchInput;
@@ -15,24 +14,20 @@ public class MainPage extends Page implements SearchWithGoogle {
     @FindBy(css = "input[type='submit'][jsaction='sf.chk']")
     private Input searchButton;
 
-    private SearchForm searchForm;
+    public MainPage() {
+        super();
+    }
 
-    public MainPage(Browser browser) {
-        super(browser);
-        searchForm = new SearchForm(browser);
+    public MainPage open() {
+        getBrowser().get(getUrl());
+        return this;
     }
 
     @Override
-    public void waitToLoad() {
-        getWait().until(ExpectedConditions.presenceOfElementLocated(searchInput.getBy()));
-    }
-
-    public SearchForm getSearchForm() {
-        return searchForm;
-    }
-
-    @Override
-    public void searchFor(String phrase) {
+    public ResultsPage searchFor(String phrase) {
         searchInput.fill(phrase);
+        ResultsPage resultsPage = nextPage(ResultsPage.class);
+        resultsPage.waitForResults();
+        return resultsPage;
     }
 }

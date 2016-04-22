@@ -1,5 +1,6 @@
 package com.malski.core.web.elements;
 
+import com.malski.core.cucumber.TestContext;
 import com.malski.core.web.factory.LazyLocator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -8,6 +9,9 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import static org.openqa.selenium.support.ui.ExpectedConditions.elementSelectionStateToBe;
+import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeSelected;
 
 public class SelectImpl extends ElementImpl implements Select {
     private org.openqa.selenium.support.ui.Select innerSelect;
@@ -128,5 +132,15 @@ public class SelectImpl extends ElementImpl implements Select {
     @Override
     public void selectByIndex(int index) {
         innerSelect.selectByIndex(index);
+    }
+
+    @Override
+    public void waitUntilSelected() {
+        TestContext.getBrowser().getWait().until(elementToBeSelected(this));
+    }
+
+    @Override
+    public void waitUntilUnselected() {
+        TestContext.getBrowser().getWait().until(elementSelectionStateToBe(this, false));
     }
 }

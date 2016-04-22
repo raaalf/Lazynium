@@ -1,6 +1,6 @@
 package com.malski.core.web.factory;
 
-import com.malski.core.web.elements.Element;
+import com.malski.core.web.elements.*;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.internal.WrapsElement;
@@ -8,6 +8,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 import org.openqa.selenium.support.pagefactory.FieldDecorator;
+import org.openqa.selenium.support.pagefactory.internal.LocatingElementListHandler;
 
 import java.lang.reflect.*;
 import java.util.List;
@@ -77,6 +78,15 @@ public class ElementDecorator implements FieldDecorator {
     @SuppressWarnings("unchecked")
     protected <T> List<T> proxyForListLocator(ClassLoader loader, Class<T> interfaceType, LazyLocator locator) {
         InvocationHandler handler = new ElementListHandler(interfaceType, locator);
-        return (List<T>) Proxy.newProxyInstance(loader, new Class[]{List.class}, handler);
+        List<T> proxy;
+        proxy = (List<T>) Proxy.newProxyInstance(loader, new Class[]{List.class, ElementsWait.class, ElementsStates.class}, handler);
+        return proxy;
+    }
+
+    /* Generate a type-parameterized locator proxy for the element in question. */
+    protected <T> T proxyForModule(ClassLoader loader, Class<T> interfaceType, LazyLocator locator) {
+        InvocationHandler handler = new ElementHandler(interfaceType, locator);
+        return interfaceType.cast(Proxy.newProxyInstance(
+                loader, new Class[]{interfaceType, WebElement.class, WrapsElement.class, Locatable.class, ElementStates.class, ElementWait.class}, handler));
     }
 }

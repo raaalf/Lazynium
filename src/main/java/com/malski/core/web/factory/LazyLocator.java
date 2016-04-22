@@ -7,7 +7,7 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 import java.util.List;
 
 public interface LazyLocator extends ElementLocator {
-    By getBy();
-    Element getElement();
-    List<Element> getElements();
+    Selector getSelector();
+    <T extends Element> Element getElement(Class<T> clazz);
+    <T extends Element> List<? extends Element> getElements(Class<T> clazz);
 }

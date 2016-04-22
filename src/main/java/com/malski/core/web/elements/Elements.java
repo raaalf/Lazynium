@@ -5,8 +5,7 @@ import org.openqa.selenium.By;
 
 import java.util.List;
 
-public interface Elements<T extends Element> extends List<T> {
-    By getBy();
+public interface Elements<T extends Element> extends List<T>, ElementsWait, ElementsStates {
 
     LazyLocator getLocator();
 
