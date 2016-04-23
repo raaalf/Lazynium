@@ -10,9 +10,11 @@ import com.malski.core.web.elements.Element;
 import com.malski.core.web.elements.Elements;
 import com.malski.core.web.factory.LazyPageFactory;
 import org.apache.commons.lang3.StringUtils;
-import org.assertj.core.api.Assertions;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.FluentWait;
+
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.CoreMatchers.*;
 
 /**
  * Class which is representing displayed page and allow to performing basic actions on it
@@ -114,14 +116,14 @@ public abstract class Page implements WebView {
             PageInfo pageInfo = this.getClass().getAnnotation(PageInfo.class);
             url = pageInfo.url();
             if(!StringUtils.isEmpty(pageInfo.check())) {
-                Assertions.assertThat(browser.getCurrentUrl()).matches(pageInfo.check());
+                assertThat("Check if url match to pattern", getBrowser().getCurrentUrl().matches(pageInfo.check()), is(true));
             }
         }
     }
 
     private void waitToLoad() {
         try {
-            getWait().until(WaitConditions.pageLoaded(browser.getWebDriver()));
+            getWait().until(WaitConditions.pageLoaded(getBrowser().getWebDriver()));
         } catch (TimeoutException | NullPointerException e) {
             //sometimes PageInfo remains in Interactive mode and never becomes Complete, then we can still try to access the controls
             String state = jsExecutor.getReadyState();

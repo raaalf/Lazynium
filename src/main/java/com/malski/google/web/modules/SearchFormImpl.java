@@ -23,7 +23,6 @@ public class SearchFormImpl extends Module implements SearchForm {
 
     public SearchForm searchFor(String phrase) {
         searchInput.fill(phrase);
-        searchButton.click();
         return this;
     }
 }

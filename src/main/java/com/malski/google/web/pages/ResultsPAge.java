@@ -8,17 +8,16 @@ import com.malski.core.web.page.Page;
 import com.malski.google.web.api.SearchWithGoogle;
 import com.malski.google.web.modules.SearchForm;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
 
 import java.util.List;
 
-@PageInfo(check = "https://www.google\\.com/\\?gfe_rd\\=cr\\&ei\\=")
+@PageInfo(check = "https:\\/\\/www\\.google\\.[a-z]{2,3}\\/\\?gfe_rd=cr\\&ei=\\S+")
 public class ResultsPage extends Page implements SearchWithGoogle {
 
-    @FindBys({@FindBy(xpath = "//div[@id='rso']//div[@class='rc']/*[@class='r']/a")})
+    @FindBy(xpath = "//div[@id='rso']//div[@class='rc']/*[@class='r']/a")
     private Elements<Element> results;
 
-    @Module
+    @Module(@FindBy(id = "searchform"))
     private SearchForm searchForm;
 
     public ResultsPage() {
