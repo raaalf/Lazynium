@@ -17,7 +17,7 @@ import org.openqa.selenium.support.ui.FluentWait;
 /**
  * Class which is representing displayed page and allow to performing basic actions on it
  */
-public abstract class Page implements WebComponent {
+public abstract class Page implements WebView {
     private final Browser browser;
     private final JsExecutor jsExecutor;
     private final ScreenShooter shooter;
@@ -53,22 +53,22 @@ public abstract class Page implements WebComponent {
 
     @Override
     public Element $(String css) {
-        return this.getElement(By.cssSelector(css));
+        return getElement(By.cssSelector(css));
     }
 
     @Override
     public Element $i(String id) {
-        return this.getElement(By.id(id));
+        return getElement(By.id(id));
     }
 
     @Override
     public Element $n(String name) {
-        return this.getElement(By.name(name));
+        return getElement(By.name(name));
     }
 
     @Override
     public Element $x(String xpath) {
-        return this.getElement(By.xpath(xpath));
+        return getElement(By.xpath(xpath));
     }
 
     @Override
@@ -78,22 +78,22 @@ public abstract class Page implements WebComponent {
 
     @Override
     public Elements<Element> $$(String css) {
-        return this.getElements(By.cssSelector(css));
+        return getElements(By.cssSelector(css));
     }
 
     @Override
     public Elements<Element> $$i(String id) {
-        return this.getElements(By.id(id));
+        return getElements(By.id(id));
     }
 
     @Override
     public Elements<Element> $$n(String name) {
-        return this.getElements(By.name(name));
+        return getElements(By.name(name));
     }
 
     @Override
     public Elements<Element> $$x(String xpath) {
-        return this.getElements(By.xpath(xpath));
+        return getElements(By.xpath(xpath));
     }
 
     public <T extends Page> T as(Class<T> cls) {
@@ -105,6 +105,10 @@ public abstract class Page implements WebComponent {
         return LazyPageFactory.initElements(getBrowser(), cls);
     }
 
+    public void takeScreenShot(String fileName) {
+        shooter.getScreenShot(fileName);
+    }
+
     private void handlePageInfo() {
         if(this.getClass().isAnnotationPresent(PageInfo.class)) {
             PageInfo pageInfo = this.getClass().getAnnotation(PageInfo.class);
@@ -113,10 +117,6 @@ public abstract class Page implements WebComponent {
                 Assertions.assertThat(browser.getCurrentUrl()).matches(pageInfo.check());
             }
         }
-    }
-
-    public void takeScreenShot(String fileName) {
-        shooter.getScreenShot(fileName);
     }
 
     private void waitToLoad() {

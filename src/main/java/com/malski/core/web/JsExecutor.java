@@ -5,8 +5,7 @@ import com.malski.core.web.factory.Selector;
 import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
-
-import static com.malski.core.web.factory.Selector.Type.CSS;
+import org.openqa.selenium.support.How;
 
 public class JsExecutor {
     private JavascriptExecutor executor;
@@ -32,7 +31,7 @@ public class JsExecutor {
     }
 
     public void setValue(Element element, String value) {
-        String script = element.getSelector().getType().equals(CSS) ? String.format("value=%s", value) : String.format("val('%s').change()", value);
+        String script = element.getSelector().getHow().equals(How.CSS) ? String.format("value=%s", value) : String.format("val('%s').change()", value);
         performAction(element.getSelector(), script);
     }
 
@@ -57,33 +56,33 @@ public class JsExecutor {
     }
 
     private void performAction(Selector selector, String action) {
-        switch (selector.getType()) {
+        switch (selector.getHow()) {
             case CSS:
-                callCssSelector("%s", selector.getValue(), action);
+                callCssSelector("%s", selector.getUsing(), action);
                 break;
             case ID:
-                callCssSelector("#%s", selector.getValue(), action);
+                callCssSelector("#%s", selector.getUsing(), action);
                 break;
             case XPATH:
-                callXpathSelector("%s", selector.getValue(), action);
+                callXpathSelector("%s", selector.getUsing(), action);
                 break;
             case NAME:
-                callCssSelector("[name=%s]", selector.getValue(), action);
+                callCssSelector("[name=%s]", selector.getUsing(), action);
                 break;
             case CLASS_NAME:
-                callCssSelector(".%s", selector.getValue(), action);
+                callCssSelector(".%s", selector.getUsing(), action);
                 break;
             case TAG_NAME:
-                callXpathSelector(".//%s", selector.getValue(), action);
+                callXpathSelector(".//%s", selector.getUsing(), action);
                 break;
             case LINK_TEXT:
-                callXpathSelector(".//a[normalize-space()='%s']", selector.getValue(), action);
+                callXpathSelector(".//a[normalize-space()='%s']", selector.getUsing(), action);
                 break;
             case PARTIAL_LINK_TEXT:
-                callXpathSelector(".//a[contains(.,'%s')]", selector.getValue(), action);
+                callXpathSelector(".//a[contains(.,'%s')]", selector.getUsing(), action);
                 break;
             default:
-                throw new InvalidSelectorException(String.format("Selector type '%s' is not supported", selector.getType().toString()));
+                throw new InvalidSelectorException(String.format("Selector type '%s' is not supported", selector.getHow().toString()));
         }
 
     }

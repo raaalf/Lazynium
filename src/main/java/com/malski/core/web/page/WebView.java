@@ -7,7 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 
-public interface WebComponent {
+public interface WebView {
     Browser getBrowser();
 
     FluentWait<WebDriver> getWait();

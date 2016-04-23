@@ -3,7 +3,7 @@ package com.malski.core.web.elements;
 import com.malski.core.cucumber.TestContext;
 import com.malski.core.web.conditions.WaitConditions;
 import com.malski.core.web.factory.LazyLocator;
-import com.malski.core.web.factory.Locator;
+import com.malski.core.web.factory.LazyLocatorImpl;
 import org.openqa.selenium.*;
 
 import java.lang.reflect.Constructor;
@@ -28,7 +28,7 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
     }
 
     public ElementsImpl(By by, SearchContext context, final Class<T> elemClass) {
-        this.locator = new Locator(context, by);
+        this.locator = new LazyLocatorImpl(context, by);
         setElemClass(elemClass);
     }
 
@@ -54,7 +54,7 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
             Constructor<T> cons = elemClass.getConstructor(LazyLocator.class, WebElement.class);
             webElements.forEach(webElement -> {
                 try {
-                    getWrappedElements().add(cons.newInstance(locator, webElement));
+                    getWrappedElements().add(cons.newInstance(getLocator(), webElement));
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
@@ -215,7 +215,7 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
     }
 
     public List<String> getTexts() {
-        return elements.stream().map(Element::getText).collect(Collectors.toList());
+        return getWrappedElements().stream().map(Element::getText).collect(Collectors.toList());
     }
 
     public List<String> getValues() {
@@ -235,22 +235,22 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
 
     @Override
     public void waitUntilAllPresent() {
-        TestContext.getBrowser().getWait().until(presenceOfAllElementsLocatedBy(locator.getSelector().getBy()));
+        TestContext.getBrowser().getWait().until(presenceOfAllElementsLocatedBy(getLocator().getSelector().getBy()));
     }
 
     @Override
     public void waitUntilAnyPresent() {
-        TestContext.getBrowser().getWait().until(presenceOfElementLocated(locator.getSelector().getBy()));
+        TestContext.getBrowser().getWait().until(presenceOfElementLocated(getLocator().getSelector().getBy()));
     }
 
     @Override
     public void waitUntilAllVisible() {
-        TestContext.getBrowser().getWait().until(visibilityOfAllElementsLocatedBy(locator.getSelector().getBy()));
+        TestContext.getBrowser().getWait().until(visibilityOfAllElementsLocatedBy(getLocator().getSelector().getBy()));
     }
 
     @Override
     public void waitUntilAnyVisible() {
-        TestContext.getBrowser().getWait().until(visibilityOfElementLocated(locator.getSelector().getBy()));
+        TestContext.getBrowser().getWait().until(visibilityOfElementLocated(getLocator().getSelector().getBy()));
     }
 
     @Override
@@ -261,27 +261,27 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
 
     @Override
     public void waitUntilAnyDisappear() {
-        TestContext.getBrowser().getWait().until(invisibilityOfElementLocated(locator.getSelector().getBy()));
+        TestContext.getBrowser().getWait().until(invisibilityOfElementLocated(getLocator().getSelector().getBy()));
     }
 
     @Override
     public void waitUntilAllEnabled() {
-        TestContext.getBrowser().getWait().until(WaitConditions.elementsToBeClickable(locator.getSelector().getBy()));
+        TestContext.getBrowser().getWait().until(WaitConditions.elementsToBeClickable(getLocator().getSelector().getBy()));
     }
 
     @Override
     public void waitUntilAnyEnabled() {
-        TestContext.getBrowser().getWait().until(elementToBeClickable(locator.getSelector().getBy()));
+        TestContext.getBrowser().getWait().until(elementToBeClickable(getLocator().getSelector().getBy()));
     }
 
     @Override
     public void waitUntilAllDisabled() {
-        TestContext.getBrowser().getWait().until(not(WaitConditions.elementsToBeClickable(locator.getSelector().getBy())));
+        TestContext.getBrowser().getWait().until(not(WaitConditions.elementsToBeClickable(getLocator().getSelector().getBy())));
     }
 
     @Override
     public void waitUntilAnyDisabled() {
-        TestContext.getBrowser().getWait().until(not(elementToBeClickable(locator.getSelector().getBy())));
+        TestContext.getBrowser().getWait().until(not(elementToBeClickable(getLocator().getSelector().getBy())));
     }
 
 //    @Override

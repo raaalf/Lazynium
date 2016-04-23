@@ -4,6 +4,7 @@ import com.malski.core.web.elements.Element;
 import com.malski.core.web.elements.ElementImpl;
 import com.malski.core.web.elements.Elements;
 import com.malski.core.web.elements.ElementsImpl;
+import com.malski.core.web.factory.LazyLocator;
 import io.github.bonigarcia.wdm.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -102,8 +103,16 @@ public class Browser implements WebDriver {
         return new ElementImpl(by, getWebDriver());
     }
 
+    public Element getElement(LazyLocator locator) {
+        return new ElementImpl(locator);
+    }
+
     public Elements<Element> getElements(By by) {
         return new ElementsImpl<>(by, getWebDriver(), Element.class);
+    }
+
+    public Elements<Element> getElements(LazyLocator locator) {
+        return new ElementsImpl<>(locator, Element.class);
     }
 
     public WebDriver getWebDriver() {

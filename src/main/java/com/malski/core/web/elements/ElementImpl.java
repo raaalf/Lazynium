@@ -2,7 +2,7 @@ package com.malski.core.web.elements;
 
 import com.malski.core.cucumber.TestContext;
 import com.malski.core.web.factory.LazyLocator;
-import com.malski.core.web.factory.Locator;
+import com.malski.core.web.factory.LazyLocatorImpl;
 import com.malski.core.web.factory.Selector;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.internal.Coordinates;
@@ -20,7 +20,7 @@ public class ElementImpl implements Element {
     private LazyLocator locator;
 
     public ElementImpl(By by, SearchContext context) {
-        this.locator = new Locator(context, by);
+        this.locator = new LazyLocatorImpl(context, by);
     }
 
     public ElementImpl(LazyLocator locator) {
@@ -33,7 +33,7 @@ public class ElementImpl implements Element {
     }
 
     public ElementImpl(By by, WebElement element) {
-        this.locator = new Locator(element, by);
+        this.locator = new LazyLocatorImpl(element, by);
         this.element = element;
     }
 
@@ -139,12 +139,12 @@ public class ElementImpl implements Element {
 
 //    @Override
 //    public By getBy() {
-//        return locator.getBy();
+//        return getLocator().getBy();
 //    }
 
     @Override
     public Selector getSelector() {
-        return locator.getSelector();
+        return getLocator().getSelector();
     }
 
     @Override

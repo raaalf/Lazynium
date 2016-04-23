@@ -28,7 +28,7 @@ public class GoogleSteps {
     }
 
     @When("^I search for \"(.+)\"$")
-    public void search_for_page(String phrase) {
+    public void search_for(String phrase) {
         MainPage mainPage = TestContext.getPage().as(MainPage.class);
         TestContext.setPage(mainPage.searchFor(phrase));
     }
@@ -37,6 +37,12 @@ public class GoogleSteps {
     public void verify_that_page_is_in_results(String pageName) {
         ResultsPage resultsPage = TestContext.getPage().as(ResultsPage.class);
         validator.checkResultsText(resultsPage.getResultTitles(), pageName);
+    }
+
+    @When("^I research for \"(.+)\"$")
+    public void research_for(String phrase) {
+        ResultsPage resultsPage = TestContext.getPage().as(ResultsPage.class);
+        resultsPage.getSearchForm().searchFor(phrase);
     }
 
     @After
