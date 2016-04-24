@@ -1,6 +1,7 @@
 package com.malski.core.web.factory;
 
 import com.malski.core.web.elements.Element;
+import org.openqa.selenium.WebElement;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -29,6 +30,11 @@ public class ElementHandler implements InvocationHandler {
     public Object getElementImplementation() throws Throwable {
         Constructor cons = wrappingType.getConstructor(LazyLocator.class);
         return cons.newInstance(locator);
+    }
+
+    public <T extends Element> T getElementImplementation(WebElement element) throws Throwable {
+        Constructor cons = wrappingType.getConstructor(LazyLocator.class, WebElement.class);
+        return (T) cons.newInstance(locator, element);
     }
 
     @Override

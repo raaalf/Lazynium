@@ -2,12 +2,11 @@ package com.malski.core.web.elements;
 
 import com.malski.core.cucumber.TestContext;
 import com.malski.core.web.conditions.WaitConditions;
+import com.malski.core.web.factory.ElementHandler;
 import com.malski.core.web.factory.LazyLocator;
 import com.malski.core.web.factory.LazyLocatorImpl;
 import org.openqa.selenium.*;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -17,27 +16,19 @@ import java.util.stream.Stream;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
-public class ElementsImpl<T extends Element> implements Elements<T> {
+public class ElementsImpl<E extends Element> implements Elements<E> {
     private LazyLocator locator;
-    private List<T> elements;
-    private Class elemClass;
+    private List<E> elements;
+    private Class<E> elementInterface;
 
-    public ElementsImpl(LazyLocator locator, final Class<T> elemClass) {
+    public ElementsImpl(LazyLocator locator, final Class<E> elementInterface) {
         this.locator = locator;
-        setElemClass(elemClass);
+        this.elementInterface = elementInterface;
     }
 
-    public ElementsImpl(By by, SearchContext context, final Class<T> elemClass) {
+    public ElementsImpl(By by, SearchContext context, final Class<E> elementInterface) {
         this.locator = new LazyLocatorImpl(context, by);
-        setElemClass(elemClass);
-    }
-
-    protected void setElemClass(Class<T> clazz) {
-        try {
-            this.elemClass = Class.forName(clazz.getCanonicalName() + "Impl");
-        } catch (ClassNotFoundException e) {
-            this.elemClass = ElementImpl.class;
-        }
+        this.elementInterface = elementInterface;
     }
 
     @Override
@@ -49,17 +40,17 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
     public void refresh() {
         elements = new ArrayList<>();
         List<WebElement> webElements = getLocator().findElements();
+        ElementHandler handler = new ElementHandler(elementInterface, getLocator());
         try {
-            @SuppressWarnings("unchecked")
-            Constructor<T> cons = elemClass.getConstructor(LazyLocator.class, WebElement.class);
             webElements.forEach(webElement -> {
                 try {
-                    getWrappedElements().add(cons.newInstance(getLocator(), webElement));
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
+                    E element = handler.getElementImplementation(webElement);
+                    getWrappedElements().add(element);
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
                 }
             });
-        } catch (NoSuchMethodException e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }
@@ -80,12 +71,12 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
     }
 
     @Override
-    public Iterator<T> iterator() {
+    public Iterator<E> iterator() {
         return getWrappedElements().iterator();
     }
 
     @Override
-    public void forEach(Consumer<? super T> action) {
+    public void forEach(Consumer<? super E> action) {
         getWrappedElements().forEach(action);
     }
 
@@ -100,8 +91,8 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
     }
 
     @Override
-    public boolean add(T t) {
-        return getWrappedElements().add(t);
+    public boolean add(E e) {
+        return getWrappedElements().add(e);
     }
 
     @Override
@@ -115,12 +106,12 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
     }
 
     @Override
-    public boolean addAll(Collection<? extends T> c) {
+    public boolean addAll(Collection<? extends E> c) {
         return getWrappedElements().addAll(c);
     }
 
     @Override
-    public boolean addAll(int index, Collection<? extends T> c) {
+    public boolean addAll(int index, Collection<? extends E> c) {
         return getWrappedElements().addAll(index, c);
     }
 
@@ -130,7 +121,7 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
     }
 
     @Override
-    public boolean removeIf(Predicate<? super T> filter) {
+    public boolean removeIf(Predicate<? super E> filter) {
         return getWrappedElements().removeIf(filter);
     }
 
@@ -140,12 +131,12 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
     }
 
     @Override
-    public void replaceAll(UnaryOperator<T> operator) {
+    public void replaceAll(UnaryOperator<E> operator) {
         getWrappedElements().replaceAll(operator);
     }
 
     @Override
-    public void sort(Comparator<? super T> c) {
+    public void sort(Comparator<? super E> c) {
         getWrappedElements().sort(c);
     }
 
@@ -155,22 +146,22 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
     }
 
     @Override
-    public T get(int index) {
+    public E get(int index) {
         return getWrappedElements().get(index);
     }
 
     @Override
-    public T set(int index, T element) {
+    public E set(int index, E element) {
         return getWrappedElements().set(index, element);
     }
 
     @Override
-    public void add(int index, T element) {
+    public void add(int index, E element) {
         getWrappedElements().add(index, element);
     }
 
     @Override
-    public T remove(int index) {
+    public E remove(int index) {
         return getWrappedElements().remove(index);
     }
 
@@ -185,32 +176,32 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
     }
 
     @Override
-    public ListIterator<T> listIterator() {
+    public ListIterator<E> listIterator() {
         return getWrappedElements().listIterator();
     }
 
     @Override
-    public ListIterator<T> listIterator(int index) {
+    public ListIterator<E> listIterator(int index) {
         return getWrappedElements().listIterator(index);
     }
 
     @Override
-    public List<T> subList(int fromIndex, int toIndex) {
+    public List<E> subList(int fromIndex, int toIndex) {
         return getWrappedElements().subList(fromIndex, toIndex);
     }
 
     @Override
-    public Spliterator<T> spliterator() {
+    public Spliterator<E> spliterator() {
         return getWrappedElements().spliterator();
     }
 
     @Override
-    public Stream<T> stream() {
+    public Stream<E> stream() {
         return getWrappedElements().stream();
     }
 
     @Override
-    public Stream<T> parallelStream() {
+    public Stream<E> parallelStream() {
         return getWrappedElements().parallelStream();
     }
 
@@ -226,7 +217,8 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
         return elements.stream().map(Element::getId).collect(Collectors.toList());
     }
 
-    public List<T> getWrappedElements() {
+    public List<E> getWrappedElements() {
+        TestContext.getBrowser().waitForPageToLoad();
         if (elements == null) {
             refresh();
         }
@@ -306,7 +298,7 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
 
     @Override
     public boolean areAllVisible() {
-        for (T element : getWrappedElements()) {
+        for (E element : getWrappedElements()) {
             if (!element.isVisible()) {
                 return false;
             }
@@ -316,7 +308,7 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
 
     @Override
     public boolean isAnyVisible() {
-        for (T element : getWrappedElements()) {
+        for (E element : getWrappedElements()) {
             if (element.isVisible()) {
                 return true;
             }
@@ -326,7 +318,7 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
 
     @Override
     public boolean areAllPresent() {
-        for (T element : getWrappedElements()) {
+        for (E element : getWrappedElements()) {
             if (!element.isPresent()) {
                 return false;
             }
@@ -336,7 +328,7 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
 
     @Override
     public boolean isAnyPresent() {
-        for (T element : getWrappedElements()) {
+        for (E element : getWrappedElements()) {
             if (element.isPresent()) {
                 return true;
             }
@@ -346,7 +338,7 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
 
     @Override
     public boolean areAllEnabled() {
-        for (T element : getWrappedElements()) {
+        for (E element : getWrappedElements()) {
             if (!element.isEnabled()) {
                 return false;
             }
@@ -356,7 +348,7 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
 
     @Override
     public boolean isAnyEnabled() {
-        for (T element : getWrappedElements()) {
+        for (E element : getWrappedElements()) {
             if (element.isEnabled()) {
                 return true;
             }
@@ -366,7 +358,7 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
 
     @Override
     public boolean hasAnyFocus() {
-        for (T element : getWrappedElements()) {
+        for (E element : getWrappedElements()) {
             if (element.hasFocus()) {
                 return true;
             }
@@ -376,7 +368,7 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
 
     @Override
     public boolean areAllSelected() {
-        for (T element : getWrappedElements()) {
+        for (E element : getWrappedElements()) {
             if (!element.isSelected()) {
                 return false;
             }
@@ -386,7 +378,7 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
 
     @Override
     public boolean isAnySelected() {
-        for (T element : getWrappedElements()) {
+        for (E element : getWrappedElements()) {
             if (element.isSelected()) {
                 return true;
             }
@@ -396,7 +388,7 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
 
     @Override
     public boolean areAllUnselected() {
-        for (T element : getWrappedElements()) {
+        for (E element : getWrappedElements()) {
             if (element.isSelected()) {
                 return false;
             }
@@ -406,7 +398,7 @@ public class ElementsImpl<T extends Element> implements Elements<T> {
 
     @Override
     public boolean isAnyUnselected() {
-        for (T element : getWrappedElements()) {
+        for (E element : getWrappedElements()) {
             if (!element.isSelected()) {
                 return true;
             }

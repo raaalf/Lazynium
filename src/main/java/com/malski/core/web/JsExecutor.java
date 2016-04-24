@@ -4,14 +4,15 @@ import com.malski.core.web.elements.Element;
 import com.malski.core.web.factory.Selector;
 import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.How;
 
 public class JsExecutor {
     private JavascriptExecutor executor;
 
-    public JsExecutor(Browser browser) {
-        executor = (JavascriptExecutor) browser.getWebDriver();
+    public JsExecutor(WebDriver driver) {
+        executor = (JavascriptExecutor) driver;
     }
 
     public Object executeScript(String script, Object... objects) {

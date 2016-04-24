@@ -23,26 +23,24 @@ public class GoogleSteps {
 
     @Given("^I open google main page$")
     public void open_google_main_page() {
-        MainPage mainPage = new MainPage();
-        TestContext.setPage(mainPage.open());
+        new MainPage().
+                open();
     }
 
     @When("^I search for \"(.+)\"$")
     public void search_for(String phrase) {
-        MainPage mainPage = TestContext.getPage().as(MainPage.class);
-        TestContext.setPage(mainPage.searchFor(phrase));
+        new MainPage().
+                searchFor(phrase);
     }
 
     @Then("^verify that page \"(.+)\" is in results$")
     public void verify_that_page_is_in_results(String pageName) {
-        ResultsPage resultsPage = TestContext.getPage().as(ResultsPage.class);
-        validator.checkResultsText(resultsPage.getResultTitles(), pageName);
+        validator.checkResultsText(new ResultsPage().getResultTitles(), pageName);
     }
 
     @When("^I research for \"(.+)\"$")
     public void research_for(String phrase) {
-        ResultsPage resultsPage = TestContext.getPage().as(ResultsPage.class);
-        resultsPage.getSearchForm().searchFor(phrase);
+        new ResultsPage().searchFor(phrase);
     }
 
     @After

@@ -159,6 +159,7 @@ public class ElementImpl implements Element {
 
     @Override
     public WebElement getWrappedElement() {
+        TestContext.getBrowser().waitForPageToLoad();
         if(element == null) {
             refresh();
         }

@@ -3,6 +3,7 @@ package com.malski.core.web;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.ScreenshotException;
 
 import java.io.File;
@@ -11,8 +12,8 @@ import java.io.IOException;
 public class ScreenShooter {
     private TakesScreenshot shooter;
 
-    public ScreenShooter(Browser browser) {
-        shooter = (TakesScreenshot) browser.getWebDriver();
+    public ScreenShooter(WebDriver driver) {
+        shooter = (TakesScreenshot) driver;
     }
 
     public void getScreenShot(String fileName) {

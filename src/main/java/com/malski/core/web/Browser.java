@@ -1,5 +1,6 @@
 package com.malski.core.web;
 
+import com.malski.core.web.conditions.WaitConditions;
 import com.malski.core.web.elements.Element;
 import com.malski.core.web.elements.ElementImpl;
 import com.malski.core.web.elements.Elements;
@@ -24,14 +25,26 @@ import java.util.concurrent.TimeUnit;
  * Browser class is implementation of WebDriver to execute basic actions using it
  */
 public class Browser implements WebDriver {
-    private WebDriver driver;
+    private final WebDriver driver;
+    private final JsExecutor jsExecutor;
+    private final ScreenShooter shooter;
     private FluentWait<WebDriver> wait;
 
     private static final long TIMEOUT_SECONDS = 30;
 
     public Browser(String browserType) {
         this.driver = initializeWebDriver(browserType.toLowerCase());
+        this.jsExecutor = new JsExecutor(driver);
+        this.shooter = new ScreenShooter(driver);
         this.setDefaultWaitTimeout();
+    }
+
+    public JsExecutor getJsExecutor() {
+        return this.jsExecutor;
+    }
+
+    public ScreenShooter getScreenShooter() {
+        return this.shooter;
     }
 
     @Override
@@ -136,8 +149,21 @@ public class Browser implements WebDriver {
         this.wait = new WebDriverWait(getWebDriver(), seconds);
     }
 
-    public Object executeScript(String script, Object... objects) {
-        return ((JavascriptExecutor) getWebDriver()).executeScript(script, objects);
+    public void takeScreenShot(String fileName) {
+        shooter.getScreenShot(fileName);
+    }
+
+    public void waitForPageToLoad() {
+        try {
+            getWait().until(WaitConditions.pageLoaded(getWebDriver()));
+        } catch (TimeoutException | NullPointerException e) {
+            //sometimes PageInfo remains in Interactive mode and never becomes Complete, then we can still try to access the controls
+            String state = getJsExecutor().getReadyState();
+            if (!state.equalsIgnoreCase("interactive")) throw e;
+        } catch (WebDriverException e) {
+            String state = getJsExecutor().getReadyState();
+            if (!(state.equalsIgnoreCase("complete") || state.equalsIgnoreCase("loaded"))) throw e;
+        }
     }
 
     public boolean elementExists(By locator) {

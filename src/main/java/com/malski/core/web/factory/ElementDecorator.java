@@ -83,7 +83,7 @@ public class ElementDecorator implements FieldDecorator {
     }
 
     /* Generate a type-parameterized locator proxy for the element in question. */
-    protected <T> T proxyForLocator(ClassLoader loader, Class<T> interfaceType, LazyLocator locator) {
+    private <T> T proxyForLocator(ClassLoader loader, Class<T> interfaceType, LazyLocator locator) {
         InvocationHandler handler = new ElementHandler(interfaceType, locator);
         return interfaceType.cast(Proxy.newProxyInstance(
                 loader, new Class[]{interfaceType, WebElement.class, WrapsElement.class, Locatable.class}, handler));
@@ -91,13 +91,13 @@ public class ElementDecorator implements FieldDecorator {
 
     /* generates a proxy for a list of elements to be wrapped. */
     @SuppressWarnings("unchecked")
-    protected <T> List<T> proxyForListLocator(ClassLoader loader, Class<T> interfaceType, LazyLocator locator) {
+    private <T> List<T> proxyForListLocator(ClassLoader loader, Class<T> interfaceType, LazyLocator locator) {
         InvocationHandler handler = new ElementListHandler(interfaceType, locator);
         return (List<T>) Proxy.newProxyInstance(loader, new Class[]{Elements.class, List.class, ElementsWait.class, ElementsStates.class}, handler);
     }
 
     /* Generate a type-parametrized locator proxy for the WebView in question. */
-    protected <T> T proxyForWebModule(ClassLoader loader, Class<T> interfaceType, LazyLocator locator) {
+    private <T> T proxyForWebModule(ClassLoader loader, Class<T> interfaceType, LazyLocator locator) {
         InvocationHandler handler = new WebModuleHandler(interfaceType, locator);
         return interfaceType.cast(Proxy.newProxyInstance(
                 loader, new Class[]{interfaceType, WebModule.class}, handler));

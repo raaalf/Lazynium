@@ -2,10 +2,7 @@ package com.malski.core.web.page;
 
 import com.malski.core.cucumber.TestContext;
 import com.malski.core.web.Browser;
-import com.malski.core.web.JsExecutor;
-import com.malski.core.web.ScreenShooter;
 import com.malski.core.web.annotations.PageInfo;
-import com.malski.core.web.conditions.WaitConditions;
 import com.malski.core.web.elements.Element;
 import com.malski.core.web.elements.Elements;
 import com.malski.core.web.factory.LazyPageFactory;
@@ -21,16 +18,12 @@ import static org.hamcrest.CoreMatchers.*;
  */
 public abstract class Page implements WebView {
     private final Browser browser;
-    private final JsExecutor jsExecutor;
-    private final ScreenShooter shooter;
     private String url;
 
     public Page() {
         this.browser = TestContext.getBrowser();
-        this.jsExecutor = TestContext.getJsExecutor();
-        this.shooter = TestContext.getScreenShooter();
         LazyPageFactory.initElements(getBrowser(), this);
-        this.waitToLoad();
+        browser.waitForPageToLoad();
         this.handlePageInfo();
     }
 
@@ -107,10 +100,6 @@ public abstract class Page implements WebView {
         return LazyPageFactory.initElements(getBrowser(), cls);
     }
 
-    public void takeScreenShot(String fileName) {
-        shooter.getScreenShot(fileName);
-    }
-
     private void handlePageInfo() {
         if(this.getClass().isAnnotationPresent(PageInfo.class)) {
             PageInfo pageInfo = this.getClass().getAnnotation(PageInfo.class);
@@ -118,19 +107,6 @@ public abstract class Page implements WebView {
             if(!StringUtils.isEmpty(pageInfo.check())) {
                 assertThat("Check if url match to pattern", getBrowser().getCurrentUrl().matches(pageInfo.check()), is(true));
             }
-        }
-    }
-
-    private void waitToLoad() {
-        try {
-            getWait().until(WaitConditions.pageLoaded(getBrowser().getWebDriver()));
-        } catch (TimeoutException | NullPointerException e) {
-            //sometimes PageInfo remains in Interactive mode and never becomes Complete, then we can still try to access the controls
-            String state = jsExecutor.getReadyState();
-            if (!state.equalsIgnoreCase("interactive")) throw e;
-        } catch (WebDriverException e) {
-            String state = jsExecutor.getReadyState();
-            if (!(state.equalsIgnoreCase("complete") || state.equalsIgnoreCase("loaded"))) throw e;
         }
     }
 }

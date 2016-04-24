@@ -9,8 +9,8 @@ import java.util.List;
 
 public interface LazyLocator extends ElementLocator {
     Selector getSelector();
-    <T extends Element> Element getElement(Class<T> clazz);
-    <T extends Element> Elements<? extends Element> getElements(Class<T> clazz);
+    <T extends Element> T getElement(Class<T> clazz);
+    <T extends Element> Elements<T> getElements(Class<T> clazz);
     Element getElement();
     List<? extends Element> getElements();
 

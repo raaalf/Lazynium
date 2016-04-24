@@ -1,8 +1,6 @@
 package com.malski.core.cucumber;
 
 import com.malski.core.web.Browser;
-import com.malski.core.web.JsExecutor;
-import com.malski.core.web.ScreenShooter;
 import com.malski.core.web.page.Page;
 
 import java.util.HashMap;
@@ -24,42 +22,6 @@ public class TestContext {
 
     public static void setBrowser(Browser browser) {
         BROWSER_THREAD_LOCAL.set(browser);
-        setJsExecutor(new JsExecutor(browser));
-        setScreenShooter(new ScreenShooter(browser));
-    }
-
-    //js executor
-    private static final ThreadLocal<JsExecutor> JS_EXECUTOR_THREAD_LOCAL;
-
-    static {
-        JS_EXECUTOR_THREAD_LOCAL = new ThreadLocal<>();
-    }
-
-    public static JsExecutor getJsExecutor() {
-        JsExecutor jsExecutor = JS_EXECUTOR_THREAD_LOCAL.get();
-        if (jsExecutor == null) throw new IllegalStateException("JsExecutor not set on the TestContext");
-        return jsExecutor;
-    }
-
-    private static void setJsExecutor(JsExecutor jsExecutor) {
-        JS_EXECUTOR_THREAD_LOCAL.set(jsExecutor);
-    }
-
-    //screen shooter
-    private static final ThreadLocal<ScreenShooter> SCREEN_SHOOTER_THREAD_LOCAL;
-
-    static {
-        SCREEN_SHOOTER_THREAD_LOCAL = new ThreadLocal<>();
-    }
-
-    public static ScreenShooter getScreenShooter() {
-        ScreenShooter screenShooter = SCREEN_SHOOTER_THREAD_LOCAL.get();
-        if (screenShooter == null) throw new IllegalStateException("JsExecutor not set on the TestContext");
-        return screenShooter;
-    }
-
-    private static void setScreenShooter(ScreenShooter screenShooter) {
-        SCREEN_SHOOTER_THREAD_LOCAL.set(screenShooter);
     }
 
     //page

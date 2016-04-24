@@ -37,7 +37,7 @@ public class LazyLocatorImpl implements ElementLocator, LazyLocator {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends Element> Element getElement(Class<T> clazz) {
+    public <T extends Element> T getElement(Class<T> clazz) {
         try {
             return (T) new ElementHandler(clazz, this).getElementImplementation();
         } catch (Throwable throwable) {
@@ -46,7 +46,7 @@ public class LazyLocatorImpl implements ElementLocator, LazyLocator {
     }
 
     @Override
-    public <T extends Element> Elements<? extends Element> getElements(Class<T> clazz) {
+    public <T extends Element> Elements<T> getElements(Class<T> clazz) {
         return new ElementsImpl<>(this, clazz);
     }
 
