@@ -78,7 +78,27 @@ public class ElementImpl implements Element {
     }
 
     @Override
+    public boolean isDisplayed(long timeout) {
+        try {
+            waitUntilDisabled(timeout);
+        } catch (Exception ignore) {
+            return false;
+        }
+        return getWrappedElement().isDisplayed();
+    }
+
+    @Override
     public boolean isVisible() {
+        return getWrappedElement().isDisplayed();
+    }
+
+    @Override
+    public boolean isVisible(long timeout) {
+        try {
+            waitUntilVisible(timeout);
+        } catch (Exception ignore) {
+            return false;
+        }
         return getWrappedElement().isDisplayed();
     }
 
@@ -93,12 +113,42 @@ public class ElementImpl implements Element {
     }
 
     @Override
+    public boolean isPresent(long timeout) {
+        try {
+            waitUntilPresent(timeout);
+        } catch (Exception ignore) {
+            return false;
+        }
+        return isPresent();
+    }
+
+    @Override
     public boolean isEnabled() {
         return getWrappedElement().isEnabled();
     }
 
     @Override
+    public boolean isEnabled(long timeout) {
+        try {
+            waitUntilEnabled(timeout);
+        } catch (Exception ignore) {
+            return false;
+        }
+        return getWrappedElement().isEnabled();
+    }
+
+    @Override
     public boolean hasFocus() {
+        return getWrappedElement().equals(TestContext.getBrowser().switchTo().activeElement());
+    }
+
+    @Override
+    public boolean hasFocus(long timeout) {
+        try {
+            waitUntilVisible(timeout);
+        } catch (Exception ignore) {
+            return false;
+        }
         return getWrappedElement().equals(TestContext.getBrowser().switchTo().activeElement());
     }
 
@@ -160,7 +210,7 @@ public class ElementImpl implements Element {
     @Override
     public WebElement getWrappedElement() {
         TestContext.getBrowser().waitForPageToLoad();
-        if(element == null) {
+        if (element == null) {
             refresh();
         }
         return element;
@@ -168,7 +218,7 @@ public class ElementImpl implements Element {
 
     @Override
     public Element getElement(By by) {
-        return new ElementImpl(by, getWrappedElement());
+        return new ElementImpl(by, getWrappedElement().findElement(by));
     }
 
     @Override
@@ -235,7 +285,7 @@ public class ElementImpl implements Element {
     public <T extends Element> T as(Class<T> iface) {
         try {
             @SuppressWarnings("unchecked")
-            Class<T> clazz = (Class<T>) Class.forName(iface.getCanonicalName()+"Impl");
+            Class<T> clazz = (Class<T>) Class.forName(iface.getCanonicalName() + "Impl");
             Constructor<T> constructor = clazz.getConstructor(LazyLocator.class);
             return constructor.newInstance(getLocator());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
@@ -260,8 +310,18 @@ public class ElementImpl implements Element {
     }
 
     @Override
+    public void waitUntilPresent(long timeout) {
+        TestContext.getBrowser().getWait(timeout).until(presenceOfElementLocated(getLocator().getSelector().getBy()));
+    }
+
+    @Override
     public void waitUntilVisible() {
         TestContext.getBrowser().getWait().until(visibilityOfElementLocated(getLocator().getSelector().getBy()));
+    }
+
+    @Override
+    public void waitUntilVisible(long timeout) {
+        TestContext.getBrowser().getWait(timeout).until(visibilityOfElementLocated(getLocator().getSelector().getBy()));
     }
 
     @Override
@@ -270,12 +330,27 @@ public class ElementImpl implements Element {
     }
 
     @Override
+    public void waitUntilDisappear(long timeout) {
+        TestContext.getBrowser().getWait(timeout).until(invisibilityOfElementLocated(getLocator().getSelector().getBy()));
+    }
+
+    @Override
     public void waitUntilEnabled() {
         TestContext.getBrowser().getWait().until(elementToBeClickable(getLocator().getSelector().getBy()));
     }
 
     @Override
+    public void waitUntilEnabled(long timeout) {
+        TestContext.getBrowser().getWait(timeout).until(elementToBeClickable(getLocator().getSelector().getBy()));
+    }
+
+    @Override
     public void waitUntilDisabled() {
         TestContext.getBrowser().getWait().until(not(elementToBeClickable(getLocator().getSelector().getBy())));
+    }
+
+    @Override
+    public void waitUntilDisabled(long timeout) {
+        TestContext.getBrowser().getWait(timeout).until(not(elementToBeClickable(getLocator().getSelector().getBy())));
     }
 }

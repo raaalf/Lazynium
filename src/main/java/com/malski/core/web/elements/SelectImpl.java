@@ -42,17 +42,17 @@ public class SelectImpl extends ElementImpl implements Select {
 
     @Override
     public boolean isMultiple() {
-        return innerSelect.isMultiple();
+        return getWrappedSelect().isMultiple();
     }
 
     @Override
     public void deselectByIndex(int index) {
-        innerSelect.deselectByIndex(index);
+        getWrappedSelect().deselectByIndex(index);
     }
 
     @Override
     public void selectByValue(String value) {
-        innerSelect.selectByValue(value);
+        getWrappedSelect().selectByValue(value);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class SelectImpl extends ElementImpl implements Select {
 
     @Override
     public void selectAll() {
-        this.getOptions().stream().filter(option -> !option.isSelected()).forEach(com.malski.core.web.elements.Element::click);
+        this.getOptions().stream().filter(option -> !option.isSelected()).forEach(Element::click);
     }
 
     public Element getFirstSelectedOption() {
@@ -78,12 +78,12 @@ public class SelectImpl extends ElementImpl implements Select {
 
     @Override
     public void selectByVisibleText(String text) {
-        innerSelect.selectByVisibleText(text);
+        getWrappedSelect().selectByVisibleText(text);
     }
 
     @Override
     public void deselectByValue(String value) {
-        innerSelect.deselectByValue(value);
+        getWrappedSelect().deselectByValue(value);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class SelectImpl extends ElementImpl implements Select {
 
     @Override
     public void deselectAll() {
-        innerSelect.deselectAll();
+        getWrappedSelect().deselectAll();
     }
 
     @Override
@@ -126,12 +126,22 @@ public class SelectImpl extends ElementImpl implements Select {
 
     @Override
     public void deselectByVisibleText(String text) {
-        innerSelect.deselectByVisibleText(text);
+        getWrappedSelect().deselectByVisibleText(text);
     }
 
     @Override
     public void selectByIndex(int index) {
-        innerSelect.selectByIndex(index);
+        getWrappedSelect().selectByIndex(index);
+    }
+
+    @Override
+    public boolean isSelected(long timeout) {
+        try {
+            waitUntilSelected(timeout);
+        } catch (Exception ignore) {
+            return false;
+        }
+        return getWrappedElement().isSelected();
     }
 
     @Override
@@ -140,7 +150,17 @@ public class SelectImpl extends ElementImpl implements Select {
     }
 
     @Override
+    public void waitUntilSelected(long timeout) {
+        TestContext.getBrowser().getWait(timeout).until(elementToBeSelected(this));
+    }
+
+    @Override
     public void waitUntilUnselected() {
         TestContext.getBrowser().getWait().until(elementSelectionStateToBe(this, false));
+    }
+
+    @Override
+    public void waitUntilUnselected(long timeout) {
+        TestContext.getBrowser().getWait(timeout).until(elementSelectionStateToBe(this, false));
     }
 }

@@ -1,7 +1,6 @@
 package com.malski.google.web.pages;
 
 import com.malski.core.web.annotations.Module;
-import com.malski.core.web.annotations.PageInfo;
 import com.malski.core.web.elements.Element;
 import com.malski.core.web.elements.Elements;
 import com.malski.core.web.page.Page;
@@ -11,7 +10,6 @@ import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
-@PageInfo(check = "https:\\/\\/www\\.google\\.[a-z]{2,3}\\/\\?gfe_rd=cr\\&ei=\\S+")
 public class ResultsPage extends Page implements SearchWithGoogle {
 
     @FindBy(xpath = "//div[@id='rso']//div[@class='rc']/*[@class='r']/a")
@@ -30,6 +28,7 @@ public class ResultsPage extends Page implements SearchWithGoogle {
     @Override
     public ResultsPage searchFor(String phrase) {
         getSearchForm().searchFor(phrase);
+        waitForResults();
         return this;
     }
 

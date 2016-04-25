@@ -20,7 +20,7 @@ public class LazyPageFactory extends org.openqa.selenium.support.PageFactory {
         return page;
     }
 
-//    public static <T extends Module> T initElements(Browser browser, Class<T> moduleClassToProxy, Element rootElement) {
+//    public static <T extends WebModuleImpl> T initElements(Browser browser, Class<T> moduleClassToProxy, Element rootElement) {
 //        T module = instantiateModule(browser, moduleClassToProxy, rootElement);
 //        initElements(browser, module);
 //        return module;

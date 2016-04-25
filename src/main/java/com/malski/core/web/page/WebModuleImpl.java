@@ -16,34 +16,34 @@ import org.openqa.selenium.support.ui.FluentWait;
 /**
  * Class which is representing displayed module on page and allow to performing basic actions on it
  */
-public abstract class Module implements WebModule {
+public abstract class WebModuleImpl implements WebModule {
     private final Browser browser;
     private final Element rootElement;
 
-    public Module() {
+    public WebModuleImpl() {
         this.browser = TestContext.getBrowser();
-        if(this.getClass().isAnnotationPresent(FindBy.class)) {
+        if(getClass().isAnnotationPresent(FindBy.class)) {
             LazyLocatorFactory factory = new LazyLocatorFactory(getBrowser().getWebDriver());
-            LazyLocator locator = factory.createLocator(new LazyAnnotations(this.getClass()));
+            LazyLocator locator = factory.createLocator(new LazyAnnotations(getClass()));
             this.rootElement = getBrowser().getElement(locator);
         } else {
-            throw new IllegalArgumentException("\'@FindBy\' annotation has to be specified either in class definition or in field declaration annotation \'Module\' or \'IFrame\'!");
+            throw new IllegalArgumentException("\'@FindBy\' annotation has to be specified either in class definition or in field declaration annotation \'WebModuleImpl\' or \'IFrame\'!");
         }
     }
 
-    public Module(LazyLocator locator) {
+    public WebModuleImpl(LazyLocator locator) {
         this.browser = TestContext.getBrowser();
         this.rootElement = getBrowser().getElement(locator);
         LazyPageFactory.initElements(getRoot(), this);
     }
 
-    public Module(By by) {
+    public WebModuleImpl(By by) {
         this.browser = TestContext.getBrowser();
         this.rootElement = getBrowser().getElement(by);
         LazyPageFactory.initElements(getRoot(), this);
     }
 
-    public Module(Element rootElement) {
+    public WebModuleImpl(Element rootElement) {
         this.browser = TestContext.getBrowser();
         this.rootElement = rootElement;
         LazyPageFactory.initElements(getRoot(), this);

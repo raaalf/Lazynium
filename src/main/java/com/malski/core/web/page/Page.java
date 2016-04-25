@@ -104,9 +104,7 @@ public abstract class Page implements WebView {
         if(this.getClass().isAnnotationPresent(PageInfo.class)) {
             PageInfo pageInfo = this.getClass().getAnnotation(PageInfo.class);
             url = pageInfo.url();
-            if(!StringUtils.isEmpty(pageInfo.check())) {
-                assertThat("Check if url match to pattern", getBrowser().getCurrentUrl().matches(pageInfo.check()), is(true));
-            }
+            // TODO handle all action for PageInfo
         }
     }
 }

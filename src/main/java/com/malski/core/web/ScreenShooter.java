@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.ScreenshotException;
 
 import java.io.File;
@@ -24,5 +25,9 @@ public class ScreenShooter {
         } catch (IOException e) {
             throw new ScreenshotException(e.getMessage());
         }
+    }
+
+    public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {
+        return shooter.getScreenshotAs(target);
     }
 }

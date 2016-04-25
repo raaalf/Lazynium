@@ -32,6 +32,7 @@ public class ElementHandler implements InvocationHandler {
         return cons.newInstance(locator);
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Element> T getElementImplementation(WebElement element) throws Throwable {
         Constructor cons = wrappingType.getConstructor(LazyLocator.class, WebElement.class);
         return (T) cons.newInstance(locator, element);

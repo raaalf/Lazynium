@@ -15,9 +15,6 @@ public class LazyAnnotations extends AbstractAnnotations {
 
     public LazyAnnotations(Field field) {
         this.field = field;
-        if (field != null) {
-            this.clazz = field.getType();
-        }
     }
 
     public LazyAnnotations(Class clazz) {
@@ -48,6 +45,13 @@ public class LazyAnnotations extends AbstractAnnotations {
             findBy = frame.value();
         }
         if (findBy == null || isFinByUnset(findBy)) {
+            if (field != null) {
+                try {
+                    this.clazz = Class.forName(field.getType().getCanonicalName()+"Impl");
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException("no interface implementation.");
+                }
+            }
             return buildByFromClassForModule();
         } else {
             return handleFindByForModule(findBy);
@@ -65,7 +69,7 @@ public class LazyAnnotations extends AbstractAnnotations {
             FindBy findBy = (FindBy) clazz.getAnnotation(FindBy.class);
             return handleFindByForModule(findBy);
         }
-        throw new IllegalArgumentException("\'@FindBy\' annotation has to be specified either in interface definition or in field declaration using \'@Module\' or \'@IFrame\' !");
+        throw new IllegalArgumentException("\'@FindBy\' annotation has to be specified either in interface definition or in field declaration using \'@WebModuleImpl\' or \'@IFrame\' !");
     }
 
     private By handleFindByForModule(FindBy findBy) {

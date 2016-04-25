@@ -26,12 +26,22 @@ public class ElementDecorator implements FieldDecorator {
 
     @Override
     public Object decorate(ClassLoader loader, Field field) {
-        if (isDecorable(field.getType(), field) || isDecorableList(field) || isDecorableWebModule(field.getType(), field)) {
+        if(isDecorableWebModule(field.getType(), field)) {
+            return decorateWebModule(loader, field);
+        } else if (isDecorable(field.getType(), field) || isDecorableList(field)) {
             return decorateComponent(loader, field);
         } else {
             return null;
         }
+    }
 
+    private Object decorateWebModule(ClassLoader loader, Field field) {
+        Class<?> fieldType = field.getType();
+        if (WebModule.class.isAssignableFrom(fieldType)) {
+            return proxyForWebModule(loader, fieldType);
+        } else {
+            return null;
+        }
     }
 
     private Object decorateComponent(ClassLoader loader, Field field) {
@@ -43,14 +53,11 @@ public class ElementDecorator implements FieldDecorator {
         if (WebElement.class.equals(fieldType)) {
             fieldType = Element.class;
         }
-
         if (WebElement.class.isAssignableFrom(fieldType)) {
             return proxyForLocator(loader, fieldType, locator);
         } else if (List.class.isAssignableFrom(fieldType)) {
             Class<?> erasureClass = getErasureClass(field);
             return proxyForListLocator(loader, erasureClass, locator);
-        } else if (WebModule.class.isAssignableFrom(fieldType)) {
-            return proxyForWebModule(loader, fieldType, locator);
         } else {
             return null;
         }
@@ -97,8 +104,8 @@ public class ElementDecorator implements FieldDecorator {
     }
 
     /* Generate a type-parametrized locator proxy for the WebView in question. */
-    private <T> T proxyForWebModule(ClassLoader loader, Class<T> interfaceType, LazyLocator locator) {
-        InvocationHandler handler = new WebModuleHandler(interfaceType, locator);
+    private <T> T proxyForWebModule(ClassLoader loader, Class<T> interfaceType) {
+        InvocationHandler handler = new WebModuleHandler(interfaceType);
         return interfaceType.cast(Proxy.newProxyInstance(
                 loader, new Class[]{interfaceType, WebModule.class}, handler));
     }

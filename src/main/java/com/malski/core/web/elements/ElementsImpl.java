@@ -231,8 +231,18 @@ public class ElementsImpl<E extends Element> implements Elements<E> {
     }
 
     @Override
+    public void waitUntilAllPresent(long timeout) {
+        TestContext.getBrowser().getWait(timeout).until(presenceOfAllElementsLocatedBy(getLocator().getSelector().getBy()));
+    }
+
+    @Override
     public void waitUntilAnyPresent() {
         TestContext.getBrowser().getWait().until(presenceOfElementLocated(getLocator().getSelector().getBy()));
+    }
+
+    @Override
+    public void waitUntilAnyPresent(long timeout) {
+        TestContext.getBrowser().getWait(timeout).until(presenceOfElementLocated(getLocator().getSelector().getBy()));
     }
 
     @Override
@@ -241,8 +251,18 @@ public class ElementsImpl<E extends Element> implements Elements<E> {
     }
 
     @Override
+    public void waitUntilAllVisible(long timeout) {
+        TestContext.getBrowser().getWait(timeout).until(visibilityOfAllElementsLocatedBy(getLocator().getSelector().getBy()));
+    }
+
+    @Override
     public void waitUntilAnyVisible() {
         TestContext.getBrowser().getWait().until(visibilityOfElementLocated(getLocator().getSelector().getBy()));
+    }
+
+    @Override
+    public void waitUntilAnyVisible(long timeout) {
+        TestContext.getBrowser().getWait(timeout).until(visibilityOfElementLocated(getLocator().getSelector().getBy()));
     }
 
     @Override
@@ -252,8 +272,19 @@ public class ElementsImpl<E extends Element> implements Elements<E> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public void waitUntilAllDisappear(long timeout) {
+        TestContext.getBrowser().getWait(timeout).until(WaitConditions.invisibilityOfAllElements(getWrappedElements()));
+    }
+
+    @Override
     public void waitUntilAnyDisappear() {
         TestContext.getBrowser().getWait().until(invisibilityOfElementLocated(getLocator().getSelector().getBy()));
+    }
+
+    @Override
+    public void waitUntilAnyDisappear(long timeout) {
+        TestContext.getBrowser().getWait(timeout).until(invisibilityOfElementLocated(getLocator().getSelector().getBy()));
     }
 
     @Override
@@ -262,8 +293,18 @@ public class ElementsImpl<E extends Element> implements Elements<E> {
     }
 
     @Override
+    public void waitUntilAllEnabled(long timeout) {
+        TestContext.getBrowser().getWait(timeout).until(WaitConditions.elementsToBeClickable(getLocator().getSelector().getBy()));
+    }
+
+    @Override
     public void waitUntilAnyEnabled() {
         TestContext.getBrowser().getWait().until(elementToBeClickable(getLocator().getSelector().getBy()));
+    }
+
+    @Override
+    public void waitUntilAnyEnabled(long timeout) {
+        TestContext.getBrowser().getWait(timeout).until(elementToBeClickable(getLocator().getSelector().getBy()));
     }
 
     @Override
@@ -272,8 +313,18 @@ public class ElementsImpl<E extends Element> implements Elements<E> {
     }
 
     @Override
+    public void waitUntilAllDisabled(long timeout) {
+        TestContext.getBrowser().getWait(timeout).until(not(WaitConditions.elementsToBeClickable(getLocator().getSelector().getBy())));
+    }
+
+    @Override
     public void waitUntilAnyDisabled() {
         TestContext.getBrowser().getWait().until(not(elementToBeClickable(getLocator().getSelector().getBy())));
+    }
+
+    @Override
+    public void waitUntilAnyDisabled(long timeout) {
+        TestContext.getBrowser().getWait(timeout).until(not(elementToBeClickable(getLocator().getSelector().getBy())));
     }
 
 //    @Override
