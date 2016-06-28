@@ -2,7 +2,7 @@ package com.malski.core.web.factory;
 
 import com.malski.core.web.annotations.IFrame;
 import com.malski.core.web.annotations.Module;
-import com.malski.core.web.page.WebModule;
+import com.malski.core.web.page.api.WebModule;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.*;
 import org.openqa.selenium.support.pagefactory.AbstractAnnotations;
@@ -44,10 +44,10 @@ public class LazyAnnotations extends AbstractAnnotations {
             IFrame frame = this.field.getAnnotation(IFrame.class);
             findBy = frame.value();
         }
-        if (findBy == null || isFinByUnset(findBy)) {
+        if (findBy == null || isFindByUnset(findBy)) {
             if (field != null) {
                 try {
-                    this.clazz = Class.forName(field.getType().getCanonicalName()+"Impl");
+                    this.clazz = ImplHandler.getInterfaceImpl(field.getType());
                 } catch (ClassNotFoundException e) {
                     throw new RuntimeException("no interface implementation.");
                 }
@@ -58,7 +58,7 @@ public class LazyAnnotations extends AbstractAnnotations {
         }
     }
 
-    private boolean isFinByUnset(FindBy findBy) {
+    private boolean isFindByUnset(FindBy findBy) {
         return "".equals(findBy.className()) && "".equals(findBy.css()) && "".equals(findBy.id()) && "".equals(findBy.linkText())
                 && "".equals(findBy.name()) && "".equals(findBy.partialLinkText()) && "".equals(findBy.tagName())
                 && "".equals(findBy.xpath()) && How.UNSET.equals(findBy.how());

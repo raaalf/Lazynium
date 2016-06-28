@@ -1,8 +1,8 @@
 package com.malski.core.web.factory;
 
-import com.malski.core.web.elements.Element;
-import com.malski.core.web.elements.Elements;
-import com.malski.core.web.elements.ElementsImpl;
+import com.malski.core.web.elements.api.Element;
+import com.malski.core.web.elements.api.Elements;
+import com.malski.core.web.elements.impl.ElementsImpl;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;

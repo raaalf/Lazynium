@@ -1,9 +1,9 @@
 package com.malski.google.web.pages;
 
 import com.malski.core.web.annotations.Module;
-import com.malski.core.web.elements.Element;
-import com.malski.core.web.elements.Elements;
-import com.malski.core.web.page.Page;
+import com.malski.core.web.elements.api.Element;
+import com.malski.core.web.elements.api.Elements;
+import com.malski.core.web.page.impl.Page;
 import com.malski.google.web.api.SearchWithGoogle;
 import com.malski.google.web.modules.SearchForm;
 import org.openqa.selenium.support.FindBy;

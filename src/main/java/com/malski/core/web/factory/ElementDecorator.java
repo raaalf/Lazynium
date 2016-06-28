@@ -2,8 +2,12 @@ package com.malski.core.web.factory;
 
 import com.malski.core.web.annotations.IFrame;
 import com.malski.core.web.annotations.Module;
-import com.malski.core.web.elements.*;
-import com.malski.core.web.page.WebModule;
+import com.malski.core.web.elements.api.Element;
+import com.malski.core.web.elements.api.Elements;
+import com.malski.core.web.elements.api.ElementsStates;
+import com.malski.core.web.elements.api.ElementsWait;
+import com.malski.core.web.page.api.Frame;
+import com.malski.core.web.page.api.WebModule;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.internal.WrapsElement;
@@ -26,7 +30,9 @@ public class ElementDecorator implements FieldDecorator {
 
     @Override
     public Object decorate(ClassLoader loader, Field field) {
-        if(isDecorableWebModule(field.getType(), field)) {
+        if(isDecorableFrame(field.getType(), field)) {
+            return decorateFrame(loader, field);
+        } else if(isDecorableWebModule(field.getType(), field)) {
             return decorateWebModule(loader, field);
         } else if (isDecorable(field.getType(), field) || isDecorableList(field)) {
             return decorateComponent(loader, field);
@@ -37,19 +43,36 @@ public class ElementDecorator implements FieldDecorator {
 
     private Object decorateWebModule(ClassLoader loader, Field field) {
         Class<?> fieldType = field.getType();
+        LazyLocator locator = (LazyLocator)factory.createLocator(field);
+        if (locator == null) {
+            return null;
+        }
         if (WebModule.class.isAssignableFrom(fieldType)) {
-            return proxyForWebModule(loader, fieldType);
+            return proxyForWebModule(loader, fieldType ,locator);
+        } else {
+            return null;
+        }
+    }
+
+    private Object decorateFrame(ClassLoader loader, Field field) {
+        Class<?> fieldType = field.getType();
+        LazyLocator locator = (LazyLocator)factory.createLocator(field);
+        if (locator == null) {
+            return null;
+        }
+        if (Frame.class.isAssignableFrom(fieldType)) {
+            return proxyForFrame(loader, fieldType ,locator);
         } else {
             return null;
         }
     }
 
     private Object decorateComponent(ClassLoader loader, Field field) {
+        Class<?> fieldType = field.getType();
         LazyLocator locator = (LazyLocator)factory.createLocator(field);
         if (locator == null) {
             return null;
         }
-        Class<?> fieldType = field.getType();
         if (WebElement.class.equals(fieldType)) {
             fieldType = Element.class;
         }
@@ -86,7 +109,12 @@ public class ElementDecorator implements FieldDecorator {
 
     private boolean isDecorableWebModule(Class clazz, Field field) {
         return !(clazz == null || !WebModule.class.isAssignableFrom(clazz)) &&
-                !(field.getAnnotation(Module.class) == null && field.getAnnotation(IFrame.class) == null);
+                field.getAnnotation(Module.class) != null;
+    }
+
+    private boolean isDecorableFrame(Class clazz, Field field) {
+        return !(clazz == null || !Frame.class.isAssignableFrom(clazz)) &&
+                field.getAnnotation(IFrame.class) != null;
     }
 
     /* Generate a type-parameterized locator proxy for the element in question. */
@@ -103,10 +131,17 @@ public class ElementDecorator implements FieldDecorator {
         return (List<T>) Proxy.newProxyInstance(loader, new Class[]{Elements.class, List.class, ElementsWait.class, ElementsStates.class}, handler);
     }
 
-    /* Generate a type-parametrized locator proxy for the WebView in question. */
-    private <T> T proxyForWebModule(ClassLoader loader, Class<T> interfaceType) {
-        InvocationHandler handler = new WebModuleHandler(interfaceType);
+    /* Generate a type-parametrized locator proxy for the WebModule in question. */
+    private <T> T proxyForWebModule(ClassLoader loader, Class<T> interfaceType, LazyLocator locator) {
+        InvocationHandler handler = new WebModuleHandler(interfaceType, locator);
         return interfaceType.cast(Proxy.newProxyInstance(
                 loader, new Class[]{interfaceType, WebModule.class}, handler));
+    }
+
+    /* Generate a type-parametrized locator proxy for the Frame in question. */
+    private <T> T proxyForFrame(ClassLoader loader, Class<T> interfaceType, LazyLocator locator) {
+        InvocationHandler handler = new FrameHandler(interfaceType, locator);
+        return interfaceType.cast(Proxy.newProxyInstance(
+                loader, new Class[]{interfaceType, Frame.class}, handler));
     }
 }

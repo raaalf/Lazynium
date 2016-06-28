@@ -1,6 +1,6 @@
 package com.malski.core.web.factory;
 
-import com.malski.core.web.elements.Element;
+import com.malski.core.web.elements.api.Element;
 import org.openqa.selenium.WebElement;
 
 import java.lang.reflect.Constructor;
@@ -21,15 +21,16 @@ public class ElementHandler implements InvocationHandler {
         }
 
         try {
-            this.wrappingType = Class.forName(interfaceType.getCanonicalName()+"Impl");
+            this.wrappingType = ImplHandler.getInterfaceImpl(interfaceType);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("no interface implementation.");
         }
     }
 
-    public Object getElementImplementation() throws Throwable {
+    @SuppressWarnings("unchecked")
+    public <T extends Element> T getElementImplementation() throws Throwable {
         Constructor cons = wrappingType.getConstructor(LazyLocator.class);
-        return cons.newInstance(locator);
+        return (T) cons.newInstance(locator);
     }
 
     @SuppressWarnings("unchecked")

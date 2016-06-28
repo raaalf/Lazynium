@@ -1,8 +1,8 @@
 package com.malski.core.web.factory;
 
-import com.malski.core.web.elements.Element;
-import com.malski.core.web.elements.Elements;
-import com.malski.core.web.elements.ElementsImpl;
+import com.malski.core.web.elements.api.Element;
+import com.malski.core.web.elements.api.Elements;
+import com.malski.core.web.elements.impl.ElementsImpl;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -23,6 +23,11 @@ public class LazyLocatorImpl implements ElementLocator, LazyLocator {
     public LazyLocatorImpl(SearchContext searchContext, By by) {
         this.searchContext = searchContext;
         this.selector = new Selector(by);
+    }
+
+    public LazyLocatorImpl(SearchContext searchContext, Selector selector) {
+        this.searchContext = searchContext;
+        this.selector = selector;
     }
 
     @Override

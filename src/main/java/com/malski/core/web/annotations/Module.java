@@ -1,7 +1,6 @@
 package com.malski.core.web.annotations;
 
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.How;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

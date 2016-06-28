@@ -1,12 +1,12 @@
 package com.malski.google.web.pages;
 
-import com.malski.core.web.annotations.PageInfo;
-import com.malski.core.web.elements.Input;
-import com.malski.core.web.page.Page;
+import com.malski.core.web.annotations.PageCheck;
+import com.malski.core.web.elements.api.Input;
+import com.malski.core.web.page.impl.Page;
 import com.malski.google.web.api.SearchWithGoogle;
 import org.openqa.selenium.support.FindBy;
 
-@PageInfo(url = "https://www.google.com")
+@PageCheck(url = "https://www.google.com")
 public class MainPage extends Page implements SearchWithGoogle {
     @FindBy(id = "lst-ib")
     private Input searchInput;
@@ -26,7 +26,7 @@ public class MainPage extends Page implements SearchWithGoogle {
     @Override
     public ResultsPage searchFor(String phrase) {
         searchInput.fill(phrase);
-        ResultsPage resultsPage = nextPage(ResultsPage.class);
+        ResultsPage resultsPage = new ResultsPage();
         resultsPage.waitForResults();
         return resultsPage;
     }

@@ -1,13 +1,12 @@
 package com.malski.core.web.conditions;
 
-import com.malski.core.web.elements.Element;
+import com.malski.core.web.elements.api.Element;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class WaitConditions {
@@ -71,7 +70,7 @@ public class WaitConditions {
                         if(element.isDisplayed()) {
                             return false;
                         }
-                    } catch (Exception e) {
+                    } catch (Exception ignore) {
                     }
                 }
                 return true;

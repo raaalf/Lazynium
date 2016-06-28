@@ -1,15 +1,13 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="Cucumber runner">
-    <parameter name="browser" value="chrome"/>
 
     <test name="Tests runner">
         <parameter name="features" value="src/test/resources/features"/>
-        <parameter name="glue" value="com.malski.google.glue"/>
+        <parameter name="glue" value="com.malski.glue"/>
         <parameter name="tags" value="@search"/>
 
         <classes>
             <class name="com.malski.core.cucumber.CucumberNG" />
-            <!--<class name="com.malski.google.runners.GoogleTestRunner" />-->
         </classes>
     </test>
 </suite>

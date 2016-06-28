@@ -1,0 +1,48 @@
+package com.malski.glue.hooks;
+
+import com.malski.core.cucumber.TestContext;
+import cucumber.api.Scenario;
+import cucumber.api.java.After;
+import cucumber.api.java.Before;
+import org.apache.log4j.Logger;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.WebDriverException;
+
+public class DefaultHooks {
+    private static Logger log = Logger.getLogger(DefaultHooks.class);
+
+    public DefaultHooks() {}
+
+    @Before(order = 1)
+    public void init() {
+        TestContext.initialize();
+    }
+
+    @Before(order = 2)
+    public void deleteAllCookies() {
+        TestContext.getBrowser().manage().deleteAllCookies();
+    }
+
+    @After(order = 2)
+    public void afterScenario(Scenario scenario) {
+        if (scenario.isFailed()) {
+            try {
+                byte[] screenshot = TestContext.getBrowser().getScreenShooter().getScreenshotAs(OutputType.BYTES);
+                scenario.embed(screenshot, "image/png");
+            } catch (WebDriverException somePlatformsDontSupportScreenshots) {
+                log.error(somePlatformsDontSupportScreenshots.getMessage());
+            }
+            //get page alert if exist
+            if (TestContext.getBrowser().isAlertPresent()) {
+                log.error("There was an alert on page: " + TestContext.getBrowser().getActiveAlert().getText());
+            }
+        }
+    }
+
+    @After(order = 1)
+    public void quitBrowser() {
+        //quit browser
+        TestContext.getBrowser().quit();
+        TestContext.setBrowser(null);
+    }
+}

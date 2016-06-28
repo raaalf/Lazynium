@@ -1,14 +1,15 @@
 package com.malski.core.cucumber;
 
-import com.malski.core.web.Browser;
 import cucumber.api.CucumberOptions;
+import cucumber.api.SnippetType;
+import cucumber.api.testng.AbstractTestNGCucumberTests;
+import cucumber.api.testng.CucumberFeatureWrapper;
 import cucumber.api.testng.TestNGCucumberRunner;
+import org.apache.commons.lang3.StringUtils;
 import org.testng.IHookCallBack;
 import org.testng.IHookable;
 import org.testng.ITestResult;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -18,52 +19,74 @@ import java.util.HashMap;
 import java.util.Map;
 
 @CucumberOptions(features = "*", glue = "*", tags = "*", format = {"pretty"})
-public class CucumberNG implements IHookable {
-//public class CucumberNG {
+public class CucumberNG extends AbstractTestNGCucumberTests {
+    private TestNGCucumberRunner testNGCucumberRunner;
+
     public CucumberNG() {
     }
 
-    @Parameters({"browser", "features", "glue", "tags", "format"})
-    @Test(description = "Runs Cucumber Features")
-    public void runCukes(@Optional("chrome") String browser, @Optional("*") String features, @Optional("*") String glue,
-                    @Optional("") String tags, @Optional("pretty") String format)
-            throws IOException {
-        TestContext.setBrowser(new Browser(browser));
-        final CucumberOptions cucumberOptionsAnnotation = CucumberNG.class.getAnnotation(CucumberOptions.class);
-        Map<String, String[]> annotationMap = new HashMap<String, String[]>() {{
-            put("features", features.split(";"));
-            put("glue", glue.split(";"));
-            put("tags", tags.split(";"));
-            put("format", format.split(";"));
-        }};
+    @BeforeClass(
+            alwaysRun = true
+    )
+    @Parameters({"features", "glue", "tags", "format", "plugin", "dryRun", "strict", "monochrome", "name", "snippets"})
+    public void setUpClass(@Optional("") String features, @Optional("") String glue, @Optional("") String tags,
+                           @Optional("") String format, @Optional("") String plugin, @Optional("") String dryRun,
+                           @Optional("") String strict, @Optional("") String monochrome, @Optional("") String name,
+                           @Optional("") String snippets)
+            throws Exception {
+        final CucumberOptions cucumberOptionsAnnotation = this.getClass().getAnnotation(CucumberOptions.class);
+        Map<String, Object> annotationMap = new HashMap<>();
+        if (!StringUtils.isBlank(features)) {
+            annotationMap.put("features", features.split(","));
+        }
+        if (!StringUtils.isBlank(glue)) {
+            annotationMap.put("glue", glue.split(","));
+        }
+        if (!StringUtils.isBlank(tags)) {
+            annotationMap.put("tags", tags.split(","));
+        }
+        if (!StringUtils.isBlank(format)) {
+            annotationMap.put("format", format.split(","));
+        }
+        if (!StringUtils.isBlank(plugin)) {
+            annotationMap.put("plugin", plugin.split(","));
+        }
+        if (!StringUtils.isBlank(dryRun)) {
+            annotationMap.put("dryRun", Boolean.getBoolean(dryRun));
+        }
+        if (!StringUtils.isBlank(strict)) {
+            annotationMap.put("strict", Boolean.getBoolean(strict));
+        }
+        if (!StringUtils.isBlank(monochrome)) {
+            annotationMap.put("monochrome", Boolean.getBoolean(monochrome));
+        }
+        if (!StringUtils.isBlank(name)) {
+            annotationMap.put("name", name.split(","));
+        }
+        if (!StringUtils.isBlank(snippets)) {
+            annotationMap.put("snippets", SnippetType.fromString(snippets));
+        }
         changeCucumberOptions(cucumberOptionsAnnotation, annotationMap);
-        TestNGCucumberRunner runner = new TestNGCucumberRunner(this.getClass());
-        runner.runCukes();
+        this.testNGCucumberRunner = new TestNGCucumberRunner(this.getClass());
     }
 
-    public void run(IHookCallBack iHookCallBack, ITestResult iTestResult) {
-        iHookCallBack.runTestMethod(iTestResult);
+    @Test(description = "Runs Cucumber Feature", dataProvider = "features")
+    public void feature(CucumberFeatureWrapper cucumberFeature) {
+        this.testNGCucumberRunner.runCucumber(cucumberFeature.getCucumberFeature());
     }
 
-//    @Parameters({"browser", "features", "glue", "tags", "format"})
-//    @Test(description = "Runs Cucumber Features")
-//    public void runCukes(@Optional("chrome") String browser, @Optional("*") String features, @Optional("*") String glue,
-//                    @Optional("") String tags, @Optional("pretty") String format)
-//            throws IOException {
-//        System.setProperty("TEST_BROWSER", browser); // TODO change it to not use system properties
-//        final CucumberOptions cucumberOptionsAnnotation = CucumberNG.class.getAnnotation(CucumberOptions.class);
-//        Map<String, String[]> annotationMap = new HashMap<String, String[]>() {{
-//            put("features", features.split(";"));
-//            put("glue", glue.split(";"));
-//            put("tags", tags.split(";"));
-//            put("format", format.split(";"));
-//        }};
-//        changeCucumberOptions(cucumberOptionsAnnotation, annotationMap);
-//        new TestNGCucumberRunner(getClass()).runCukes();
-//    }
+    @DataProvider
+    public Object[][] features() {
+        return this.testNGCucumberRunner.provideFeatures();
+    }
+
+    @AfterClass
+    public void tearDownClass() throws Exception {
+        this.testNGCucumberRunner.finish();
+    }
 
     @SuppressWarnings("unchecked")
-    private static void changeCucumberOptions(Annotation annotation, Map<String, String[]> annotationMap) {
+    private static void changeCucumberOptions(Annotation annotation, Map<String, Object> annotationMap) {
         Object handler = Proxy.getInvocationHandler(annotation);
         Field f;
         try {
