@@ -2,6 +2,10 @@
 
 Test framework based on Selenium Webdriver, Cucumber, TestNG and Selophane(https://github.com/elisarver/selophane).
 
+## Thanks:
+- foobar automation team for support
+-@elisarver for Selophane sources
+
 ## Installation
 
 You need on you computer Maven (installation:http://www.mkyong.com/maven/how-to-install-maven-in-windows/) and Java JDK 8.
@@ -10,6 +14,7 @@ After checkout this project, please be sure it was correctly build with maven.
 
 ## To run tests:
 
+Run cucumber scenario.
 
 ## Tested on
 
