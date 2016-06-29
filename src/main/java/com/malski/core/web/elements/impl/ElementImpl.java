@@ -1,6 +1,7 @@
 package com.malski.core.web.elements.impl;
 
 import com.malski.core.web.base.LazySearchContextImpl;
+import com.malski.core.web.conditions.WaitConditions;
 import com.malski.core.web.elements.api.Element;
 import com.malski.core.web.factory.ElementHandler;
 import com.malski.core.web.factory.LazyLocator;
@@ -9,7 +10,6 @@ import com.malski.core.web.factory.Selector;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.internal.Locatable;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import java.util.List;
 
@@ -347,15 +347,11 @@ public class ElementImpl extends LazySearchContextImpl implements Element {
 
     @Override
     public void waitUntilAttributeChange(String attributeName, String expectedValue) {
-        getBrowser().getWait().until((ExpectedCondition<Boolean>) driver -> {
-                    refresh();
-                    String enabled = getAttribute(attributeName);
-                    if (expectedValue == null) {
-                        return enabled == null;
-                    } else {
-                        return enabled.equals(expectedValue);
-                    }
-                }
-        );
+        getBrowser().getWait().until(WaitConditions.attributeChanged(this, attributeName, expectedValue));
+    }
+
+    @Override
+    public void waitUntilAttributeChange(String attributeName, String expectedValue, long timeout) {
+        getBrowser().getWait(timeout).until(WaitConditions.attributeChanged(this, attributeName, expectedValue));
     }
 }

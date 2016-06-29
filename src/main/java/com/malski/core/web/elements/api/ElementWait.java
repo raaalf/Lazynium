@@ -23,4 +23,6 @@ public interface ElementWait {
     void waitUntilDisabled(long timeout);
 
     void waitUntilAttributeChange(String attributeName, String expectedValue);
+
+    void waitUntilAttributeChange(String attributeName, String expectedValue, long timeout);
 }

@@ -20,8 +20,8 @@ public class WaitConditions {
             String state = StringUtils.EMPTY;
             try {
                 state = executor.executeScript("return document.readyState").toString();
-            // } catch (InvalidSelectorException e) {
-            //Ignore
+                // } catch (InvalidSelectorException e) {
+                //Ignore
             } catch (NoSuchWindowException e) {
                 //when popup is closed, switch to last windows
                 driver.switchTo().window(driver.getWindowHandles().iterator().next());
@@ -32,54 +32,61 @@ public class WaitConditions {
     }
 
     public static ExpectedCondition<List<WebElement>> elementsToBeClickable(final By locator) {
-        return new ExpectedCondition<List<WebElement>> () {
-
-            ExpectedCondition<List<WebElement>> visibilityOfAllElementsLocatedBy = ExpectedConditions.visibilityOfAllElementsLocatedBy(locator);
-
-            public List<WebElement> apply(WebDriver driver) {
-                List<WebElement> elements = this.visibilityOfAllElementsLocatedBy.apply(driver);
-                List<WebElement> results = new ArrayList<>();
-                if(elements == null) {
-                    return null;
-                }
-                for (WebElement element : elements) {
-                    try {
-                        if (element != null && element.isEnabled()) {
-                            results.add(element);
-                        } else {
-                            return null;
-                        }
-                    } catch (StaleElementReferenceException var4) {
+        return driver -> {
+            List<WebElement> elements = ExpectedConditions.visibilityOfAllElementsLocatedBy(locator).apply(driver);
+            List<WebElement> results = new ArrayList<>();
+            if (elements == null) {
+                return null;
+            }
+            for (WebElement element : elements) {
+                try {
+                    if (element != null && element.isEnabled()) {
+                        results.add(element);
+                    } else {
                         return null;
                     }
+                } catch (StaleElementReferenceException var4) {
+                    return null;
                 }
-                return results;
             }
-
-            public String toString() {
-                return "elements to be clickable: " + locator;
-            }
+            return results;
         };
     }
 
     public static <T extends Element> ExpectedCondition<Boolean> invisibilityOfAllElements(List<T> elements) {
-        return new ExpectedCondition<Boolean>() {
-            public Boolean apply(WebDriver webDriver) {
-                for(T element : elements) {
-                    try {
-                        if(element.isDisplayed()) {
-                            return false;
-                        }
-                    } catch (Exception ignore) {
+        return driver -> {
+            for (T element : elements) {
+                try {
+                    if (element.isDisplayed()) {
+                        return false;
                     }
+                } catch (Exception ignore) {
                 }
-                return true;
             }
-
-            public String toString() {
-                return "invisibility of all elements " + elements;
-            }
+            return true;
         };
     }
 
+    public static ExpectedCondition<Boolean> attributeChanged(By by, String attributeName, String expectedValue) {
+        return driver -> {
+            WebElement webElement = driver.findElement(by);
+            String enabled = webElement.getAttribute(attributeName);
+            if (expectedValue == null) {
+                return enabled == null;
+            }
+            return enabled.equals(expectedValue);
+        };
+    }
+
+    public static ExpectedCondition<Boolean> attributeChanged(Element element, String attributeName, String expectedValue) {
+        return driver -> {
+            element.refresh();
+            String enabled = element.getAttribute(attributeName);
+            if (expectedValue == null) {
+                return enabled == null;
+            } else {
+                return enabled.equals(expectedValue);
+            }
+        };
+    }
 }

@@ -13,24 +13,24 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class GoogleSteps {
 
     @Given("^I open google main page$")
-    public void open_google_main_page() {
+    public void openGoogleMainPage() {
         new MainPage().
                 open();
     }
 
     @When("^I search for \"(.+)\"$")
-    public void search_for(String phrase) {
+    public void searchFor(String phrase) {
         new MainPage().
                 searchFor(phrase);
     }
 
     @Then("^verify that page \"(.+)\" is in results$")
-    public void verify_that_page_is_in_results(String pageName) {
+    public void verifyThatPageIsInResults(String pageName) {
         assertThat(new ResultsPage().getResultTitles(), everyItem(containsString(pageName)));
     }
 
     @When("^I research for \"(.+)\"$")
-    public void research_for(String phrase) {
+    public void researchFor(String phrase) {
         new ResultsPage().searchFor(phrase);
     }
 }

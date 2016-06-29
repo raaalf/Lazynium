@@ -3,6 +3,7 @@ package com.malski.core.web.page.impl;
 import com.malski.core.cucumber.TestContext;
 import com.malski.core.web.base.Browser;
 import com.malski.core.web.base.LazySearchContextImpl;
+import com.malski.core.web.conditions.WaitConditions;
 import com.malski.core.web.elements.api.Element;
 import com.malski.core.web.factory.LazyLocator;
 import com.malski.core.web.factory.LazyPageFactory;
@@ -126,15 +127,11 @@ public abstract class WebModuleImpl extends LazySearchContextImpl implements Web
 
     @Override
     public void waitUntilAttributeChange(String attributeName, String expectedValue) {
-        getBrowser().getWait().until((ExpectedCondition<Boolean>) driver -> {
-                    getRoot().refresh();
-                    String enabled = getRoot().getAttribute(attributeName);
-                    if (expectedValue == null) {
-                        return enabled == null;
-                    } else {
-                        return enabled.equals(expectedValue);
-                    }
-                }
-        );
+        getBrowser().getWait().until(WaitConditions.attributeChanged(getRoot(), attributeName, expectedValue));
+    }
+
+    @Override
+    public void waitUntilAttributeChange(String attributeName, String expectedValue, long timeout) {
+        getBrowser().getWait(timeout).until(WaitConditions.attributeChanged(getRoot(), attributeName, expectedValue));
     }
 }

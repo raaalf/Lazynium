@@ -182,7 +182,7 @@ public class Browser extends LazySearchContextImpl implements WebDriver {
     }
 
     public void setDefaultWaitTimeout() {
-        this.wait = new WebDriverWait(this.driver, TIMEOUT_SECONDS);
+        this.wait = new WebDriverWait(getWebDriver(), TIMEOUT_SECONDS);
         setImplicitlyWait(IMPLICITLY_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
@@ -204,7 +204,7 @@ public class Browser extends LazySearchContextImpl implements WebDriver {
     }
 
     public boolean elementExists(WebElement element, long timeout) {
-        WebDriverWait wait = new WebDriverWait(this.driver, timeout);
+        WebDriverWait wait = new WebDriverWait(getWebDriver(), timeout);
         try {
             wait.until(ExpectedConditions.visibilityOf(element));
         } catch (TimeoutException e) {
@@ -266,29 +266,11 @@ public class Browser extends LazySearchContextImpl implements WebDriver {
     }
 
     public void waitUntilAttributeChange(By by, String attributeName, String expectedValue) {
-        getWait().until(
-                (ExpectedCondition<Boolean>) driver -> {
-                    WebElement webElement = findElement(by);
-                    String enabled = webElement.getAttribute(attributeName);
-                    if (expectedValue == null) {
-                        return enabled == null;
-                    }
-                    return enabled.equals(expectedValue);
-                }
-        );
+        getWait().until(WaitConditions.attributeChanged(by, attributeName, expectedValue));
     }
 
     public void waitUntilAttributeChange(By by, String attributeName, String expectedValue, long timeout) {
-        getWait(timeout).until(
-                (ExpectedCondition<Boolean>) driver -> {
-                    WebElement webElement = findElement(by);
-                    String enabled = webElement.getAttribute(attributeName);
-                    if (expectedValue == null) {
-                        return enabled == null;
-                    }
-                    return enabled.equals(expectedValue);
-                }
-        );
+        getWait(timeout).until(WaitConditions.attributeChanged(by, attributeName, expectedValue));
     }
 
 
