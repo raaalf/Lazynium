@@ -45,7 +45,16 @@ public class FrameImpl extends WebModuleImpl implements Frame {
 
     private void initElements() {
         switchIn();
-        LazyPageFactory.initElements(getSearchContext(), this);
+        LazyPageFactory.initElements(this, this);
         switchOut();
     }
+
+    @Override
+    public void refresh() {
+        switchOut();
+        getRoot().refresh();
+        setSearchContext(getRoot());
+        initElements();
+    }
+
 }

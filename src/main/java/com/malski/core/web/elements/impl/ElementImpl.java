@@ -1,5 +1,6 @@
 package com.malski.core.web.elements.impl;
 
+import com.malski.core.web.base.LazySearchContext;
 import com.malski.core.web.base.LazySearchContextImpl;
 import com.malski.core.web.conditions.WaitConditions;
 import com.malski.core.web.elements.api.Element;
@@ -10,8 +11,7 @@ import com.malski.core.web.factory.Selector;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.internal.Locatable;
-
-import java.util.List;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import static com.malski.core.cucumber.TestContext.getBrowser;
 
@@ -20,11 +20,11 @@ public class ElementImpl extends LazySearchContextImpl implements Element {
     private WebElement element;
     private LazyLocator locator;
 
-    public ElementImpl(By by, SearchContext context) {
+    public ElementImpl(By by, LazySearchContext context) {
         this.locator = new LazyLocatorImpl(context, by);
     }
 
-    public ElementImpl(Selector selector, SearchContext context) {
+    public ElementImpl(Selector selector, LazySearchContext context) {
         this.locator = new LazyLocatorImpl(context, selector);
     }
 
@@ -38,14 +38,19 @@ public class ElementImpl extends LazySearchContextImpl implements Element {
     }
 
     public ElementImpl(By by, WebElement element) {
-        this.locator = new LazyLocatorImpl(element, by);
+        this.locator = new LazyLocatorImpl(new LazySearchContextImpl(element) {
+            @Override
+            public void refresh() {
+            }
+        }, by);
         this.element = element;
     }
 
     @Override
     public SearchContext getSearchContext() {
         if (super.getSearchContext() == null) {
-            setSearchContext(getWrappedElement());
+            WebElement thisElem = getWrappedElement();
+            setSearchContext(thisElem);
         }
         return super.getSearchContext();
     }
@@ -58,24 +63,28 @@ public class ElementImpl extends LazySearchContextImpl implements Element {
 
     @Override
     public void doubleClick() {
+        WebElement thisElem = getWrappedElement();
         getBrowser().getActions()
-                .doubleClick(getWrappedElement())
+                .doubleClick(thisElem)
                 .perform();
     }
 
     @Override
     public void rightClick() {
+        WebElement thisElem = getWrappedElement();
         getBrowser().getActions()
-                .contextClick(getWrappedElement())
+                .contextClick(thisElem)
                 .perform();
     }
 
     @Override
     public void dragAndDrop(Element elementToDrop) {
+        WebElement thisElem = getWrappedElement();
+        WebElement toDropElem = elementToDrop.getWrappedElement();
         getBrowser().getActions()
-                .clickAndHold(getWrappedElement())
-                .moveToElement(elementToDrop.getWrappedElement())
-                .release(elementToDrop.getWrappedElement())
+                .clickAndHold(thisElem)
+                .moveToElement(toDropElem)
+                .release(toDropElem)
                 .build()
                 .perform();
 //        getBrowser().getActions().dragAndDrop(this, elementToDrop).perform();
@@ -83,8 +92,9 @@ public class ElementImpl extends LazySearchContextImpl implements Element {
 
     @Override
     public void mouseOver() {
+        WebElement thisElem = getWrappedElement();
         getBrowser().getActions()
-                .moveToElement(getWrappedElement())
+                .moveToElement(thisElem)
                 .perform();
     }
 
@@ -204,16 +214,6 @@ public class ElementImpl extends LazySearchContextImpl implements Element {
     }
 
     @Override
-    public List<WebElement> findElements(By by) {
-        return getWrappedElement().findElements(by);
-    }
-
-    @Override
-    public WebElement findElement(By by) {
-        return getWrappedElement().findElement(by);
-    }
-
-    @Override
     public Point getLocation() {
         return getWrappedElement().getLocation();
     }
@@ -233,11 +233,6 @@ public class ElementImpl extends LazySearchContextImpl implements Element {
         return getWrappedElement().getCssValue(s);
     }
 
-//    @Override
-//    public By getBy() {
-//        return getLocator().getBy();
-//    }
-
     @Override
     public Selector getSelector() {
         return getLocator().getSelector();
@@ -255,10 +250,19 @@ public class ElementImpl extends LazySearchContextImpl implements Element {
 
     @Override
     public WebElement getWrappedElement() {
-        if (element == null) {
+        if (isStaleness()) {
             refresh();
         }
         return element;
+    }
+
+    @Override
+    public boolean isStaleness() {
+        if (element == null) {
+            element = getLocator().findElement();
+        }
+        Boolean staleness = ExpectedConditions.stalenessOf(element).apply(getBrowser().getWebDriver());
+        return staleness != null && staleness;
     }
 
     @Override
@@ -292,7 +296,9 @@ public class ElementImpl extends LazySearchContextImpl implements Element {
 
     @Override
     public void refresh() {
+        getLocator().refresh();
         element = getLocator().findElement();
+        setSearchContext(element);
     }
 
     @Override

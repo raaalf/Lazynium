@@ -29,7 +29,7 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 /**
  * Browser class is implementation of WebDriver to execute basic actions using it
  */
-public class Browser extends LazySearchContextImpl implements WebDriver {
+public class Browser extends LazySearchContextImpl implements WebDriver, LazySearchContext {
     private WebDriver driver;
     private JsExecutor jsExecutor;
     private ScreenShooter shooter;
@@ -59,6 +59,7 @@ public class Browser extends LazySearchContextImpl implements WebDriver {
         return this.actions;
     }
 
+    @Override
     public void refresh() {
         if (getWebDriver().toString().contains("null")) {
             initialize();
@@ -75,18 +76,16 @@ public class Browser extends LazySearchContextImpl implements WebDriver {
     }
 
     @Override
-    public WebElement findElement(By by) {
-        return getWebDriver().findElement(by);
+    public SearchContext getSearchContext() {
+        if (super.getSearchContext() == null) {
+            setSearchContext(getWebDriver());
+        }
+        return super.getSearchContext();
     }
 
     @Override
     public String getPageSource() {
         return getWebDriver().getPageSource();
-    }
-
-    @Override
-    public List<WebElement> findElements(By by) {
-        return getWebDriver().findElements(by);
     }
 
     @Override

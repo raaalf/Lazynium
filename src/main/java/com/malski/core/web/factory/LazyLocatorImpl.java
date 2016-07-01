@@ -1,10 +1,9 @@
 package com.malski.core.web.factory;
 
+import com.malski.core.web.base.LazySearchContext;
 import com.malski.core.web.elements.api.Element;
 import com.malski.core.web.elements.api.Elements;
-import com.malski.core.web.elements.impl.ElementsImpl;
 import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.pagefactory.AbstractAnnotations;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
@@ -12,20 +11,20 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 import java.util.List;
 
 public class LazyLocatorImpl implements ElementLocator, LazyLocator {
-    private final SearchContext searchContext;
+    private final LazySearchContext searchContext;
     private Selector selector;
 
-    public LazyLocatorImpl(SearchContext searchContext, AbstractAnnotations annotations) {
+    public LazyLocatorImpl(LazySearchContext searchContext, AbstractAnnotations annotations) {
         this.searchContext = searchContext;
         this.selector = new Selector(annotations.buildBy());
     }
 
-    public LazyLocatorImpl(SearchContext searchContext, By by) {
+    public LazyLocatorImpl(LazySearchContext searchContext, By by) {
         this.searchContext = searchContext;
         this.selector = new Selector(by);
     }
 
-    public LazyLocatorImpl(SearchContext searchContext, Selector selector) {
+    public LazyLocatorImpl(LazySearchContext searchContext, Selector selector) {
         this.searchContext = searchContext;
         this.selector = selector;
     }
@@ -52,7 +51,7 @@ public class LazyLocatorImpl implements ElementLocator, LazyLocator {
 
     @Override
     public <T extends Element> Elements<T> getElements(Class<T> clazz) {
-        return new ElementsImpl<>(this, clazz);
+        return new ElementListHandler(clazz, this).getElementImplementation();
     }
 
     @Override
@@ -62,11 +61,20 @@ public class LazyLocatorImpl implements ElementLocator, LazyLocator {
 
     @Override
     public List<? extends Element> getElements() {
-        return new ElementsImpl<>(this, Element.class);
+        return new ElementListHandler(Element.class, this).getElementImplementation();
     }
 
     @Override
     public Selector getSelector() {
         return this.selector;
+    }
+
+    @Override
+    public void refresh() {
+        try {
+            this.searchContext.refresh();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

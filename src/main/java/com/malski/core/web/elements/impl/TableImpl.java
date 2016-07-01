@@ -1,5 +1,6 @@
 package com.malski.core.web.elements.impl;
 
+import com.malski.core.web.base.LazySearchContext;
 import com.malski.core.web.elements.api.Element;
 import com.malski.core.web.elements.api.Elements;
 import com.malski.core.web.elements.api.Table;
@@ -7,16 +8,17 @@ import com.malski.core.web.factory.LazyLocator;
 import com.malski.core.web.factory.Selector;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+
+import java.util.stream.Collectors;
 
 public class TableImpl extends ElementImpl implements Table {
 
-    public TableImpl(By by, SearchContext context) {
+    public TableImpl(By by, LazySearchContext context) {
         super(by, context);
     }
 
-    public TableImpl(Selector selector, SearchContext context) {
+    public TableImpl(Selector selector, LazySearchContext context) {
         super(selector, context);
     }
 
@@ -34,7 +36,11 @@ public class TableImpl extends ElementImpl implements Table {
 
     @Override
     public int getRowCount() {
-        return getRows().size();
+        if ($("tbody>tr").isPresent(1)) {
+            return getRows().size();
+        } else {
+            return 0;
+        }
     }
 
     @Override
@@ -69,12 +75,54 @@ public class TableImpl extends ElementImpl implements Table {
 
     @Override
     public Elements<Element> getRows() {
-        return $$("tbody>tr");
+        return getRows(Element.class);
+    }
+
+    @Override
+    public <T extends Element> Elements<T> getRows(Class<T> clazz) {
+        return $$("tbody>tr", clazz);
+    }
+
+    @Override
+    public Elements<Element> getRows(String text) {
+        Elements<Element> rows = getEmptyElementsList();
+        rows.addAll(getRows().stream().filter(row -> row.getText().contains(text)).collect(Collectors.toList()));
+        return rows;
+    }
+
+    @Override
+    public Elements<Element> getRows(int colIndex, String text) {
+        int headersSize = getColumnHeaders().size();
+        if (headersSize <= colIndex) {
+            throw new NoSuchElementException("No column with index: " + colIndex + ". Max index: " + headersSize);
+        }
+        Elements<Element> rows = getEmptyElementsList();
+        for (Element row : getRows()) {
+            Elements<Element> cells = getCells(row);
+            if (cells.get(colIndex).getText().contains(text)) {
+                rows.add(row);
+            }
+        }
+        return rows;
+    }
+
+    @Override
+    public Elements<Element> getRows(String columnName, String text) {
+        int colIndex = getColumnHeaderIndex(columnName);
+        if (colIndex < 0) {
+            throw new NoSuchElementException("No column with name: " + columnName);
+        }
+        return getRows(colIndex, text);
     }
 
     @Override
     public Element getRow(int rowIdx) {
-        Elements<Element> rows = getRows();
+        return getRow(rowIdx, Element.class);
+    }
+
+    @Override
+    public <T extends Element> T getRow(int rowIdx, Class<T> clazz) {
+        Elements<T> rows = getRows(clazz);
         if (rows.size() <= rowIdx) {
             throw new NoSuchElementException("No row with index: " + rowIdx + ". Max row: " + rows.size());
         }
@@ -83,7 +131,12 @@ public class TableImpl extends ElementImpl implements Table {
 
     @Override
     public Element getRow(String text) {
-        for (Element row : getRows()) {
+        return getRow(text, Element.class);
+    }
+
+    @Override
+    public <T extends Element> T getRow(String text, Class<T> clazz) {
+        for (T row : getRows(clazz)) {
             if (row.getText().contains(text)) {
                 return row;
             }
@@ -105,17 +158,32 @@ public class TableImpl extends ElementImpl implements Table {
 
     @Override
     public Elements<Element> getRowCells(int index) {
-        return getRow(index).getElements(By.tagName("td"));
+        return getCells(getRow(index));
+    }
+
+    @Override
+    public <T extends Element> Elements<T> getRowCells(int index, Class<T> clazz) {
+        return getCells(getRow(index), clazz);
     }
 
     @Override
     public Elements<Element> getRowCells(String text) {
-        return getRow(text).getElements(By.tagName("td"));
+        return getCells(getRow(text));
+    }
+
+    @Override
+    public <T extends Element> Elements<T> getRowCells(String text, Class<T> clazz) {
+        return getCells(getRow(text), clazz);
     }
 
     @Override
     public Element getCell(int rowIndex, int colIndex) {
-        Elements<Element> cells = getRowCells(rowIndex);
+        return getCell(rowIndex, colIndex, Element.class);
+    }
+
+    @Override
+    public <T extends Element> T getCell(int rowIndex, int colIndex, Class<T> clazz) {
+        Elements<T> cells = getRowCells(rowIndex, clazz);
         if (cells.size() <= colIndex) {
             throw new NoSuchElementException("No column with index: " + colIndex + ". Max index: " + cells.size());
         }
@@ -124,7 +192,12 @@ public class TableImpl extends ElementImpl implements Table {
 
     @Override
     public Element getCell(int rowIndex, String columnName) {
-        Elements<Element> cells = getRowCells(rowIndex);
+        return getCell(rowIndex, columnName, Element.class);
+    }
+
+    @Override
+    public <T extends Element> T getCell(int rowIndex, String columnName, Class<T> clazz) {
+        Elements<T> cells = getRowCells(rowIndex, clazz);
         int colIndex = getColumnHeaderIndex(columnName);
         if (colIndex < 0) {
             throw new NoSuchElementException("No column with name: " + columnName);
@@ -134,7 +207,12 @@ public class TableImpl extends ElementImpl implements Table {
 
     @Override
     public Element getCell(String rowText, int colIndex) {
-        Elements<Element> cells = getRowCells(rowText);
+        return getCell(rowText, colIndex, Element.class);
+    }
+
+    @Override
+    public <T extends Element> T getCell(String rowText, int colIndex, Class<T> clazz) {
+        Elements<T> cells = getRowCells(rowText, clazz);
         if (cells.size() <= colIndex) {
             throw new NoSuchElementException("No column with index: " + colIndex + ". Max index: " + cells.size());
         }
@@ -143,7 +221,12 @@ public class TableImpl extends ElementImpl implements Table {
 
     @Override
     public Element getCell(String rowText, String columnName) {
-        Elements<Element> cells = getRowCells(rowText);
+        return getCell(rowText, columnName, Element.class);
+    }
+
+    @Override
+    public <T extends Element> T getCell(String rowText, String columnName, Class<T> clazz) {
+        Elements<T> cells = getRowCells(rowText, clazz);
         int colIndex = getColumnHeaderIndex(columnName);
         if (colIndex < 0) {
             throw new NoSuchElementException("No column with name: " + columnName);
@@ -161,4 +244,11 @@ public class TableImpl extends ElementImpl implements Table {
         return $("tfoot");
     }
 
+    private Elements<Element> getCells(Element row) {
+        return getCells(row, Element.class);
+    }
+
+    private <T extends Element> Elements<T> getCells(Element row, Class<T> clazz) {
+        return row.getElements(By.tagName("td"), clazz);
+    }
 }

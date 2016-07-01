@@ -1,10 +1,9 @@
 package com.malski.core.web.factory;
 
 import com.malski.core.web.base.Browser;
+import com.malski.core.web.base.LazySearchContext;
 import com.malski.core.web.page.impl.Page;
 import com.malski.core.web.page.api.WebView;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 import org.openqa.selenium.support.pagefactory.FieldDecorator;
@@ -20,11 +19,11 @@ public class LazyPageFactory extends PageFactory {
         return page;
     }
 
-    public static <T extends WebView> void initElements(WebDriver driver, T webComponent) {
-        initElements(new LazyLocatorFactory(driver), webComponent);
+    public static <T extends WebView> void initElements(Browser browser, T webComponent) {
+        initElements(new LazyLocatorFactory(browser), webComponent);
     }
 
-    public static <T extends WebView> T initElements(SearchContext searchContext, T webComponent) {
+    public static <T extends WebView> T initElements(LazySearchContext searchContext, T webComponent) {
         initElements(new ElementDecorator(new LazyLocatorFactory(searchContext)), webComponent);
         return webComponent;
     }

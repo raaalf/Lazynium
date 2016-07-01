@@ -1,5 +1,6 @@
 package com.malski.core.web.elements.impl;
 
+import com.malski.core.web.base.LazySearchContext;
 import com.malski.core.web.elements.api.Link;
 import com.malski.core.web.factory.LazyLocator;
 import com.malski.core.web.factory.Selector;
@@ -9,11 +10,11 @@ import org.openqa.selenium.WebElement;
 
 public class LinkImpl extends ElementImpl implements Link {
 
-    public LinkImpl(By by, SearchContext context) {
+    public LinkImpl(By by, LazySearchContext context) {
         super(by, context);
     }
 
-    public LinkImpl(Selector selector, SearchContext context) {
+    public LinkImpl(Selector selector, LazySearchContext context) {
         super(selector, context);
     }
 

@@ -4,7 +4,7 @@ Test framework based on Selenium Webdriver, Cucumber, TestNG and Selophane(https
 
 ## Thanks:
 - foobar automation team for support
--@elisarver for Selophane sources
+- @elisarver for Selophane sources
 
 ## Installation
 

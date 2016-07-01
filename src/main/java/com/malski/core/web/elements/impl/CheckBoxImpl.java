@@ -1,10 +1,10 @@
 package com.malski.core.web.elements.impl;
 
+import com.malski.core.web.base.LazySearchContext;
 import com.malski.core.web.elements.api.CheckBox;
 import com.malski.core.web.factory.LazyLocator;
 import com.malski.core.web.factory.Selector;
 import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.elementSelectionStateToBe;
@@ -13,11 +13,11 @@ import static com.malski.core.cucumber.TestContext.getBrowser;
 
 public class CheckBoxImpl extends ElementImpl implements CheckBox {
 
-    public CheckBoxImpl(By by, SearchContext context) {
+    public CheckBoxImpl(By by, LazySearchContext context) {
         super(by, context);
     }
 
-    public CheckBoxImpl(Selector selector, SearchContext context) {
+    public CheckBoxImpl(Selector selector, LazySearchContext context) {
         super(selector, context);
     }
 

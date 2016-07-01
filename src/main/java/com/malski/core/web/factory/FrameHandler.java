@@ -15,7 +15,7 @@ public class FrameHandler implements InvocationHandler {
 
     private final List<String> outsideMethodNames = Arrays.asList("waitUntilPresent", "waitUntilVisible", "waitUntilDisappear",
             "waitUntilEnabled", "waitUntilDisabled", "refresh", "getBrowser", "getSearchContext", "setRoot", "getFrame",
-            "switchIn", "switchOut", "getRoot", "setSearchContext");
+            "switchIn", "switchOut", "getRoot", "setSearchContext", "refresh");
 
     /* Generates a handler to retrieve the WebElement from a locator for
        a given WebElement interface descendant. */

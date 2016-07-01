@@ -3,6 +3,7 @@ package com.malski.core.web.page.impl;
 import com.malski.core.cucumber.TestContext;
 import com.malski.core.web.annotations.PageCheck;
 import com.malski.core.web.base.Browser;
+import com.malski.core.web.base.LazySearchContext;
 import com.malski.core.web.base.LazySearchContextImpl;
 import com.malski.core.web.factory.LazyPageFactory;
 import com.malski.core.web.page.api.WebView;
@@ -17,15 +18,15 @@ import static org.hamcrest.CoreMatchers.is;
 /**
  * Class which is representing displayed page and allow to performing basic actions on it
  */
-public abstract class Page extends LazySearchContextImpl implements WebView {
+public abstract class Page extends LazySearchContextImpl implements WebView, LazySearchContext {
     protected final Logger log = Logger.getLogger(getClass());
     private final Browser browser;
     private String url;
-    protected boolean isOpened = true;
+    private boolean isOpened = true;
 
     public Page() {
         this.browser = TestContext.getBrowser();
-        LazyPageFactory.initElements(getSearchContext(), this);
+        LazyPageFactory.initElements(this, this);
         browser.waitForPageToLoad();
         this.handlePageInfo();
     }
@@ -36,6 +37,13 @@ public abstract class Page extends LazySearchContextImpl implements WebView {
             setSearchContext(getBrowser());
         }
         return super.getSearchContext();
+    }
+
+    @Override
+    public void refresh() {
+        getBrowser().refresh();
+        setSearchContext(getBrowser());
+        LazyPageFactory.initElements(this, this);
     }
 
     public String getUrl() {

@@ -12,6 +12,8 @@ public interface Elements<T extends Element> extends List<T>, ElementsWait, Elem
 
     List<String> getValues();
 
+    List<String> getAttributes(String attributeName);
+
     List<String> getIds();
 
     void refresh();

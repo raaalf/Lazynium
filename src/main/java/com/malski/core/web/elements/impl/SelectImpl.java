@@ -1,12 +1,12 @@
 package com.malski.core.web.elements.impl;
 
+import com.malski.core.web.base.LazySearchContext;
 import com.malski.core.web.elements.api.Element;
 import com.malski.core.web.elements.api.Elements;
 import com.malski.core.web.elements.api.Select;
 import com.malski.core.web.factory.LazyLocator;
 import com.malski.core.web.factory.Selector;
 import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
@@ -19,11 +19,11 @@ import static com.malski.core.cucumber.TestContext.getBrowser;
 public class SelectImpl extends ElementImpl implements Select {
     private org.openqa.selenium.support.ui.Select innerSelect;
 
-    public SelectImpl(By by, SearchContext context) {
+    public SelectImpl(By by, LazySearchContext context) {
         super(by, context);
     }
 
-    public SelectImpl(Selector selector, SearchContext context) {
+    public SelectImpl(Selector selector, LazySearchContext context) {
         super(selector, context);
     }
 
@@ -107,9 +107,9 @@ public class SelectImpl extends ElementImpl implements Select {
 
     @Override
     public Elements<Element> getAllSelectedOptions() {
-        Elements<Element> toReturn = new ElementsImpl<>();
-        this.getOptions().forEach(option -> {
-            if (option.isSelected()) {
+        Elements<Element> toReturn = getEmptyElementsList();
+        this.getOptions().forEach( option -> {
+            if(option.isSelected()) {
                 toReturn.add(option);
             }
         });

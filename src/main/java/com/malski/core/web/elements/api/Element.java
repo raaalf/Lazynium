@@ -29,5 +29,7 @@ public interface Element extends WebElement, WrapsElement, Locatable, ElementSta
 
     void refresh();
 
+    boolean isStaleness();
+
     <T extends Element> T as(Class<T> clazz);
 }

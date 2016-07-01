@@ -1,14 +1,14 @@
 package com.malski.core.web.factory;
 
-import org.openqa.selenium.SearchContext;
+import com.malski.core.web.base.LazySearchContext;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 
 import java.lang.reflect.Field;
 
 public class LazyLocatorFactory implements ElementLocatorFactory {
-    private final SearchContext searchContext;
+    private final LazySearchContext searchContext;
 
-    public LazyLocatorFactory(SearchContext searchContext) {
+    public LazyLocatorFactory(LazySearchContext searchContext) {
         this.searchContext = searchContext;
     }
 

@@ -1,10 +1,10 @@
 package com.malski.core.web.elements.impl;
 
+import com.malski.core.web.base.LazySearchContext;
 import com.malski.core.web.elements.api.RadioButton;
 import com.malski.core.web.factory.LazyLocator;
 import com.malski.core.web.factory.Selector;
 import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.elementSelectionStateToBe;
@@ -13,11 +13,11 @@ import static com.malski.core.cucumber.TestContext.getBrowser;
 
 public class RadioButtonImpl extends ElementImpl implements RadioButton {
 
-    public RadioButtonImpl(By by, SearchContext context) {
+    public RadioButtonImpl(By by, LazySearchContext context) {
         super(by, context);
     }
 
-    public RadioButtonImpl(Selector selector, SearchContext context) {
+    public RadioButtonImpl(Selector selector, LazySearchContext context) {
         super(selector, context);
     }
 

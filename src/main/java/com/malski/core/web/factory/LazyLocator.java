@@ -17,4 +17,5 @@ public interface LazyLocator extends ElementLocator {
 
     List<? extends Element> getElements();
 
+    void refresh();
 }

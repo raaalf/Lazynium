@@ -1,5 +1,6 @@
 package com.malski.core.web.elements.impl;
 
+import com.malski.core.web.base.LazySearchContext;
 import com.malski.core.web.conditions.WaitConditions;
 import com.malski.core.web.elements.api.Element;
 import com.malski.core.web.elements.api.Elements;
@@ -29,12 +30,12 @@ public class ElementsImpl<E extends Element> implements Elements<E> {
         this.elementInterface = elementInterface;
     }
 
-    public ElementsImpl(By by, SearchContext context, final Class<E> elementInterface) {
+    public ElementsImpl(By by, LazySearchContext context, final Class<E> elementInterface) {
         this.locator = new LazyLocatorImpl(context, by);
         this.elementInterface = elementInterface;
     }
 
-    public ElementsImpl(Selector selector, SearchContext context, final Class<E> elementInterface) {
+    public ElementsImpl(Selector selector, LazySearchContext context, final Class<E> elementInterface) {
         this.locator = new LazyLocatorImpl(context, selector);
         this.elementInterface = elementInterface;
     }
@@ -56,6 +57,15 @@ public class ElementsImpl<E extends Element> implements Elements<E> {
 
     @Override
     public void refresh() {
+        try {
+            setList();
+        } catch (StaleElementReferenceException ignore) {
+            getLocator().refresh();
+            setList();
+        }
+    }
+
+    private void setList() {
         elements = new ArrayList<>();
         if (getLocator() == null) {
             return;
@@ -232,6 +242,10 @@ public class ElementsImpl<E extends Element> implements Elements<E> {
 
     public List<String> getValues() {
         return stream().map(Element::getValue).collect(Collectors.toList());
+    }
+
+    public List<String> getAttributes(String attributeName) {
+        return getWrappedElements().stream().map(element -> element.getAttribute(attributeName)).collect(Collectors.toList());
     }
 
     public List<String> getIds() {
