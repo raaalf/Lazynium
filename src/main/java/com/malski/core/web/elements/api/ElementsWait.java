@@ -20,4 +20,12 @@ public interface ElementsWait {
     void waitUntilAllDisabled();
 
     void waitUntilAnyDisabled();
+
+//    void waitUntilAllSelected();
+//
+//    void waitUntilAnySelected();
+//
+//    void waitUntilAllUnselected();
+//
+//    void waitUntilAnyUnselected();
 }

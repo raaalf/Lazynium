@@ -1,14 +1,15 @@
 package com.malski.core.web.factory;
 
-import com.malski.core.web.base.Browser;
-import com.malski.core.web.base.LazySearchContext;
-import com.malski.core.web.page.impl.Page;
-import com.malski.core.web.page.api.WebView;
+import com.malski.core.web.control.Browser;
+import com.malski.core.web.control.LazySearchContext;
+import com.malski.core.web.view.Page;
+import com.malski.core.web.view.View;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 import org.openqa.selenium.support.pagefactory.FieldDecorator;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 public class LazyPageFactory extends PageFactory {
@@ -19,21 +20,41 @@ public class LazyPageFactory extends PageFactory {
         return page;
     }
 
-    public static <T extends WebView> void initElements(Browser browser, T webComponent) {
+    public static <T extends View> void initElements(Browser browser, T webComponent) {
         initElements(new LazyLocatorFactory(browser), webComponent);
     }
 
-    public static <T extends WebView> T initElements(LazySearchContext searchContext, T webComponent) {
-        initElements(new ElementDecorator(new LazyLocatorFactory(searchContext)), webComponent);
+    public static <T extends View> T initElements(LazySearchContext searchContext, T webComponent) {
+        initFields(new LazyFieldDecorator(new LazyLocatorFactory(searchContext)), webComponent);
         return webComponent;
     }
 
-    public static <T extends WebView> void initElements(final ElementLocatorFactory factory, T webComponent) {
-        initElements(new ElementDecorator(factory), webComponent);
+    public static <T extends View> void initElements(final ElementLocatorFactory factory, T webComponent) {
+        initFields(new LazyFieldDecorator(factory), webComponent);
     }
 
-    public static <T extends WebView> void initElements(FieldDecorator decorator, T webComponent) {
+    public static <T extends View> void initElements(FieldDecorator decorator, T webComponent) {
         PageFactory.initElements(decorator, webComponent);
+    }
+
+    public static void initFields(LazyFieldDecorator decorator, Object page) {
+        for(Class proxyIn = page.getClass(); proxyIn != Object.class; proxyIn = proxyIn.getSuperclass()) {
+            proxyFields(decorator, page, proxyIn);
+        }
+    }
+
+    private static void proxyFields(LazyFieldDecorator decorator, Object page, Class<?> proxyIn) {
+        for (Field field : proxyIn.getDeclaredFields()) {
+            Object value = decorator.decorate(field);
+            if (value != null) {
+                try {
+                    field.setAccessible(true);
+                    field.set(page, value);
+                } catch (IllegalAccessException var10) {
+                    throw new RuntimeException(var10);
+                }
+            }
+        }
     }
 
     private static <T extends Page> T instantiatePage(Browser browser, Class<T> pageClassToProxy) {

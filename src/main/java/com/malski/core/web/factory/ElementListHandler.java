@@ -1,60 +1,52 @@
 package com.malski.core.web.factory;
 
-import com.malski.core.web.base.LazySearchContext;
-import com.malski.core.web.elements.api.Element;
-import com.malski.core.web.elements.api.Elements;
-import com.malski.core.web.elements.impl.ElementsImpl;
+import com.malski.core.web.control.LazySearchContext;
+import com.malski.core.web.elements.Element;
+import com.malski.core.web.elements.Elements;
+import net.sf.cglib.proxy.MethodProxy;
 import org.openqa.selenium.By;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class ElementListHandler implements InvocationHandler {
-    private final LazyLocator locator;
-    private Class<?> wrappingInterface;
+public class ElementListHandler<T extends Element> extends LazyInterceptor<T> {
 
-    /* Generates a handler to retrieve the WebElement from a locator for
-       a given WebElement interface descendant. */
-    public ElementListHandler(Class<?> interfaceType, LazyLocator locator) {
-        this.locator = locator;
-        init(interfaceType);
+    public ElementListHandler(Class<T> interfaceType, LazyLocator locator) {
+        super(interfaceType, locator);
     }
 
-    public ElementListHandler(Class<?> interfaceType, By by, LazySearchContext searchContext) {
-        this.locator = new LazyLocatorImpl(searchContext, by);
-        init(interfaceType);
+    public ElementListHandler(Class<T> interfaceType, By by, LazySearchContext searchContext) {
+        super(interfaceType, by, searchContext);
     }
 
-    public ElementListHandler(Class<?> interfaceType, Selector selector, LazySearchContext searchContext) {
-        this.locator = new LazyLocatorImpl(searchContext, selector);
-        init(interfaceType);
-    }
-
-    private <T> void init(Class<T> interfaceType) {
-        if (!Element.class.isAssignableFrom(interfaceType)) {
-            throw new RuntimeException("interface not assignable to Element.");
-        }
-        this.wrappingInterface = interfaceType;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T extends Element> Elements<T> getElementImplementation() {
-        return new ElementsImpl<>(locator, (Class<T>) wrappingInterface);
-    }
-
-    public static <T extends Element> Elements<T> getEmptyList() {
-        return new ElementsImpl<>();
+    public ElementListHandler(Class<T> interfaceType, Selector selector, LazySearchContext searchContext) {
+        super(interfaceType, selector, searchContext);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Object invoke(Object object, Method method, Object[] objects) throws Throwable {
-        Elements<? extends Element> wrappedList = new ElementsImpl<>(locator, (Class<? extends Element>) wrappingInterface);
+    protected void init(Class<T> type) {
+        if (!Element.class.isAssignableFrom(type)) {
+            throw new RuntimeException("interface not assignable to Element.");
+        }
+        setWrapper(type);
+    }
+
+    public Elements<T> getImplementation() {
+        return new Elements<>(getLocator(), getWrapper());
+    }
+
+    @Override
+    protected Object interceptInvoke(Object object, Method method, Object[] args, MethodProxy methodProxy) throws InvocationTargetException, IllegalAccessException {
+        @SuppressWarnings("unchecked")
+        Elements<T> wrappedList = new Elements<>(getLocator(), getWrapper());
+        return invoke(wrappedList, object, method, args, methodProxy);
+    }
+
+    protected Object invoke(Elements<T> wrappedList, Object object, Method method, Object[] args, MethodProxy methodProxy) throws InvocationTargetException, IllegalAccessException {
         try {
-            return method.invoke(wrappedList, objects);
-        } catch (InvocationTargetException e) {
-            throw e.getCause();
+            return methodProxy.invoke(wrappedList, args);
+        } catch (Throwable ignore) {
+            return method.invoke(wrappedList, args);
         }
     }
 }

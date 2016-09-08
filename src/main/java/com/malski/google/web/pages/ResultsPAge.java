@@ -1,21 +1,20 @@
 package com.malski.google.web.pages;
 
-import com.malski.core.web.annotations.Module;
-import com.malski.core.web.elements.api.Element;
-import com.malski.core.web.elements.api.Elements;
-import com.malski.core.web.page.impl.Page;
-import com.malski.google.web.api.SearchWithGoogle;
+import com.malski.core.web.annotations.IModule;
+import com.malski.core.web.elements.Element;
+import com.malski.core.web.elements.Elements;
+import com.malski.core.web.view.Page;
 import com.malski.google.web.modules.SearchForm;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
 
-public class ResultsPage extends Page implements SearchWithGoogle {
+public class ResultsPage extends Page {
 
     @FindBy(xpath = "//div[@id='rso']//div[@class='rc']/*[@class='r']/a")
     private Elements<Element> results;
 
-    @Module(@FindBy(id = "searchform"))
+    @IModule(@FindBy(id = "searchform"))
     private SearchForm searchForm;
 
     public ResultsPage() {
@@ -25,15 +24,15 @@ public class ResultsPage extends Page implements SearchWithGoogle {
         return searchForm;
     }
 
-    @Override
-    public ResultsPage searchFor(String phrase) {
+    public ResultsPage search(String phrase) {
         getSearchForm().searchFor(phrase);
         waitForResults();
         return this;
     }
 
-    public void waitForResults() {
+    public ResultsPage waitForResults() {
         results.waitUntilAnyVisible();
+        return this;
     }
 
     public List<String> getResultTitles() {

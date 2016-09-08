@@ -2,6 +2,8 @@ package com.malski.core.web.elements.api;
 
 public interface ElementStates {
 
+    boolean isDisplayed();
+
     boolean isDisplayed(long timeout);
 
     boolean isVisible();
@@ -19,4 +21,10 @@ public interface ElementStates {
     boolean hasFocus();
 
     boolean hasFocus(long timeout);
+
+    boolean isInViewport();
+
+    boolean isInViewport(long timeout);
+
+    boolean isStaleness();
 }

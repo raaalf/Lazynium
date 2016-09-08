@@ -25,4 +25,12 @@ public interface ElementWait {
     void waitUntilAttributeChange(String attributeName, String expectedValue);
 
     void waitUntilAttributeChange(String attributeName, String expectedValue, long timeout);
+
+    void waitUntilIsInViewport();
+
+    void waitUntilIsInViewport(long timeout);
+
+    void waitUntilIsClickable();
+
+    void waitUntilIsClickable(long timeout);
 }

@@ -1,6 +1,6 @@
 package com.malski.core.web.factory;
 
-import com.malski.core.web.base.LazySearchContext;
+import com.malski.core.web.control.LazySearchContext;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 
 import java.lang.reflect.Field;
@@ -13,10 +13,10 @@ public class LazyLocatorFactory implements ElementLocatorFactory {
     }
 
     public LazyLocator createLocator(Field field) {
-        return new LazyLocatorImpl(this.searchContext, new LazyAnnotations(field));
+        return new LazyLocator(this.searchContext, new LazyAnnotations(field));
     }
 
     public LazyLocator createLocator(LazyAnnotations lazyAnnotations) {
-        return new LazyLocatorImpl(this.searchContext, lazyAnnotations);
+        return new LazyLocator(this.searchContext, lazyAnnotations);
     }
 }

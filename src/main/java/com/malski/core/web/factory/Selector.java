@@ -43,6 +43,11 @@ public class Selector extends By {
         return by.findElement(searchContext);
     }
 
+    @Override
+    public String toString() {
+        return "{ "+how.toString() + ", " + using + " }";
+    }
+
     public By getBy() {
         return by;
     }

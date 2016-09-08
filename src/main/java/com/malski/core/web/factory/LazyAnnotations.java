@@ -1,8 +1,8 @@
 package com.malski.core.web.factory;
 
 import com.malski.core.web.annotations.IFrame;
-import com.malski.core.web.annotations.Module;
-import com.malski.core.web.page.api.WebModule;
+import com.malski.core.web.annotations.IModule;
+import com.malski.core.web.view.Module;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.*;
 import org.openqa.selenium.support.pagefactory.AbstractAnnotations;
@@ -28,7 +28,7 @@ public class LazyAnnotations extends AbstractAnnotations {
     public By buildBy() {
         if (field == null) {
             return buildByFromClassForModule();
-        } else if (WebModule.class.isAssignableFrom(field.getType())) {
+        } else if (Module.class.isAssignableFrom(field.getType())) {
             return buildByFromFieldForModule();
         } else {
             return buildByForElement();
@@ -37,8 +37,8 @@ public class LazyAnnotations extends AbstractAnnotations {
 
     private By buildByFromFieldForModule() {
         FindBy findBy = null;
-        if (this.field.isAnnotationPresent(Module.class)) {
-            Module module = this.field.getAnnotation(Module.class);
+        if (this.field.isAnnotationPresent(IModule.class)) {
+            IModule module = this.field.getAnnotation(IModule.class);
             findBy = module.value();
         } else if (this.field.isAnnotationPresent(IFrame.class)) {
             IFrame frame = this.field.getAnnotation(IFrame.class);
@@ -46,11 +46,7 @@ public class LazyAnnotations extends AbstractAnnotations {
         }
         if (findBy == null || isFindByUnset(findBy)) {
             if (field != null) {
-                try {
-                    this.clazz = ImplHandler.getInterfaceImpl(field.getType());
-                } catch (ClassNotFoundException e) {
-                    throw new RuntimeException("no interface implementation.");
-                }
+                this.clazz = field.getType();
             }
             return buildByFromClassForModule();
         } else {

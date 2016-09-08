@@ -2,4 +2,6 @@
 <properties>
     <comment>This is an optional header comment string</comment>
     <entry key="browser">chrome</entry>
+    <entry key="appType">web</entry>
+    <entry key="displayDirection">down</entry>
 </properties>
