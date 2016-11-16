@@ -11,9 +11,6 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.internal.WrapsElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-
-import java.util.List;
 
 import static com.malski.core.utils.TestContext.getBrowser;
 import static com.malski.core.utils.TestContext.getConfig;
@@ -33,19 +30,18 @@ public class Element extends LazySearchContext implements WebElement, WrapsEleme
     }
 
     @Override
-    public List<WebElement> simpleFindElements(By by) {
-        return getWrappedElement().findElements(by);
-    }
-
-    @Override
-    public WebElement simpleFindElement(By by) {
-        return getWrappedElement().findElement(by);
+    public SearchContext getContext() {
+        return getWrappedElement();
     }
 
     @Override
     public void click() {
-        waitUntilIsClickable(getConfig().getTimeout());
+        waitUntilIsClickable(getConfig().getMinTimeout());
         getWrappedElement().click();
+    }
+
+    public void clickAndWait() {
+        click();
         getBrowser().waitForPageToLoad();
     }
 
@@ -64,15 +60,18 @@ public class Element extends LazySearchContext implements WebElement, WrapsEleme
     }
 
     public void dragAndDrop(Element elementToDrop) {
+        getBrowser().getActions().dragAndDrop(this, elementToDrop).perform();
+    }
+
+    public void dragAndDropWithOffset(Element elementToDrop, int xOffset, int yOffset) {
         WebElement thisElem = getWrappedElement();
         WebElement toDropElem = elementToDrop.getWrappedElement();
         getBrowser().getActions()
                 .clickAndHold(thisElem)
-                .moveToElement(toDropElem)
+                .moveToElement(toDropElem, xOffset, yOffset)
                 .release(toDropElem)
                 .build()
                 .perform();
-//        getBrowser().getActions().dragAndDrop(this, elementToDrop).perform();
     }
 
     public void mouseOver() {
@@ -85,7 +84,7 @@ public class Element extends LazySearchContext implements WebElement, WrapsEleme
     public void scrollIntoView() {
         if (!isInViewport()) {
             getBrowser().waitForPageToLoad();
-            getBrowser().getJsExecutor().scrollIntoView(getWrappedElement());
+            getBrowser().getJsExecutor().scrollIntoView(this);
             getBrowser().waitForPageToLoad();
         }
     }
@@ -128,7 +127,7 @@ public class Element extends LazySearchContext implements WebElement, WrapsEleme
     @Override
     public boolean isDisplayed(long timeout) {
         try {
-            waitUntilDisabled(timeout);
+            waitUntilIsInViewport(timeout);
         } catch (Exception ignore) {
             return false;
         }
@@ -153,8 +152,7 @@ public class Element extends LazySearchContext implements WebElement, WrapsEleme
     @Override
     public boolean isPresent() {
         try {
-            refresh();
-            return true;
+            return getLocator().findElement() != null;
         } catch (NoSuchElementException e) {
             return false;
         }
@@ -273,9 +271,10 @@ public class Element extends LazySearchContext implements WebElement, WrapsEleme
     public boolean isStaleness() {
         if (element == null) {
             setWebElement();
+            return false;
+        } else {
+            return WaitConditions.stalenessOf(element);
         }
-        Boolean staleness = ExpectedConditions.stalenessOf(element).apply(getBrowser().getWebDriver());
-        return staleness != null && staleness;
     }
 
     @Override
@@ -365,12 +364,17 @@ public class Element extends LazySearchContext implements WebElement, WrapsEleme
 
     @Override
     public void waitUntilAttributeChange(String attributeName, String expectedValue) {
-        getBrowser().getWait().until(WaitConditions.attributeChanged(this, attributeName, expectedValue));
+        getBrowser().waitUntilAttributeChange(getLocator(), attributeName, expectedValue);
+    }
+
+    @Override
+    public void waitUntilAttributeChangeFrom(String attributeName, String startValue) {
+        getBrowser().waitUntilAttributeFrom(getLocator(), attributeName, startValue);
     }
 
     @Override
     public void waitUntilAttributeChange(String attributeName, String expectedValue, long timeout) {
-        getBrowser().getWait(timeout).until(WaitConditions.attributeChanged(this, attributeName, expectedValue));
+        getBrowser().waitUntilAttributeChange(getLocator(), attributeName, expectedValue, timeout);
     }
 
     @Override
@@ -385,11 +389,11 @@ public class Element extends LazySearchContext implements WebElement, WrapsEleme
 
     @Override
     public void waitUntilIsClickable() {
-        getBrowser().getWait().until(ExpectedConditions.elementToBeClickable(getWrappedElement()));
+        getBrowser().waitUntilIsClickable(getLocator());
     }
 
     @Override
     public void waitUntilIsClickable(long timeout) {
-        getBrowser().getWait(timeout).until(ExpectedConditions.elementToBeClickable(getWrappedElement()));
+        getBrowser().waitUntilIsClickable(getLocator(), timeout);
     }
 }

@@ -6,18 +6,23 @@ import java.io.File;
 
 import static com.malski.core.utils.TestContext.getPropertyByKey;
 
-/**
- * Created by rmalski on 2016-08-09.
- */
 public class TestConfig {
     private String driversDirPath;
     private String downloadDirPath;
     private String testResourceDirPath;
     private String resourceDirPath;
     private String app;
+    private String device;
+    private String osVersion;
     private String driver;
+    private long minTimeout;
     private long timeout;
+    private long maxTimeout;
+    private long driverSleepMs;
+    private long implicitlyTimeoutMs;
+    private long explicitlyTimeout;
     private int retryCount;
+    private boolean videoRecording;
 
     protected final Logger log = Logger.getLogger(getClass());
 
@@ -27,16 +32,24 @@ public class TestConfig {
 
     private void setConfiguration() {
         setApp();
+        setDevice();
+        setOsVersion();
         setDriver();
+        setMinTimeout();
         setTimeout();
+        setMaxTimeout();
+        setDriverSleepMs();
+        setImplicitlyTimeoutMs();
+        setExplicitlyTimeoutMs();
         setRetryCount();
         setDownloadDirPath();
         setTestResourceDirPath();
         setResourceDirPath();
         setDriversDirPath();
+        setVideoRecording();
     }
 
-    public void setApp() {
+    private void setApp() {
         this.app = getPropertyByKey(PropertyKey.APP);
     }
 
@@ -44,7 +57,23 @@ public class TestConfig {
         return app;
     }
 
-    public void setDriver() {
+    private void setDevice() {
+        this.device = getPropertyByKey(PropertyKey.DEVICE);
+    }
+
+    public String getDevice() {
+        return device;
+    }
+
+    private void setOsVersion() {
+        this.osVersion = getPropertyByKey(PropertyKey.OS_VERSION);
+    }
+
+    public String getOsVersion() {
+        return osVersion;
+    }
+
+    private void setDriver() {
         this.driver = getPropertyByKey(PropertyKey.DRIVER);
     }
 
@@ -58,6 +87,46 @@ public class TestConfig {
 
     private void setTimeout() {
         this.timeout = Long.parseLong(getPropertyByKey(PropertyKey.TIMEOUT));
+    }
+
+    public long getMaxTimeout() {
+        return maxTimeout;
+    }
+
+    private void setMaxTimeout() {
+        this.maxTimeout = Long.parseLong(getPropertyByKey(PropertyKey.MAX_TIMEOUT));
+    }
+
+    public long getImplicitlyTimeoutMs() {
+        return this.implicitlyTimeoutMs;
+    }
+
+    private void setImplicitlyTimeoutMs() {
+        this.implicitlyTimeoutMs = Long.parseLong(getPropertyByKey(PropertyKey.IMPLICITLY_TIMEOUT_MS));
+    }
+
+    public long getExplicitlyTimeout() {
+        return this.explicitlyTimeout;
+    }
+
+    private void setExplicitlyTimeoutMs() {
+        this.explicitlyTimeout = Long.parseLong(getPropertyByKey(PropertyKey.EXPLICITLY_TIMEOUT));
+    }
+
+    public long getDriverSleepMs() {
+        return this.driverSleepMs;
+    }
+
+    private void  setDriverSleepMs() {
+        this.driverSleepMs = Long.parseLong(getPropertyByKey(PropertyKey.DRIVER_SLEEP_MS));
+    }
+
+    public long getMinTimeout() {
+        return minTimeout;
+    }
+
+    private void setMinTimeout() {
+        this.minTimeout = Long.parseLong(getPropertyByKey(PropertyKey.MIN_TIMEOUT));
     }
 
     private void setRetryCount() {
@@ -94,5 +163,13 @@ public class TestConfig {
 
     public String getDriversDirPath() {
         return driversDirPath;
+    }
+
+    private void setVideoRecording() {
+        this.videoRecording = Boolean.parseBoolean(getPropertyByKey(PropertyKey.VIDEO_RECORDING));
+    }
+
+    public boolean isVideoRecordingEnabled() {
+        return videoRecording;
     }
 }

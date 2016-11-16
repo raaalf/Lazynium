@@ -7,38 +7,36 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TestContext {
+    private static boolean initiated = true;
 
-    private static final ThreadLocal<Browser> BROWSER_THREAD_LOCAL;
-    private static final ThreadLocal<Application> APP_THREAD_LOCAL;
+    private static Browser browser;
+    private static Application app;
+    private static VideoRecorder videoRecorder;
 
     public static void initialize() {
-        if(PROPERTIES_THREAD_LOCAL.get() == null) {
-            PROPERTIES_THREAD_LOCAL.set(CustomProperties.getProperties("testProperties.xml"));
-        }
-        if (CONFIG_THREAD_LOCAL.get() == null) {
-            CONFIG_THREAD_LOCAL.set(new TestConfig());
-        }
-        if(getConfig().getApp().equals("web")) {
-            if (BROWSER_THREAD_LOCAL.get() == null) {
-                setBrowser(getConfig().getDriver());
+        if(initiated) {
+            if (properties == null) {
+                properties = CustomProperties.getProperties("testProperties.xml");
             }
-        } else {
-            if (APP_THREAD_LOCAL.get() == null) {
-                setApplication(getConfig().getDriver());
+            if (config == null) {
+                config = new TestConfig();
             }
-        }
-        if(CONTAINER_THREAD_LOCAL.get() == null) {
-            CONTAINER_THREAD_LOCAL.set(new HashMap<>());
+            if (container == null) {
+                container = new HashMap<>();
+            }
+            initiated = false;
         }
     }
 
-    static {
-        BROWSER_THREAD_LOCAL = new ThreadLocal<>();
-        APP_THREAD_LOCAL = new ThreadLocal<>();
+    public static VideoRecorder getVideoRecorder() {
+        if(videoRecorder == null) {
+            videoRecorder = new VideoRecorder();
+        }
+        return videoRecorder;
     }
 
     public static Browser getBrowser() {
-        Browser browser = BROWSER_THREAD_LOCAL.get();
+        Browser browser = TestContext.browser;
         if (browser == null) {
             throw new IllegalStateException("Browser not set on the TestContext");
         }
@@ -46,11 +44,11 @@ public class TestContext {
     }
 
     public static void setBrowser(String driver) {
-        BROWSER_THREAD_LOCAL.set(new Browser(driver));
+        browser = new Browser(driver);
     }
 
     public static Application getApplication() {
-        Application app = APP_THREAD_LOCAL.get();
+        Application app = TestContext.app;
         if (app == null) {
             throw new IllegalStateException("Application not set on the TestContext");
         }
@@ -59,27 +57,22 @@ public class TestContext {
 
 
     public static void setApplication(String driver) {
-        APP_THREAD_LOCAL.set(new Application(driver));
+        app = new Application(driver);
     }
 
-    private static final ThreadLocal<Map<ContainerKey, Object>> CONTAINER_THREAD_LOCAL;
-
-    //container for handling variables shared between steps
-    static {
-        CONTAINER_THREAD_LOCAL = new ThreadLocal<>();
-    }
+    private static Map<ContainerKey, Object> container;
 
     public static Map<ContainerKey, Object> getContainer() {
-        return CONTAINER_THREAD_LOCAL.get();
+        return container;
     }
 
     @SuppressWarnings("unchecked")
     public static <T> T getFromContainer(ContainerKey key) {
-        return (T) CONTAINER_THREAD_LOCAL.get().get(key);
+        return (T) container.get(key);
     }
 
     public static void setInContainer(ContainerKey key, Object value) {
-        CONTAINER_THREAD_LOCAL.get().put(key, value);
+        container.put(key, value);
     }
 
     public static boolean containerContainsKey(ContainerKey key) {
@@ -95,19 +88,14 @@ public class TestContext {
     }
 
     //properties for running tests
-    private static final ThreadLocal<Map<String, String>> PROPERTIES_THREAD_LOCAL;
-    private static final ThreadLocal<TestConfig> CONFIG_THREAD_LOCAL;
-
-    static {
-        PROPERTIES_THREAD_LOCAL = new ThreadLocal<>();
-        CONFIG_THREAD_LOCAL = new ThreadLocal<>();
-    }
+    private static Map<String, String> properties;
+    private static TestConfig config;
 
     public static String getPropertyByKey(PropertyKey key){
-        return PROPERTIES_THREAD_LOCAL.get().get(key.toString());
+        return properties.get(key.toString());
     }
 
     public static TestConfig getConfig() {
-        return CONFIG_THREAD_LOCAL.get();
+        return config;
     }
 }

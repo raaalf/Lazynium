@@ -3,7 +3,6 @@ package com.malski.core.web.factory;
 import com.malski.core.web.control.LazySearchContext;
 import com.malski.core.web.elements.Element;
 import com.malski.core.web.elements.Elements;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.pagefactory.AbstractAnnotations;
@@ -12,7 +11,6 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 import java.util.List;
 
 public class LazyLocator implements ElementLocator {
-    private static Logger log = Logger.getLogger(LazyLocator.class);
     private final LazySearchContext searchContext;
     private Selector selector;
     private int index = 0;
@@ -52,11 +50,7 @@ public class LazyLocator implements ElementLocator {
 
     @SuppressWarnings("unchecked")
     public <T extends Element> T getElement(Class<T> clazz) {
-        try {
-            return (T) new ElementHandler(clazz, this).getImplementation();
-        } catch (Throwable throwable) {
-            return null;
-        }
+        return (T) new ElementHandler(clazz, this).getImplementation();
     }
 
     public <T extends Element> Elements<T> getElements(Class<T> clazz) {
@@ -76,12 +70,7 @@ public class LazyLocator implements ElementLocator {
     }
 
     public boolean refresh() {
-        try {
-            return this.searchContext.refresh();
-        } catch (Exception e) {
-            log.error(e);
-            return false;
-        }
+        return this.searchContext.refresh();
     }
 
     public LazyLocator duplicate(int index) {
@@ -92,6 +81,6 @@ public class LazyLocator implements ElementLocator {
 
     @Override
     public String toString() {
-        return selector == null ? "null" : "Located by: " + selector.toString();
+        return selector == null ? "null" : "Located by: " + selector.toString() + "["+index+"]";
     }
 }

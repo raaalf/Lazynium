@@ -8,10 +8,9 @@ import com.malski.core.web.elements.api.ElementStates;
 import com.malski.core.web.factory.LazyLocator;
 import com.malski.core.web.factory.LazyPageFactory;
 import org.apache.log4j.Logger;
-import org.openqa.selenium.*;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.FluentWait;
-
-import java.util.List;
 
 /**
  * Class which is representing displayed module on page and allow to performing basic actions on it
@@ -23,14 +22,13 @@ public abstract class Module extends LazySearchContext implements View, ElementS
     public Module() {
     }
 
-    public void initialize(LazyLocator locator) {
+    public void setRoot(LazyLocator locator) {
         this.rootElement = locator.getElement();
-        initElements();
     }
 
     @Override
     public void initElements() {
-        LazyPageFactory.initElements(getRoot(), this);
+        LazyPageFactory.initElements(this);
     }
 
     @Override
@@ -39,23 +37,8 @@ public abstract class Module extends LazySearchContext implements View, ElementS
     }
 
     @Override
-    public List<WebElement> findElements(By by) {
-        try {
-            return getRoot().findElements(by);
-        } catch (StaleElementReferenceException ignore) {
-            refresh();
-            return getRoot().findElements(by);
-        }
-    }
-
-    @Override
-    public WebElement findElement(By by) {
-        try {
-            return getRoot().findElement(by);
-        } catch (StaleElementReferenceException ignore) {
-            refresh();
-            return getRoot().findElement(by);
-        }
+    public SearchContext getContext() {
+        return getRoot();
     }
 
     @Override
@@ -95,21 +78,11 @@ public abstract class Module extends LazySearchContext implements View, ElementS
     }
 
     public boolean isPresent() {
-        try {
-            getRoot().refresh();
-            return true;
-        } catch (NoSuchElementException e) {
-            return false;
-        }
+        return getRoot().isPresent();
     }
 
     public boolean isPresent(long timeout) {
-        try {
-            waitUntilPresent(timeout);
-        } catch (Exception ignore) {
-            return false;
-        }
-        return isPresent();
+        return getRoot().isPresent(timeout);
     }
 
     public boolean isEnabled() {

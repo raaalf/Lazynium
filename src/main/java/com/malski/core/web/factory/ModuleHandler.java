@@ -18,12 +18,14 @@ public class ModuleHandler<T extends Module> extends LazyInterceptor<T> {
         setWrapper(type);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public T getImplementation() {
         try {
             Constructor cons = getWrapper().getConstructor();
             T module = (T) cons.newInstance();
-            module.initialize(getLocator());
+            module.setRoot(getLocator());
+            module.initElements();
             return module;
         } catch (Throwable e) {
             throw new RuntimeException("Not able to create object of type: " + getWrapper().getSimpleName(), e);

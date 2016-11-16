@@ -31,6 +31,7 @@ public class ElementListHandler<T extends Element> extends LazyInterceptor<T> {
         setWrapper(type);
     }
 
+    @Override
     public Elements<T> getImplementation() {
         return new Elements<>(getLocator(), getWrapper());
     }
@@ -42,7 +43,7 @@ public class ElementListHandler<T extends Element> extends LazyInterceptor<T> {
         return invoke(wrappedList, object, method, args, methodProxy);
     }
 
-    protected Object invoke(Elements<T> wrappedList, Object object, Method method, Object[] args, MethodProxy methodProxy) throws InvocationTargetException, IllegalAccessException {
+    private Object invoke(Elements<T> wrappedList, Object object, Method method, Object[] args, MethodProxy methodProxy) throws InvocationTargetException, IllegalAccessException {
         try {
             return methodProxy.invoke(wrappedList, args);
         } catch (Throwable ignore) {

@@ -1,5 +1,6 @@
 package com.malski.core.web.control;
 
+import com.machinepublishers.jbrowserdriver.JBrowserDriver;
 import com.malski.core.utils.PropertyKey;
 import com.malski.core.web.conditions.WaitConditions;
 import com.malski.core.web.factory.LazyLocator;
@@ -7,23 +8,29 @@ import io.github.bonigarcia.wdm.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.*;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.firefox.MarionetteDriver;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.BuildInfo;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.awt.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.malski.core.utils.TestContext.getConfig;
@@ -40,7 +47,6 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElemen
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
 
-
 /**
  * Browser class is implementation of WebDriver to execute basic actions using it
  */
@@ -49,11 +55,8 @@ public class Browser extends LazySearchContext implements WebDriver {
     private JsExecutor jsExecutor;
     private ScreenShooter shooter;
     private Actions actions;
-    private FluentWait<WebDriver> wait;
     private String browserType;
-
-    private static final long TIMEOUT_SECONDS = 30;
-    private static final long IMPLICITLY_TIMEOUT_SECONDS = 10;
+    private String latestWindowHandle;
 
     protected final Logger log = Logger.getLogger(getClass());
 
@@ -63,15 +66,48 @@ public class Browser extends LazySearchContext implements WebDriver {
     }
 
     public JsExecutor getJsExecutor() {
+        if(this.jsExecutor == null) {
+            this.jsExecutor = new JsExecutor(getWebDriver());
+        }
         return this.jsExecutor;
     }
 
     public ScreenShooter getScreenShooter() {
+        if(this.shooter == null) {
+            this.shooter = new ScreenShooter(getWebDriver());
+        }
         return this.shooter;
     }
 
     public Actions getActions() {
+        if(this.actions == null) {
+            this.actions = new Actions(getWebDriver());
+        }
         return this.actions;
+    }
+
+    public String getBrowserType() {
+        switch (browserType) {
+            case "chrome":
+            case "ch":
+                return "chrome";
+            case "firefox":
+            case "ff":
+                return "firefox";
+            case "edge":
+                return "edge";
+            case "internet_explorer":
+            case "ie":
+                return "ie";
+            case "marionette":
+                return "marionette";
+            case "phantomjs":
+                return "phantomjs";
+            case "jbrowser":
+                return "jbrowser";
+            default:
+                return "htmlunit";
+        }
     }
 
     @Override
@@ -84,21 +120,20 @@ public class Browser extends LazySearchContext implements WebDriver {
     }
 
     private void initialize() {
-        driver = initializeWebDriver(this.browserType);
-        jsExecutor = new JsExecutor(getWebDriver());
-        shooter = new ScreenShooter(getWebDriver());
-        actions = new Actions(getWebDriver());
-        setDefaultWaitTimeout();
+        initialize(initializeWebDriver(this.browserType));
+    }
+
+    private void initialize(WebDriver driver) {
+        this.driver = driver;
+        this.jsExecutor = null;
+        this.shooter = null;
+        this.actions = null;
+        setImplicitlyWait(getConfig().getImplicitlyTimeoutMs(), TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public List<WebElement> simpleFindElements(By by) {
-        return getWebDriver().findElements(by);
-    }
-
-    @Override
-    public WebElement simpleFindElement(By by) {
-        return getWebDriver().findElement(by);
+    public SearchContext getContext() {
+        return getWebDriver();
     }
 
     @Override
@@ -112,7 +147,7 @@ public class Browser extends LazySearchContext implements WebDriver {
     }
 
     public void navigateTo(String url) {
-        getWebDriver().get(url);
+        get(url);
         waitForPageToLoad();
     }
 
@@ -141,6 +176,10 @@ public class Browser extends LazySearchContext implements WebDriver {
         return getWebDriver().getWindowHandles();
     }
 
+    public int getWindowsCount() {
+        return getWebDriver().getWindowHandles().size();
+    }
+
     @Override
     public String getWindowHandle() {
         return getWebDriver().getWindowHandle();
@@ -152,23 +191,22 @@ public class Browser extends LazySearchContext implements WebDriver {
     }
 
     public void switchToNewWindow() {
+        latestWindowHandle = getWindowHandle();
         for (String winHandle : getWindowHandles()) {
             switchTo().window(winHandle);
         }
     }
 
     public void switchToNextWindow() {
-        List<String> handles = Arrays.asList(getWindowHandles().toArray(new String[0]));
+        List<String> handles = Arrays.asList(getWindowHandles().toArray(new String[getWindowHandles().size() - 1]));
         int indexOfCurrentPage = handles.indexOf(getWindowHandle());
-        if (indexOfCurrentPage < handles.size() - 1)
+        if (indexOfCurrentPage < handles.size() - 1) {
             switchTo().window(handles.get(indexOfCurrentPage + 1));
+        }
     }
 
     public void switchToPreviousWindow() {
-        List<String> handles = Arrays.asList(getWindowHandles().toArray(new String[0]));
-        int indexOfCurrentPage = handles.indexOf(getWindowHandle());
-        if (indexOfCurrentPage > 0)
-            switchTo().window(handles.get(indexOfCurrentPage - 1));
+        switchTo().window(latestWindowHandle);
     }
 
     @Override
@@ -190,29 +228,23 @@ public class Browser extends LazySearchContext implements WebDriver {
     }
 
     public FluentWait<WebDriver> getWait() {
-        return wait;
+        return new WebDriverWait(getWebDriver(), getConfig().getExplicitlyTimeout(), getConfig().getDriverSleepMs());
     }
 
     public FluentWait<WebDriver> getWait(long seconds) {
-        setWaitTimeout(seconds);
-        return wait;
-    }
-
-    public void setDefaultWaitTimeout() {
-        this.wait = new WebDriverWait(getWebDriver(), TIMEOUT_SECONDS);
-        setImplicitlyWait(IMPLICITLY_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-    }
-
-    public void setWaitTimeout(long seconds) {
-        this.wait = new WebDriverWait(getWebDriver(), seconds);
+        return new WebDriverWait(getWebDriver(), seconds, getConfig().getDriverSleepMs());
     }
 
     public void waitForPageToLoad() {
+        waitForPageToLoad(getConfig().getMaxTimeout());
+    }
+
+    public void waitForPageToLoad(long timePageLoad) {
         try {
             if(isAlertPresent()) {
                 return; // alert opened so page is loaded
             }
-            getWait().until(WaitConditions.pageLoaded());
+            getWait(timePageLoad).until(WaitConditions.pageLoaded());
         } catch (TimeoutException | NullPointerException e) {
             String state = getJsExecutor().getReadyState();
             if (!state.equalsIgnoreCase("interactive")) {
@@ -322,6 +354,10 @@ public class Browser extends LazySearchContext implements WebDriver {
         getWait(timeout).until(attributeChanged(locator, attributeName, expectedValue));
     }
 
+    public void waitUntilAttributeFrom(LazyLocator locator, String attributeName, String fromValue) {
+        getWait().until(attributeChangedFrom(locator, attributeName, fromValue));
+    }
+
     public void waitUntilIsInViewport(By by) {
         getWait().until(isInViewPort(by));
     }
@@ -344,6 +380,22 @@ public class Browser extends LazySearchContext implements WebDriver {
 
     public void waitUntilAlertIsPresent(long timeout) {
         getWait(timeout).until(alertIsPresent());
+    }
+
+    public void waitUntilIsClickable(LazyLocator locator) {
+        waitUntilEnabled(locator);
+    }
+
+    public void waitUntilIsClickable(LazyLocator locator, long timeout) {
+        waitUntilEnabled(locator, timeout);
+    }
+
+    public void waitUntilNewWindowOpened(int beforeWindowsCount) {
+        getWait().until(newWindowOpened(beforeWindowsCount));
+    }
+
+    public void waitUntilCurrentWindowClosed(int beforeWindowsCount) {
+        getWait().until(currentWindowClosed(beforeWindowsCount));
     }
 
     public boolean isDisplayed(By by) {
@@ -401,9 +453,9 @@ public class Browser extends LazySearchContext implements WebDriver {
 
     public boolean isAlertPresent() {
         try {
-            waitUntilAlertIsPresent(0);
+            getWebDriver().switchTo().alert();
             return true;
-        } catch (TimeoutException eTO) {
+        } catch (NoAlertPresentException ignore) {
             return false;
         }
     }
@@ -454,66 +506,126 @@ public class Browser extends LazySearchContext implements WebDriver {
 
     private WebDriver initializeWebDriver(String browser) {
         try {
-        WebDriver driver;
-        switch (browser) {
-            case "chrome":
-            case "ch":
-                ChromeDriverManager.getInstance().setup();
-                ChromeOptions options = new ChromeOptions();
-                Map<String, Object> chromePrefs = new HashMap<>();
-                chromePrefs.put("profile.default_content_settings.geolocation", 2);
-                chromePrefs.put("download.prompt_for_download", false);
-                chromePrefs.put("download.directory_upgrade", true);
-                chromePrefs.put("download.default_directory", getConfig().getDownloadDirPath());
-                chromePrefs.put("password_manager_enabled", false);
-                options.setExperimentalOption("prefs", chromePrefs);
-                DesiredCapabilities chromeCaps = DesiredCapabilities.chrome();
-                chromeCaps.setCapability(ChromeOptions.CAPABILITY, options);
-                driver = new ChromeDriver(chromeCaps);
-                break;
-            case "firefox":
-            case "ff":
-                FirefoxProfile ffProfile = new FirefoxProfile();
-                FirefoxBinary ffBinary = new FirefoxBinary();
-                ffBinary.setTimeout(TimeUnit.SECONDS.toMillis(180));
-                ffProfile.setPreference("browser.download.folderList", 2);
-                ffProfile.setPreference("browser.download.manager.showWhenStarting", false);
-                ffProfile.setPreference("browser.download.dir", getConfig().getDownloadDirPath());
-                ffProfile.setPreference("browser.helperApps.neverAsk.saveToDisk", "application/zip;application/octet-stream;application/x-zip;application/x-zip-compressed;text/css;text/html;text/plain;text/xml;text/comma-separated-values");
-                ffProfile.setPreference("browser.helperApps.neverAsk.openFile", "application/zip;application/octet-stream;application/x-zip;application/x-zip-compressed;text/css;text/html;text/plain;text/xml;text/comma-separated-values");
-                ffProfile.setPreference("browser.helperApps.alwaysAsk.force", false);
-                driver = new FirefoxDriver(ffBinary, ffProfile);
-                break;
-            case "edge":
-                EdgeDriverManager.getInstance().setup();
-                driver = new EdgeDriver();
-                break;
-            case "internet_explorer":
-            case "ie":
-                InternetExplorerDriverManager.getInstance().setup();
-                driver = new InternetExplorerDriver();
-                break;
-            case "marionette":
-                MarionetteDriverManager.getInstance().setup();
-                driver = new MarionetteDriver();
-                break;
-            case "phantom_js":
-            default:
-                PhantomJsDriverManager.getInstance().setup();
-                driver = new PhantomJSDriver();
+            WebDriver driver;
+            switch (browser) {
+                case "chrome":
+                case "ch":
+                    ChromeDriverManager.getInstance().setup();
+                    driver = new ChromeDriver(getChromeDesiredCapabilities());
+                    break;
+                case "firefox":
+                case "ff":
+                    driver = new FirefoxDriver(getFirefoxBinary(), getFirefoxProfile());
+                    break;
+                case "edge":
+                    EdgeDriverManager.getInstance().setup();
+                    driver = new EdgeDriver();
+                    break;
+                case "internet_explorer":
+                case "ie":
+                    InternetExplorerDriverManager.getInstance().setup();
+                    driver = new InternetExplorerDriver();
+                    break;
+                case "gecko":
+                    MarionetteDriverManager.getInstance().setup();
+                    DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+                    capabilities.setCapability("marionette", true);
+                    driver = new FirefoxDriver(capabilities);
+                    break;
+                case "jbrowser":
+                    driver = new JBrowserDriver();
+                    break;
+                case "phantom_js":
+                    PhantomJsDriverManager.getInstance().setup();
+                    driver = new PhantomJSDriver();
+                    break;
+                default:
+                    driver = new HtmlUnitDriver();
+            }
+            moveBrowserToAnotherScreen(driver);
+            driver.manage().window().maximize();
+            driver.manage().timeouts().implicitlyWait(getConfig().getImplicitlyTimeoutMs(), TimeUnit.MILLISECONDS);
+            return driver;
+        } catch (IllegalArgumentException ex) {
+            return null;
         }
-        moveBrowserToAnotherScreen(driver);
-        driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(IMPLICITLY_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        return driver;
-    } catch (IllegalArgumentException ex) {
-        return null;
     }
+
+    private DesiredCapabilities addProxyCapabilities(DesiredCapabilities capability) {
+        String proxyAddress = getPropertyByKey(PropertyKey.PROXY_URL);
+        return addProxyCapabilities(capability, proxyAddress, proxyAddress, proxyAddress);
+    }
+
+    private DesiredCapabilities addProxyCapabilities(DesiredCapabilities capability, String httpProxy, String sslProxy,
+                                                     String ftpProxy) {
+        Proxy proxy = new Proxy();
+        proxy.setProxyType(Proxy.ProxyType.MANUAL);
+        proxy.setHttpProxy(httpProxy);
+        proxy.setSslProxy(sslProxy);
+        proxy.setFtpProxy(ftpProxy);
+        capability.setCapability(CapabilityType.PROXY, proxy);
+        capability.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+        return capability;
+    }
+
+    private DesiredCapabilities getChromeDesiredCapabilities() {
+        DesiredCapabilities caps = DesiredCapabilities.chrome();
+        ChromeOptions options = new ChromeOptions();
+        Map<String, Object> chromePrefs = new HashMap<>();
+        chromePrefs.put("profile.default_content_settings.geolocation", 2);
+        chromePrefs.put("download.prompt_for_download", false);
+        chromePrefs.put("download.directory_upgrade", true);
+        chromePrefs.put("download.default_directory", getConfig().getDownloadDirPath());
+        chromePrefs.put("password_manager_enabled", false);
+        chromePrefs.put("safebrowsing.enabled", "true");
+        options.setExperimentalOption("prefs", chromePrefs);
+        caps.setCapability(ChromeOptions.CAPABILITY, options);
+        boolean proxyEnabled = Boolean.valueOf(getPropertyByKey(PropertyKey.PROXY));
+        if (proxyEnabled) {
+            caps = addProxyCapabilities(caps);
+        }
+        return caps;
+    }
+
+    private FirefoxProfile addProxyProfile(FirefoxProfile ffProfile) {
+        URL proxyAddress;
+        try {
+            proxyAddress = new URL(getPropertyByKey(PropertyKey.PROXY_URL));
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Couldn't set proxy for firefox", e);
+        }
+        ffProfile.setPreference("network.proxy.type", 1);
+        ffProfile.setPreference("network.proxy.http", proxyAddress.getHost());
+        ffProfile.setPreference("network.proxy.http_port", proxyAddress.getPort());
+        ffProfile.setPreference("network.proxy.ssl", proxyAddress.getHost());
+        ffProfile.setPreference("network.proxy.ssl_port", proxyAddress.getPort());
+        return ffProfile;
+    }
+
+    private FirefoxBinary getFirefoxBinary() {
+        FirefoxBinary ffBinary = new FirefoxBinary();
+        ffBinary.setTimeout(TimeUnit.SECONDS.toMillis(180));
+        return ffBinary;
+    }
+
+    private FirefoxProfile getFirefoxProfile() {
+        FirefoxProfile ffProfile = new FirefoxProfile();
+        ffProfile.setPreference("browser.download.folderList", 2);
+        ffProfile.setPreference("browser.download.manager.showWhenStarting", false);
+        ffProfile.setPreference("browser.download.dir", getConfig().getDownloadDirPath());
+        ffProfile.setPreference("browser.helperApps.neverAsk.saveToDisk", "application/zip;application/octet-stream;application/x-zip;application/x-zip-compressed;text/css;text/html;text/plain;text/xml;text/comma-separated-values");
+        ffProfile.setPreference("browser.helperApps.neverAsk.openFile", "application/zip;application/octet-stream;application/x-zip;application/x-zip-compressed;text/css;text/html;text/plain;text/xml;text/comma-separated-values");
+        ffProfile.setPreference("browser.helperApps.alwaysAsk.force", false);
+        boolean proxyEnabled = Boolean.valueOf(getPropertyByKey(PropertyKey.PROXY));
+        if (proxyEnabled) {
+            ffProfile = addProxyProfile(ffProfile);
+        }
+        return ffProfile;
     }
 
     private void moveBrowserToAnotherScreen(WebDriver driver) {
         String multiScreen = getPropertyByKey(PropertyKey.DISPLAY_DIRECTION);
-        if (!StringUtils.isBlank(multiScreen)) {
+        if (!StringUtils.isBlank(multiScreen) && getNumberOfScreens() > 1) {
             Point point;
             switch (multiScreen.toLowerCase()) {
                 case "right":
@@ -532,6 +644,16 @@ public class Browser extends LazySearchContext implements WebDriver {
                     point = new Point(0, 0);
             }
             driver.manage().window().setPosition(point);
+        }
+    }
+
+    private int getNumberOfScreens() {
+        try {
+            GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            GraphicsDevice[] devices = env.getScreenDevices();
+            return devices.length;
+        } catch (HeadlessException e) {
+            return 1;
         }
     }
 }

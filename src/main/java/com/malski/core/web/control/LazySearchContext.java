@@ -17,6 +17,8 @@ public abstract class LazySearchContext implements SearchContext {
     public LazySearchContext() {
     }
 
+    public abstract SearchContext getContext();
+
     public Element getElement(By by) {
         return getElement(by, Element.class);
     }
@@ -165,28 +167,29 @@ public abstract class LazySearchContext implements SearchContext {
         return getElements(By.className(className), clazz);
     }
 
+    @Override
     public List<WebElement> findElements(By by) {
         try {
-            return simpleFindElements(by);
+            return getContext().findElements(by);
         } catch (StaleElementReferenceException ignore) {
             refresh();
-            return simpleFindElements(by);
+            return getContext().findElements(by);
         }
     }
-
-    public abstract List<WebElement> simpleFindElements(By by);
 
     @Override
     public WebElement findElement(By by) {
         try {
-            return simpleFindElement(by);
+            return getContext().findElement(by);
         } catch (StaleElementReferenceException ignore) {
             refresh();
-            return simpleFindElement(by);
+            return getContext().findElement(by);
         }
     }
 
-    public abstract WebElement simpleFindElement(By by);
+    public <T extends Module> T getModule(Class<T> iface) {
+        return getModule(iface, new LazyLocator(this, new LazyAnnotations(iface)));
+    }
 
     public <T extends Module> T getModule(Class<T> iface, By by) {
         return getModule(iface, new LazyLocator(this, by));
@@ -203,6 +206,10 @@ public abstract class LazySearchContext implements SearchContext {
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public <T extends Frame> T getFrame(Class<T> iface) {
+        return getFrame(iface, new LazyLocator(this, new LazyAnnotations(iface)));
     }
 
     public <T extends Frame> T getFrame(Class<T> iface, By by) {

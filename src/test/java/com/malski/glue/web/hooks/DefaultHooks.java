@@ -10,11 +10,17 @@ import org.openqa.selenium.WebDriverException;
 public class DefaultHooks {
     private static Logger log = Logger.getLogger(DefaultHooks.class);
 
-    public DefaultHooks() {}
+    public DefaultHooks() {
+        TestContext.initialize();
+    }
 
     @Before(order = 1)
-    public void init() {
-        TestContext.initialize();
+    public void init(Scenario scenario) {
+        if(TestContext.getConfig().isVideoRecordingEnabled()) {
+            TestContext.getVideoRecorder().start(scenario.getName());
+        }
+        TestContext.setBrowser(TestContext.getConfig().getDriver());
+        log.info("###### Running scenario on browser: " + TestContext.getConfig().getDriver());
     }
 
     @Before(order = 2)
@@ -43,5 +49,8 @@ public class DefaultHooks {
         //quit browser
         TestContext.getBrowser().quit();
         TestContext.setBrowser(null);
+        if(TestContext.getConfig().isVideoRecordingEnabled()) {
+            TestContext.getVideoRecorder().stop();
+        }
     }
 }

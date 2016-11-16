@@ -18,6 +18,15 @@ public class WaitConditions {
     private WaitConditions() {
     }
 
+    public static boolean stalenessOf(WebElement element) {
+        try {
+            element.isEnabled();
+            return false;
+        } catch (StaleElementReferenceException var3) {
+            return true;
+        }
+    }
+
     public static ExpectedCondition<WebElement> presenceOfElementLocated(final LazyLocator locator) {
         return new ExpectedCondition<WebElement>() {
             public WebElement apply(WebDriver driver) {
@@ -220,6 +229,23 @@ public class WaitConditions {
         };
     }
 
+    public static ExpectedCondition<Boolean> attributeChangedFrom(LazyLocator locator, String attributeName, String startValue) {
+        return new ExpectedCondition<Boolean>() {
+            public Boolean apply(WebDriver driver) {
+                WebElement webElement = locator.findElement();
+                String enabled = webElement.getAttribute(attributeName);
+                if (startValue == null) {
+                    return enabled == null;
+                }
+                return !enabled.equals(startValue);
+            }
+
+            public String toString() {
+                return "attributeChanged: attr:" + attributeName + " startValue: " + startValue + " element: " + locator.toString();
+            }
+        };
+    }
+
     public static ExpectedCondition<Boolean> isInViewPort(LazyLocator locator) {
         return new ExpectedCondition<Boolean>() {
             public Boolean apply(WebDriver driver) {
@@ -307,6 +333,30 @@ public class WaitConditions {
 
             public String toString() {
                 return "optionSelectedByIndex: " + select.getLocator().toString() + " index: " + index;
+            }
+        };
+    }
+
+    public static ExpectedCondition<Boolean> newWindowOpened(int beforeWindowsCount) {
+        return new ExpectedCondition<Boolean>() {
+            public Boolean apply(WebDriver driver) {
+                return (beforeWindowsCount + 1) == driver.getWindowHandles().size();
+            }
+
+            public String toString() {
+                return "newWindowOpened";
+            }
+        };
+    }
+
+    public static ExpectedCondition<Boolean> currentWindowClosed(int beforeWindowsCount) {
+        return new ExpectedCondition<Boolean>() {
+            public Boolean apply(WebDriver driver) {
+                return (beforeWindowsCount - 1) == driver.getWindowHandles().size();
+            }
+
+            public String toString() {
+                return "currentWindowClosed";
             }
         };
     }

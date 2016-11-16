@@ -6,7 +6,6 @@ import com.malski.core.web.elements.api.ElementsWait;
 import com.malski.core.web.factory.ElementHandler;
 import com.malski.core.web.factory.LazyLocator;
 import org.apache.log4j.Logger;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 
 import java.util.*;
@@ -45,34 +44,28 @@ public class Elements<E extends Element> implements List<E>, ElementsWait, Eleme
         return this.locator;
     }
 
-    public void refresh() {
-        try {
-            setList();
-        } catch (StaleElementReferenceException ignore) {
-            getLocator().refresh();
-            setList();
-        }
+    public boolean refresh() {
+        boolean result = getLocator() != null && getLocator().refresh();
+        init();
+        return result;
     }
 
-    private void setList() {
-        elements = new ArrayList<>();
+    private void init() {
         if (getLocator() == null) {
+            elements = new ArrayList<>();
             return;
         }
         List<WebElement> webElements = getLocator().findElements();
         ElementHandler<E> handler = new ElementHandler<>(elementInterface, getLocator());
-        try {
-            for (int i = 0; i < webElements.size(); ++i) {
-                WebElement webElement = webElements.get(i);
-                try {
-                    E element = handler.getImplementation(webElement, i);
-                    elements.add(element);
-                } catch (Throwable throwable) {
-                    log.error(throwable);
-                }
+        elements = new ArrayList<>();
+        for (int i = 0; i < webElements.size(); ++i) {
+            WebElement webElement = webElements.get(i);
+            try {
+                E element = handler.getImplementation(webElement, i);
+                elements.add(element);
+            } catch (Throwable throwable) {
+                log.error(throwable);
             }
-        } catch (Throwable e) {
-            log.error(e);
         }
     }
 
@@ -244,13 +237,21 @@ public class Elements<E extends Element> implements List<E>, ElementsWait, Eleme
 
     public List<E> getWrappedElements() {
         if (elements == null) {
-            synchronized (getClass()) {
+            synchronized (this) {
                 if (elements == null) {
-                    refresh();
+                    init();
                 }
             }
         }
         return elements;
+    }
+
+    public E getFirst() {
+        return (getWrappedElements() != null && getWrappedElements().size() > 0) ? getWrappedElements().get(0) : null;
+    }
+
+    public E getLast() {
+        return (getWrappedElements() != null && getWrappedElements().size() > 0) ? getWrappedElements().get(getWrappedElements().size() - 1) : null;
     }
 
     @Override

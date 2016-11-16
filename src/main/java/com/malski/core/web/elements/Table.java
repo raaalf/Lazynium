@@ -1,11 +1,14 @@
 package com.malski.core.web.elements;
 
 import com.malski.core.web.factory.LazyLocator;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -20,7 +23,7 @@ public class Table extends Element {
     }
 
     public int getRowCount() {
-        if ($x(".//tbody/tr[./td]").isPresent(1)) {
+        if ($x("./tbody/tr[./td]").isPresent(1)) {
             return getRows().size();
         } else {
             return 0;
@@ -28,7 +31,7 @@ public class Table extends Element {
     }
 
     public Elements<Element> getColumnHeaders() {
-        return $$("tr th");
+        return $$x("./*[self::thead or self::tbody]/tr/th");
     }
 
     public Element getColumnHeader(int colIdx) {
@@ -45,12 +48,23 @@ public class Table extends Element {
     }
 
     public int getColumnHeaderIndex(String headerText) {
-        for (int i = 0; i < getColumnHeaders().size(); ++i) {
-            if (headerText.equalsIgnoreCase(getColumnHeaders().get(i).getText().trim())) {
+        Elements<Element> headers = getColumnHeaders();
+        for (int i = 0; i < headers.size(); ++i) {
+            if (headerText.equalsIgnoreCase(headers.get(i).getText().trim())) {
                 return i;
             }
         }
         throw new NoSuchElementException("No header with name: " + headerText);
+    }
+
+    public int getColumnIndex(String firstRowText) {
+        Elements<Element> firstRow = getRowCells(0);
+        for (int i = 0; i < firstRow.size(); ++i) {
+            if (firstRowText.equalsIgnoreCase(firstRow.get(i).getText().trim())) {
+                return i;
+            }
+        }
+        throw new NoSuchElementException("No first row with text: " + firstRowText);
     }
 
     public Elements<Element> getRows() {
@@ -58,7 +72,7 @@ public class Table extends Element {
     }
 
     public <T extends Element> Elements<T> getRows(Class<T> clazz) {
-        return $$x(".//tbody/tr[./td]", clazz);
+        return $$x("./tbody/tr[./td]", clazz);
     }
 
     public Elements<Element> getRows(String text) {
@@ -67,7 +81,7 @@ public class Table extends Element {
 
     public <T extends Element> Elements<T> getRows(String text, Class<T> clazz) {
         Elements<T> rows = getEmptyElementsList();
-        rows.addAll(getRows(clazz).stream().filter(row -> row.getText().contains(text)).collect(Collectors.toList()));
+        rows.addAll(getRows(clazz).stream().filter(row -> StringUtils.containsIgnoreCase(row.getText(), text)).collect(Collectors.toList()));
         return rows;
     }
 
@@ -81,7 +95,7 @@ public class Table extends Element {
             throw new NoSuchElementException("No column with index: " + colIndex + ". Max index: " + headersSize);
         }
         Elements<T> rowsWitText = getEmptyElementsList();
-        rowsWitText.addAll(getRows(clazz).stream().filter(row -> getCells(row).get(colIndex).getText().contains(text)).collect(Collectors.toList()));
+        rowsWitText.addAll(getRows(clazz).stream().filter(row -> StringUtils.containsIgnoreCase(getCells(row).get(colIndex).getText(), text)).collect(Collectors.toList()));
         return rowsWitText;
     }
 
@@ -112,7 +126,7 @@ public class Table extends Element {
 
     public <T extends Element> T getRow(String text, Class<T> clazz) {
         for (T row : getRows(clazz)) {
-            if (row.getText().contains(text)) {
+            if (StringUtils.containsIgnoreCase(row.getText(), text)) {
                 return row;
             }
         }
@@ -139,7 +153,7 @@ public class Table extends Element {
         }
         for (T row : getRows(clazz)) {
             Elements<Element> cells = getCells(row);
-            if (cells.size() > colIndex && cells.get(colIndex).getText().contains(rowText)) {
+            if (cells.size() > colIndex && StringUtils.containsIgnoreCase(cells.get(colIndex).getText(), rowText)) {
                 return row;
             }
         }
@@ -149,7 +163,7 @@ public class Table extends Element {
     public int getRowIndex(String text) {
         int i = 0;
         for (Element row : getRows()) {
-            if (row.getText().contains(text)) {
+            if (StringUtils.containsIgnoreCase(row.getText(), text)) {
                 return i;
             }
             i++;
@@ -250,11 +264,57 @@ public class Table extends Element {
     }
 
     public Element getHead() {
-        return $("thead");
+        return $x("./thead");
     }
 
     public Element getFooter() {
-        return $("tfoot");
+        return $x("./tfoot");
+    }
+
+    public List<Map<String, String>> getTableAsListOfMaps() {
+        List<Map<String, String>> rowList = new ArrayList<>();
+        List<String> headers = getColumnHeaders().getTexts();
+        for (Element row : getRows()) {
+            List<String> cells = getCells(row).getTexts();
+            Map<String, String> rowMap = new HashMap<>();
+            for (int i = 0; i < headers.size(); ++i) {
+                rowMap.put(headers.get(i), cells.get(i).trim());
+            }
+            rowList.add(rowMap);
+        }
+        return rowList;
+    }
+
+    public List<String> getColumnTexts(int columnIndex) {
+        List<String> rowList = new ArrayList<>();
+        for (Element w : getRows()) {
+            Elements<Element> cells = getCells(w);
+            if (cells.size() > 0)
+                rowList.add(cells.get(columnIndex).getText().trim());
+        }
+        return rowList;
+    }
+
+    public List<String> getColumnTexts(String columnName) {
+        List<String> rowList = new ArrayList<>();
+        int columnIndex = getColumnHeaderIndex(columnName);
+        for (Element w : getRows()) {
+            Elements<Element> cells = getCells(w);
+            if (cells.size() > 0 && cells.size() > columnIndex)
+                rowList.add(cells.get(columnIndex).getText().trim());
+        }
+        return rowList;
+    }
+
+    public List<String> getColumnTextsByFirstRow(String firstRowText) {
+        List<String> rowList = new ArrayList<>();
+        int columnIndex = getColumnIndex(firstRowText);
+        for (Element w : getRows()) {
+            Elements<Element> cells = getCells(w);
+            if (cells.size() > 0 && cells.size() > columnIndex)
+                rowList.add(cells.get(columnIndex).getText().trim());
+        }
+        return rowList;
     }
 
     public String getTextFromColumn(String rowText, String columnName) {
@@ -266,6 +326,6 @@ public class Table extends Element {
     }
 
     private <T extends Element> Elements<T> getCells(Element row, Class<T> clazz) {
-        return row.$$t("td", clazz);
+        return row.$$x("./td", clazz);
     }
 }

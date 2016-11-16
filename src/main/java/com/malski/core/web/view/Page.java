@@ -6,13 +6,9 @@ import com.malski.core.web.control.Browser;
 import com.malski.core.web.control.LazySearchContext;
 import com.malski.core.web.factory.LazyPageFactory;
 import org.apache.log4j.Logger;
-import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.FluentWait;
-
-import java.util.List;
 
 /**
  * Class which is representing displayed page and allow to performing basic actions on it
@@ -23,34 +19,19 @@ public abstract class Page extends LazySearchContext implements View {
     private boolean isOpened = true;
 
     public Page() {
-        TestContext.getBrowser().waitForPageToLoad();
+        getBrowser().waitForPageToLoad();
         initElements();
         this.handlePageInfo();
     }
 
     @Override
     public void initElements() {
-        LazyPageFactory.initElements(this, this);
+        LazyPageFactory.initElements(this);
     }
 
     @Override
-    public List<WebElement> findElements(By by) {
-        try {
-            return getBrowser().findElements(by);
-        } catch (StaleElementReferenceException ignore) {
-            refresh();
-            return getBrowser().findElements(by);
-        }
-    }
-
-    @Override
-    public WebElement findElement(By by) {
-        try {
-            return getBrowser().findElement(by);
-        } catch (StaleElementReferenceException ignore) {
-            refresh();
-            return getBrowser().findElement(by);
-        }
+    public SearchContext getContext() {
+        return getBrowser();
     }
 
     @Override

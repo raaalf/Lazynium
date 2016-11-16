@@ -5,7 +5,6 @@ import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.openqa.selenium.By;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,33 +48,36 @@ abstract class LazyInterceptor<T> implements MethodInterceptor {
     public Object intercept(Object object, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
         try {
             return interceptInvoke(object, method, args, methodProxy);
-        } catch (InvocationTargetException e) {
-            throw clearStackTrace(e.getCause());
+        } catch (Throwable e) {
+            if(e.getCause() == null) {
+                throw clearStackTrace(e);
+            } else {
+                throw clearStackTrace(e.getCause());
+            }
         }
     }
 
     @SuppressWarnings("unchecked")
-    protected Object interceptInvoke(Object object, Method method, Object[] args, MethodProxy methodProxy) throws InvocationTargetException, IllegalAccessException {
+    protected Object interceptInvoke(Object object, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
         T thing = (T) getImplementation();
         return invoke(thing, object, method, args, methodProxy);
     }
 
-    protected Object invoke(T thing, Object object, Method method, Object[] args, MethodProxy methodProxy) throws InvocationTargetException, IllegalAccessException {
-        try {
-            return methodProxy.invoke(thing, args);
-        } catch (Throwable ignore) {
-            return method.invoke(thing, args);
-        }
+    protected Object invoke(T thing, Object object, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
+//        return methodProxy.invoke(thing, args);
+        return method.invoke(thing, args);
     }
 
     private <E extends Throwable> E clearStackTrace(E throwable) {
         List<StackTraceElement> newStack = new ArrayList<>();
-        for(StackTraceElement stack : throwable.getStackTrace()) {
-            if(!stack.getClassName().contains(".factory.")) {
-                newStack.add(stack);
+        if(throwable != null) {
+            for (StackTraceElement stack : throwable.getStackTrace()) {
+                if (!stack.getClassName().contains(".factory.")) {
+                    newStack.add(stack);
+                }
             }
+            throwable.setStackTrace(newStack.toArray(new StackTraceElement[newStack.size()]));
         }
-        throwable.setStackTrace(newStack.toArray(new StackTraceElement[newStack.size()]));
         return throwable;
     }
 }
