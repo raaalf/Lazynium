@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-<properties>
-    <comment>Cucumber options</comment>
-    <entry key="features">src/test/resources/features</entry>
-    <entry key="glue">com.malski.glue</entry>
-    <entry key="tags">@search</entry>
-    <entry key="format">pretty,html:target/cucumber,json:target/cucumber.json</entry>
-</properties>

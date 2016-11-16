@@ -16,7 +16,7 @@ public class TestContext {
     public static void initialize() {
         if(initiated) {
             if (properties == null) {
-                properties = CustomProperties.getProperties("testProperties.xml");
+                properties = CustomProperties.getProperties("test_properties.xml");
             }
             if (config == null) {
                 config = new TestConfig();
