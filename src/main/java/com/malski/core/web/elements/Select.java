@@ -1,5 +1,7 @@
 package com.malski.core.web.elements;
 
+import com.malski.core.web.elements.states.SelectState;
+import com.malski.core.web.elements.waits.SelectWait;
 import com.malski.core.web.factory.LazyLocator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -7,12 +9,7 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static com.malski.core.utils.TestContext.getBrowser;
-import static com.malski.core.web.conditions.WaitConditions.*;
-import static org.openqa.selenium.support.ui.ExpectedConditions.elementSelectionStateToBe;
-import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeSelected;
-
-public class Select extends Element {
+public class Select extends Element implements SelectWait, SelectState {
     private org.openqa.selenium.support.ui.Select innerSelect;
 
     public Select(LazyLocator locator) {
@@ -28,10 +25,6 @@ public class Select extends Element {
             innerSelect = new org.openqa.selenium.support.ui.Select(getWrappedElement());
         }
         return innerSelect;
-    }
-
-    public boolean isMultiple() {
-        return getWrappedSelect().isMultiple();
     }
 
     public void selectByIndex(int index) {
@@ -128,60 +121,7 @@ public class Select extends Element {
         return getOptions().getTexts();
     }
 
-    public boolean isSelected(long timeout) {
-        try {
-            waitUntilSelected(timeout);
-        } catch (Exception ignore) {
-            return false;
-        }
-        return getWrappedElement().isSelected();
-    }
-
-    public void waitUntilSelected() {
-        getBrowser().getWait().until(elementToBeSelected(this));
-    }
-
-    public void waitUntilSelected(long timeout) {
-        getBrowser().getWait(timeout).until(elementToBeSelected(this));
-    }
-
-    public void waitUntilUnselected() {
-        getBrowser().getWait().until(elementSelectionStateToBe(this, false));
-    }
-
-    public void waitUntilUnselected(long timeout) {
-        getBrowser().getWait(timeout).until(elementSelectionStateToBe(this, false));
-    }
-
-    public void waitUntilSelectedVisibleText(String text) {
-        getBrowser().getWait().until(optionSelectedByVisibleText(this, text));
-    }
-
-    public void waitUntilSelectedVisibleText(String text, long timeout) {
-        getBrowser().getWait(timeout).until(optionSelectedByVisibleText(this, text));
-    }
-
-    public void waitUntilSelectedValue(String value) {
-        getBrowser().getWait().until(optionSelectedByValue(this, value));
-    }
-
-    public void waitUntilSelectedValue(String value, long timeout) {
-        getBrowser().getWait(timeout).until(optionSelectedByValue(this, value));
-    }
-
-    public void waitUntilSelectedIndex(int index) {
-        getBrowser().getWait().until(optionSelectedByIndex(this, index));
-    }
-
-    public void waitUntilSelectedIndex(int index, long timeout) {
-        getBrowser().getWait(timeout).until(optionSelectedByIndex(this, index));
-    }
-
-    public void waitUntilSelectedOption(Element option) {
-        getBrowser().getWait().until(elementToBeSelected(option));
-    }
-
-    public void waitUntilSelectedOption(Element option, long timeout) {
-        getBrowser().getWait(timeout).until(elementToBeSelected(option));
+    public Select getSelect() {
+        return this;
     }
 }

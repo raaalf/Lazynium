@@ -12,163 +12,160 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-public abstract class LazySearchContext implements SearchContext {
+public interface LazySearchContext extends SearchContext {
 
-    public LazySearchContext() {
-    }
+    SearchContext getContext();
 
-    public abstract SearchContext getContext();
-
-    public Element getElement(By by) {
+    default Element getElement(By by) {
         return getElement(by, Element.class);
     }
 
-    public <T extends Element> T getElement(By by, Class<T> clazz) {
+    default <T extends Element> T getElement(By by, Class<T> clazz) {
         return new ElementHandler<>(clazz, by, this).getImplementation();
     }
 
-    public Element getElement(LazyLocator locator) {
+    default Element getElement(LazyLocator locator) {
         return getElement(locator, Element.class);
     }
 
-    public <T extends Element> T getElement(LazyLocator locator, Class<T> clazz) {
+    default <T extends Element> T getElement(LazyLocator locator, Class<T> clazz) {
         return new ElementHandler<>(clazz, locator).getImplementation();
     }
 
-    public Element getElement(Selector selector) {
+    default Element getElement(Selector selector) {
         return getElement(selector, Element.class);
     }
 
-    public <T extends Element> T getElement(Selector selector, Class<T> clazz) {
+    default <T extends Element> T getElement(Selector selector, Class<T> clazz) {
         return new ElementHandler<>(clazz, selector, this).getImplementation();
     }
 
-    public Element $(String css) {
+    default Element $(String css) {
         return getElement(By.cssSelector(css));
     }
 
-    public <T extends Element> T $(String css, Class<T> clazz) {
+    default <T extends Element> T $(String css, Class<T> clazz) {
         return getElement(By.cssSelector(css), clazz);
     }
 
-    public Element $i(String id) {
+    default Element $i(String id) {
         return getElement(By.id(id));
     }
 
-    public <T extends Element> T $i(String id, Class<T> clazz) {
+    default <T extends Element> T $i(String id, Class<T> clazz) {
         return getElement(By.id(id), clazz);
     }
 
-    public Element $n(String name) {
+    default Element $n(String name) {
         return getElement(By.name(name));
     }
 
-    public <T extends Element> T $n(String name, Class<T> clazz) {
+    default <T extends Element> T $n(String name, Class<T> clazz) {
         return getElement(By.name(name), clazz);
     }
 
-    public Element $x(String xpath) {
+    default Element $x(String xpath) {
         return getElement(By.xpath(xpath));
     }
 
-    public <T extends Element> T $x(String xpath, Class<T> clazz) {
+    default <T extends Element> T $x(String xpath, Class<T> clazz) {
         return getElement(By.xpath(xpath), clazz);
     }
 
-    public Element $t(String tagName) {
+    default Element $t(String tagName) {
         return getElement(By.tagName(tagName));
     }
 
-    public <T extends Element> T $t(String tagName, Class<T> clazz) {
+    default <T extends Element> T $t(String tagName, Class<T> clazz) {
         return getElement(By.tagName(tagName), clazz);
     }
 
-    public Element $c(String className) {
+    default Element $c(String className) {
         return getElement(By.className(className));
     }
 
-    public <T extends Element> T $c(String className, Class<T> clazz) {
+    default <T extends Element> T $c(String className, Class<T> clazz) {
         return getElement(By.className(className), clazz);
     }
 
-    public <T extends Element> Elements<T> getEmptyElementsList() {
+    default <T extends Element> Elements<T> getEmptyElementsList() {
         return new Elements<>();
     }
 
-    public Elements<Element> getElements(By by) {
+    default Elements<Element> getElements(By by) {
         return getElements(by, Element.class);
     }
 
-    public <T extends Element> Elements<T> getElements(By by, Class<T> clazz) {
+    default <T extends Element> Elements<T> getElements(By by, Class<T> clazz) {
         return new ElementListHandler<>(clazz, by, this).getImplementation();
     }
 
-    public Elements<Element> getElements(LazyLocator locator) {
+    default Elements<Element> getElements(LazyLocator locator) {
         return getElements(locator, Element.class);
     }
 
-    public <T extends Element> Elements<T> getElements(LazyLocator locator, Class<T> clazz) {
+    default <T extends Element> Elements<T> getElements(LazyLocator locator, Class<T> clazz) {
         return new ElementListHandler<>(clazz, locator).getImplementation();
     }
 
-    public Elements<Element> getElements(Selector selector) {
+    default Elements<Element> getElements(Selector selector) {
         return getElements(selector, Element.class);
     }
 
-    public <T extends Element> Elements<T> getElements(Selector selector, Class<T> clazz) {
+    default <T extends Element> Elements<T> getElements(Selector selector, Class<T> clazz) {
         return new ElementListHandler<>(clazz, selector, this).getImplementation();
     }
 
-    public Elements<Element> $$(String css) {
+    default Elements<Element> $$(String css) {
         return getElements(By.cssSelector(css));
     }
 
-    public <T extends Element> Elements<T> $$(String css, Class<T> clazz) {
+    default <T extends Element> Elements<T> $$(String css, Class<T> clazz) {
         return getElements(By.cssSelector(css), clazz);
     }
 
-    public Elements<Element> $$i(String id) {
+    default Elements<Element> $$i(String id) {
         return getElements(By.id(id));
     }
 
-    public <T extends Element> Elements<T> $$i(String id, Class<T> clazz) {
+    default <T extends Element> Elements<T> $$i(String id, Class<T> clazz) {
         return getElements(By.id(id), clazz);
     }
 
-    public Elements<Element> $$n(String name) {
+    default Elements<Element> $$n(String name) {
         return getElements(By.name(name));
     }
 
-    public <T extends Element> Elements<T> $$n(String name, Class<T> clazz) {
+    default <T extends Element> Elements<T> $$n(String name, Class<T> clazz) {
         return getElements(By.name(name), clazz);
     }
 
-    public Elements<Element> $$x(String xpath) {
+    default Elements<Element> $$x(String xpath) {
         return getElements(By.xpath(xpath));
     }
 
-    public <T extends Element> Elements<T> $$x(String xpath, Class<T> clazz) {
+    default <T extends Element> Elements<T> $$x(String xpath, Class<T> clazz) {
         return getElements(By.xpath(xpath), clazz);
     }
 
-    public Elements<Element> $$t(String tagName) {
+    default Elements<Element> $$t(String tagName) {
         return getElements(By.tagName(tagName));
     }
 
-    public <T extends Element> Elements<T> $$t(String tagName, Class<T> clazz) {
+    default <T extends Element> Elements<T> $$t(String tagName, Class<T> clazz) {
         return getElements(By.tagName(tagName), clazz);
     }
 
-    public Elements<Element> $$c(String className) {
+    default Elements<Element> $$c(String className) {
         return getElements(By.className(className));
     }
 
-    public <T extends Element> Elements<T> $$c(String className, Class<T> clazz) {
+    default <T extends Element> Elements<T> $$c(String className, Class<T> clazz) {
         return getElements(By.className(className), clazz);
     }
 
     @Override
-    public List<WebElement> findElements(By by) {
+    default List<WebElement> findElements(By by) {
         try {
             return getContext().findElements(by);
         } catch (StaleElementReferenceException ignore) {
@@ -178,7 +175,7 @@ public abstract class LazySearchContext implements SearchContext {
     }
 
     @Override
-    public WebElement findElement(By by) {
+    default WebElement findElement(By by) {
         try {
             return getContext().findElement(by);
         } catch (StaleElementReferenceException ignore) {
@@ -187,19 +184,19 @@ public abstract class LazySearchContext implements SearchContext {
         }
     }
 
-    public <T extends Module> T getModule(Class<T> iface) {
+    default <T extends Module> T getModule(Class<T> iface) {
         return getModule(iface, new LazyLocator(this, new LazyAnnotations(iface)));
     }
 
-    public <T extends Module> T getModule(Class<T> iface, By by) {
+    default <T extends Module> T getModule(Class<T> iface, By by) {
         return getModule(iface, new LazyLocator(this, by));
     }
 
-    public <T extends Module> T getModule(Class<T> iface, Selector selector) {
+    default <T extends Module> T getModule(Class<T> iface, Selector selector) {
         return getModule(iface, new LazyLocator(this, selector));
     }
 
-    public <T extends Module> T getModule(Class<T> iface, LazyLocator locator) {
+    default <T extends Module> T getModule(Class<T> iface, LazyLocator locator) {
         ModuleHandler<T> handler = new ModuleHandler<>(iface, locator);
         try {
             return handler.getImplementation();
@@ -208,19 +205,19 @@ public abstract class LazySearchContext implements SearchContext {
         }
     }
 
-    public <T extends Frame> T getFrame(Class<T> iface) {
+    default <T extends Frame> T getFrame(Class<T> iface) {
         return getFrame(iface, new LazyLocator(this, new LazyAnnotations(iface)));
     }
 
-    public <T extends Frame> T getFrame(Class<T> iface, By by) {
+    default <T extends Frame> T getFrame(Class<T> iface, By by) {
         return getFrame(iface, new LazyLocator(this, by));
     }
 
-    public <T extends Frame> T getFrame(Class<T> iface, Selector selector) {
+    default <T extends Frame> T getFrame(Class<T> iface, Selector selector) {
         return getFrame(iface, new LazyLocator(this, selector));
     }
 
-    public <T extends Frame> T getFrame(Class<T> iface, LazyLocator locator) {
+    default <T extends Frame> T getFrame(Class<T> iface, LazyLocator locator) {
         FrameHandler<T> handler = new FrameHandler<>(iface, locator);
         try {
             return handler.getImplementation();
@@ -229,5 +226,5 @@ public abstract class LazySearchContext implements SearchContext {
         }
     }
 
-    public abstract boolean refresh();
+    boolean refresh();
 }

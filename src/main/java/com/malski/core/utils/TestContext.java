@@ -11,7 +11,6 @@ public class TestContext {
 
     private static Browser browser;
     private static Application app;
-    private static VideoRecorder videoRecorder;
 
     public static void initialize() {
         if(initiated) {
@@ -26,13 +25,6 @@ public class TestContext {
             }
             initiated = false;
         }
-    }
-
-    public static VideoRecorder getVideoRecorder() {
-        if(videoRecorder == null) {
-            videoRecorder = new VideoRecorder();
-        }
-        return videoRecorder;
     }
 
     public static Browser getBrowser() {

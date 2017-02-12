@@ -21,12 +21,18 @@ public class TestConfig {
     private long driverSleepMs;
     private long implicitlyTimeoutMs;
     private long explicitlyTimeout;
+    private long scriptTimeout;
     private int retryCount;
-    private boolean videoRecording;
+    private Boolean videoRecording;
+    private Boolean videoRecordingOnFail;
+    private String videoMimeTyp;
+    private Integer videoFrameRate;
+    private String videoQuality;
+    private String videoDestinationPath;
 
     protected final Logger log = Logger.getLogger(getClass());
 
-    public TestConfig() {
+    TestConfig() {
         setConfiguration();
     }
 
@@ -39,6 +45,7 @@ public class TestConfig {
         setTimeout();
         setMaxTimeout();
         setDriverSleepMs();
+        setScriptTimeout();
         setImplicitlyTimeoutMs();
         setExplicitlyTimeoutMs();
         setRetryCount();
@@ -46,7 +53,6 @@ public class TestConfig {
         setTestResourceDirPath();
         setResourceDirPath();
         setDriversDirPath();
-        setVideoRecording();
     }
 
     private void setApp() {
@@ -91,6 +97,14 @@ public class TestConfig {
 
     public long getMaxTimeout() {
         return maxTimeout;
+    }
+
+    private void setScriptTimeout() {
+        this.scriptTimeout = Long.parseLong(getPropertyByKey(PropertyKey.SCRIPT_TIMEOUT));
+    }
+
+    public long getScriptTimeout() {
+        return scriptTimeout;
     }
 
     private void setMaxTimeout() {
@@ -169,7 +183,52 @@ public class TestConfig {
         this.videoRecording = Boolean.parseBoolean(getPropertyByKey(PropertyKey.VIDEO_RECORDING));
     }
 
-    public boolean isVideoRecordingEnabled() {
-        return videoRecording;
+    public boolean isVideoRecording() {
+        if(videoRecording == null) {
+            setVideoRecording();
+        }
+        if(videoRecordingOnFail == null) {
+            isVideoRecordingOnFail();
+        }
+        return videoRecording || videoRecordingOnFail;
+    }
+
+    private void setVideoRecordingOnFail() {
+        this.videoRecordingOnFail = Boolean.parseBoolean(getPropertyByKey(PropertyKey.VIDEO_RECORDING_FAIL));
+    }
+
+    public boolean isVideoRecordingOnFail() {
+        if(videoRecordingOnFail == null) {
+            setVideoRecordingOnFail();
+        }
+        return videoRecordingOnFail;
+    }
+
+    public String getVideMimeType() {
+        if(videoMimeTyp == null) {
+            this.videoMimeTyp = getPropertyByKey(PropertyKey.VIDEO_MIME_TYPE);
+        }
+        return videoMimeTyp;
+    }
+
+    public int getVideFrameRate() {
+        if(videoFrameRate == null) {
+            this.videoFrameRate = Integer.parseInt(getPropertyByKey(PropertyKey.VIDEO_FRAME_RATE));
+        }
+        return videoFrameRate;
+    }
+
+    public String getVideQuality() {
+        if(videoQuality == null) {
+            this.videoQuality = getPropertyByKey(PropertyKey.VIDEO_QUALITY);
+        }
+        return videoQuality;
+    }
+
+    public String getVideDestinationPath() {
+        if(videoDestinationPath == null) {
+            this.videoDestinationPath = getPropertyByKey(PropertyKey.VIDEO_DESTINATION_PATH);
+        }
+        return videoDestinationPath;
     }
 }

@@ -36,6 +36,14 @@ public class JsExecutor {
         executeScript(String.format("arguments[0].checked=%b;", state), element.getWrappedElement());
     }
 
+    public void setStyle(Element element, String style) {
+        executeScript("arguments[0].setAttribute('style', arguments[1]);", element, style);
+    }
+
+    public String getStyle(Element element) {
+        return (String) executeScript("return arguments[0].getAttribute('style'); ", element);
+    }
+
     public void dragAndDrop(Element source, Element target) {
         try {
             String dndScript = loadScriptFromFile("dnd.js");
@@ -125,8 +133,8 @@ public class JsExecutor {
                         "    pageY = document.documentElement.scrollTop;" +
                         "}" +
                         "return pageY;";
-
-        return executeScript(scrollPositionYScript);
+        Double height = Double.parseDouble(executeScript(scrollPositionYScript).toString());
+        return height.longValue();
     }
 
     public long getScrollWidth() {
@@ -138,8 +146,8 @@ public class JsExecutor {
                         "    pageX = document.documentElement.scrollLeft;" +
                         "}" +
                         "return pageX;";
-
-        return executeScript(scrollPositionXScript);
+        Double width = Double.parseDouble(executeScript(scrollPositionXScript));
+        return width.longValue();
     }
 
     public long getJsClientHeight() {
@@ -154,19 +162,14 @@ public class JsExecutor {
         return new String(Files.readAllBytes(Paths.get(TestContext.getConfig().getResourceDirPath() + File.separator + "js" + File.separator + fileName)));
     }
 
-    public void injectScript(String scriptUrl) throws IOException {
+    public void injectScript(String script) throws IOException {
         String injectingScript = loadScriptFromFile("inject_script.js");
-        executeScript(injectingScript, scriptUrl);
+        executeScript(injectingScript, script);
     }
 
-    public void injectScriptFromUrl(String scriptUrl) throws IOException {
-        String injectingScript = loadScriptFromFile("inject_script_url.js");
-        executeScript(injectingScript, scriptUrl);
-    }
-
-    public void injectJQuery() throws IOException {
-        String injectingScript = loadScriptFromFile("inject_jquery.js");
-        executeScript(injectingScript);
+    public void injectScriptSrc(String scriptSrc) throws IOException {
+        String injectingScript = loadScriptFromFile("inject_script_src.js");
+        executeScript(injectingScript, scriptSrc);
     }
 
     private String getSelectorForJs(Selector selector) {

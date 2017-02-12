@@ -117,9 +117,9 @@ public class Element extends LazyMobileContext implements TouchableElement<Mobil
 
     public void scrollIntoView() {
         if (!isInViewport()) {
-//            getApplication().waitForPageToLoad();
-//            getApplication().getJsExecutor().scrollIntoView(this);
-//            getApplication().waitForPageToLoad();
+//            getApplication().waitUntilPageLoaded();
+//            getApplication().jsExecutor().scrollIntoView(this);
+//            getApplication().waitUntilPageLoaded();
             throw new RuntimeException("Scrolling into view not implemented in mobile");
         }
     }
@@ -239,8 +239,8 @@ public class Element extends LazyMobileContext implements TouchableElement<Mobil
 //        Point point = getWrappedElement().getLocation();
 //
 //        int elemY = elemDim.getHeight() + point.getY();
-//        long browserHeight = getApplication().getJsExecutor().getJsClientHeight();
-//        long scrollHeight = getApplication().getJsExecutor().getScrollHeight();
+//        long browserHeight = getApplication().jsExecutor().getJsClientHeight();
+//        long scrollHeight = getApplication().jsExecutor().getScrollHeight();
 //
 //        return elemY >= scrollHeight && elemY <= scrollHeight + browserHeight;
         // TODO

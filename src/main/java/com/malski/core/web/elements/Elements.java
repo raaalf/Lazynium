@@ -1,8 +1,7 @@
 package com.malski.core.web.elements;
 
-import com.malski.core.web.conditions.WaitConditions;
-import com.malski.core.web.elements.api.ElementsStates;
-import com.malski.core.web.elements.api.ElementsWait;
+import com.malski.core.web.elements.states.ElementsState;
+import com.malski.core.web.elements.waits.ElementsWait;
 import com.malski.core.web.factory.ElementHandler;
 import com.malski.core.web.factory.LazyLocator;
 import org.apache.log4j.Logger;
@@ -15,11 +14,7 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.malski.core.utils.TestContext.getBrowser;
-import static com.malski.core.web.conditions.WaitConditions.*;
-import static org.openqa.selenium.support.ui.ExpectedConditions.not;
-
-public class Elements<E extends Element> implements List<E>, ElementsWait, ElementsStates {
+public class Elements<E extends Element> implements List<E>, ElementsWait<E>, ElementsState<E> {
     private LazyLocator locator;
     private List<E> elements = null;
     private Class<E> elementInterface = null;
@@ -252,166 +247,5 @@ public class Elements<E extends Element> implements List<E>, ElementsWait, Eleme
 
     public E getLast() {
         return (getWrappedElements() != null && getWrappedElements().size() > 0) ? getWrappedElements().get(getWrappedElements().size() - 1) : null;
-    }
-
-    @Override
-    public void waitUntilAllPresent() {
-        getBrowser().getWait().until(presenceOfAllElementsLocatedBy(getLocator()));
-    }
-
-    @Override
-    public void waitUntilAnyPresent() {
-        getBrowser().getWait().until(presenceOfElementLocated(getLocator()));
-    }
-
-    @Override
-    public void waitUntilAllVisible() {
-        getBrowser().getWait().until(visibilityOfAllElementsLocatedBy(getLocator()));
-    }
-
-    @Override
-    public void waitUntilAnyVisible() {
-        getBrowser().getWait().until(visibilityOfElementLocated(getLocator()));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public void waitUntilAllDisappear() {
-        getBrowser().getWait().until(WaitConditions.invisibilityOfAllElements(getWrappedElements()));
-    }
-
-    @Override
-    public void waitUntilAnyDisappear() {
-        getBrowser().getWait().until(invisibilityOfElementLocated(getLocator()));
-    }
-
-    @Override
-    public void waitUntilAllEnabled() {
-        getBrowser().getWait().until(WaitConditions.elementsToBeClickable(getLocator()));
-    }
-
-    @Override
-    public void waitUntilAnyEnabled() {
-        getBrowser().getWait().until(elementToBeClickable(getLocator()));
-    }
-
-    @Override
-    public void waitUntilAllDisabled() {
-        getBrowser().getWait().until(not(WaitConditions.elementsToBeClickable(getLocator())));
-    }
-
-    @Override
-    public void waitUntilAnyDisabled() {
-        getBrowser().getWait().until(not(elementToBeClickable(getLocator())));
-    }
-
-    @Override
-    public boolean areAllVisible() {
-        for (E element : getWrappedElements()) {
-            if (!element.isVisible()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean isAnyVisible() {
-        for (E element : getWrappedElements()) {
-            if (element.isVisible()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean areAllPresent() {
-        for (E element : getWrappedElements()) {
-            if (!element.isPresent()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean isAnyPresent() {
-        for (E element : getWrappedElements()) {
-            if (element.isPresent()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean areAllEnabled() {
-        for (E element : getWrappedElements()) {
-            if (!element.isEnabled()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean isAnyEnabled() {
-        for (E element : getWrappedElements()) {
-            if (element.isEnabled()) {
-                return true;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean hasAnyFocus() {
-        for (E element : getWrappedElements()) {
-            if (element.hasFocus()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean areAllSelected() {
-        for (E element : getWrappedElements()) {
-            if (!element.isSelected()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean isAnySelected() {
-        for (E element : getWrappedElements()) {
-            if (element.isSelected()) {
-                return true;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean areAllUnselected() {
-        for (E element : getWrappedElements()) {
-            if (element.isSelected()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean isAnyUnselected() {
-        for (E element : getWrappedElements()) {
-            if (!element.isSelected()) {
-                return true;
-            }
-        }
-        return true;
     }
 }

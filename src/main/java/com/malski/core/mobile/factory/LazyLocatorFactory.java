@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 
 public class LazyLocatorFactory extends AppiumFieldDecorator {
     private final LazyMobileContext searchContext;
-    public static long DEFAULT_IMPLICITLY_WAIT_TIMEOUT = 1L;
     public static TimeUnit DEFAULT_TIMEUNIT;
 
     public LazyLocatorFactory(LazyMobileContext searchContext) {

@@ -1,13 +1,26 @@
 package com.malski.core.web.factory;
 
+import com.malski.core.utils.TestContext;
 import com.malski.core.web.control.LazySearchContext;
 import com.malski.core.web.elements.Element;
+import net.sf.cglib.proxy.MethodProxy;
+import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 public class ElementHandler<T extends Element> extends LazyInterceptor<T> {
+
+    private String[] highlightActions = {"doubleClick", "click", "rightClick", "dragAndDrop", "dragAndDropWithOffset",
+            "mouseOver", "scrollIntoView", "clickWithoutWait", "clickWithOffset", "sendKeys", "clear", "getAttribute",
+            "getText", "getCssValue", "isEnabled", "isSelected", "getAlt", "getSrc", "fill", "getHref", "getTarget",
+            "check", "isChecked", "selectByIndex", "selectByVisibleText", "selectByVisibleTextIgnoreCases", "selectByContainingVisibleText",
+            "selectByValue", "selectOption", "selectAll", "getOptions", "getSelectedVisibleText", "getSelectedValue",
+            "getSelectedIndex", "getOptionsValues", "getOptionsVisibleTexts", "isSelected", "isMultiple", "selectAll",
+            "deselectByIndex", "deselectByVisibleText", "deselectByValue", "deselectOption", "deselectAll", "getFirstSelectedOption",
+            "getAllSelectedOptions"};
 
     public ElementHandler(Class<T> interfaceType, LazyLocator locator) {
         super(interfaceType, locator);
@@ -54,5 +67,18 @@ public class ElementHandler<T extends Element> extends LazyInterceptor<T> {
         } catch (Throwable e) {
             throw new RuntimeException("Not able to create object of type: " + getWrapper().getSimpleName(), e);
         }
+    }
+
+    @Override
+    protected Object invoke(T thing, Object object, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
+        boolean highlight = TestContext.getConfig().isVideoRecording() && ArrayUtils.contains(highlightActions, method.getName());
+        if(highlight) {
+            thing.lightOn();
+        }
+        Object result = method.invoke(thing, args);
+        if(highlight) {
+            thing.lightOff();
+        }
+        return result;
     }
 }

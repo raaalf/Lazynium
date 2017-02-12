@@ -16,11 +16,12 @@ public class DefaultHooks {
 
     @Before(order = 1)
     public void init(Scenario scenario) {
-        if(TestContext.getConfig().isVideoRecordingEnabled()) {
-            TestContext.getVideoRecorder().start(scenario.getName());
-        }
         TestContext.setBrowser(TestContext.getConfig().getDriver());
         log.info("###### Running scenario on browser: " + TestContext.getConfig().getDriver());
+        if (TestContext.getConfig().isVideoRecording()) {
+            TestContext.getBrowser().initVideoRecorder();
+            TestContext.getBrowser().videoRecorder().start(scenario.getName());
+        }
     }
 
     @Before(order = 2)
@@ -32,7 +33,7 @@ public class DefaultHooks {
     public void afterScenario(Scenario scenario) {
         if (scenario.isFailed()) {
             try {
-                byte[] screenshot = TestContext.getBrowser().getScreenShooter().getScreenshotAsByteArray();
+                byte[] screenshot = TestContext.getBrowser().screenShooter().getScreenshotAsByteArray();
                 scenario.embed(screenshot, "image/png");
             } catch (WebDriverException somePlatformsDontSupportScreenshots) {
                 log.error(somePlatformsDontSupportScreenshots.getMessage());
@@ -45,12 +46,24 @@ public class DefaultHooks {
     }
 
     @After(order = 1)
-    public void quitBrowser() {
+    public void quitBrowser(Scenario scenario) {
         //quit browser
-        TestContext.getBrowser().quit();
-        TestContext.setBrowser(null);
-        if(TestContext.getConfig().isVideoRecordingEnabled()) {
-            TestContext.getVideoRecorder().stop();
+        if (TestContext.getConfig().isVideoRecording()) {
+            addVideoToReport(scenario);
+        }
+        if (TestContext.getBrowser() != null) {
+            TestContext.getBrowser().quit();
+        }
+    }
+
+    private void addVideoToReport(Scenario scenario) {
+        TestContext.getBrowser().videoRecorder().stop();
+        if(TestContext.getConfig().isVideoRecordingOnFail() && !scenario.isFailed()) {
+            TestContext.getBrowser().videoRecorder().removeVideo();
+        } else {
+            String videoPath =  TestContext.getBrowser().videoRecorder().getVideoFilePath();
+            String mimeType =  TestContext.getBrowser().videoRecorder().getMimeType();
+            scenario.embed(videoPath.getBytes(), mimeType);
         }
     }
 }

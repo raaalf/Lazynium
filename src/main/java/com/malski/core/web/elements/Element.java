@@ -2,8 +2,7 @@ package com.malski.core.web.elements;
 
 import com.malski.core.web.conditions.WaitConditions;
 import com.malski.core.web.control.LazySearchContext;
-import com.malski.core.web.elements.api.ElementStates;
-import com.malski.core.web.elements.api.ElementWait;
+import com.malski.core.web.elements.states.ElementState;
 import com.malski.core.web.factory.ElementHandler;
 import com.malski.core.web.factory.LazyLocator;
 import com.malski.core.web.factory.Selector;
@@ -15,10 +14,11 @@ import org.openqa.selenium.internal.WrapsElement;
 import static com.malski.core.utils.TestContext.getBrowser;
 import static com.malski.core.utils.TestContext.getConfig;
 
-public class Element extends LazySearchContext implements WebElement, WrapsElement, Locatable, ElementStates, ElementWait {
+public class Element implements LazySearchContext, WebElement, WrapsElement, Locatable, ElementState {
 
     private WebElement element;
     private LazyLocator locator;
+    private String cssStyle;
 
     public Element(LazyLocator locator) {
         this.locator = locator;
@@ -34,6 +34,19 @@ public class Element extends LazySearchContext implements WebElement, WrapsEleme
         return getWrappedElement();
     }
 
+    public void lightOn() {
+        if (!isStaleness()) {
+            cssStyle = getBrowser().jsExecutor().getStyle(this);
+            getBrowser().jsExecutor().setStyle(this, "color: red; border: 3px solid red;");
+        }
+    }
+
+    public void lightOff() {
+        if (!isStaleness()) {
+            getBrowser().jsExecutor().setStyle(this, cssStyle);
+        }
+    }
+
     @Override
     public void click() {
         waitUntilIsClickable(getConfig().getMinTimeout());
@@ -42,31 +55,39 @@ public class Element extends LazySearchContext implements WebElement, WrapsEleme
 
     public void clickAndWait() {
         click();
-        getBrowser().waitForPageToLoad();
+        getBrowser().waitUntilPageLoaded();
     }
 
     public void doubleClick() {
         WebElement thisElem = getWrappedElement();
-        getBrowser().getActions()
+        getBrowser().actions()
                 .doubleClick(thisElem)
                 .perform();
     }
 
     public void rightClick() {
         WebElement thisElem = getWrappedElement();
-        getBrowser().getActions()
+        getBrowser().actions()
                 .contextClick(thisElem)
                 .perform();
     }
 
     public void dragAndDrop(Element elementToDrop) {
-        getBrowser().getActions().dragAndDrop(this, elementToDrop).perform();
+        getBrowser().actions().dragAndDrop(this, elementToDrop).perform();
+    }
+
+    public void dragAndDropByOffset(Element elementToDrop, int x, int y) {
+        getBrowser().actions().dragAndDropBy(this, elementToDrop.getLocation().getX() + x, elementToDrop.getLocation().getY() + y).perform();
+    }
+
+    public void dragAndDropBy(int x, int y) {
+        getBrowser().actions().dragAndDropBy(this, x, y).perform();
     }
 
     public void dragAndDropWithOffset(Element elementToDrop, int xOffset, int yOffset) {
         WebElement thisElem = getWrappedElement();
         WebElement toDropElem = elementToDrop.getWrappedElement();
-        getBrowser().getActions()
+        getBrowser().actions()
                 .clickAndHold(thisElem)
                 .moveToElement(toDropElem, xOffset, yOffset)
                 .release(toDropElem)
@@ -76,16 +97,16 @@ public class Element extends LazySearchContext implements WebElement, WrapsEleme
 
     public void mouseOver() {
         WebElement thisElem = getWrappedElement();
-        getBrowser().getActions()
+        getBrowser().actions()
                 .moveToElement(thisElem)
                 .perform();
     }
 
     public void scrollIntoView() {
         if (!isInViewport()) {
-            getBrowser().waitForPageToLoad();
-            getBrowser().getJsExecutor().scrollIntoView(this);
-            getBrowser().waitForPageToLoad();
+            getBrowser().waitUntilPageLoaded();
+            getBrowser().jsExecutor().scrollIntoView(this);
+            getBrowser().waitUntilPageLoaded();
         }
     }
 
@@ -125,99 +146,8 @@ public class Element extends LazySearchContext implements WebElement, WrapsEleme
     }
 
     @Override
-    public boolean isDisplayed(long timeout) {
-        try {
-            waitUntilIsInViewport(timeout);
-        } catch (Exception ignore) {
-            return false;
-        }
-        return getWrappedElement().isDisplayed();
-    }
-
-    @Override
-    public boolean isVisible() {
-        return getWrappedElement().isDisplayed();
-    }
-
-    @Override
-    public boolean isVisible(long timeout) {
-        try {
-            waitUntilVisible(timeout);
-        } catch (Exception ignore) {
-            return false;
-        }
-        return getWrappedElement().isDisplayed();
-    }
-
-    @Override
-    public boolean isPresent() {
-        try {
-            return getLocator().findElement() != null;
-        } catch (NoSuchElementException e) {
-            return false;
-        }
-    }
-
-    @Override
-    public boolean isPresent(long timeout) {
-        try {
-            waitUntilPresent(timeout);
-        } catch (Exception ignore) {
-            return false;
-        }
-        return isPresent();
-    }
-
-    @Override
     public boolean isEnabled() {
         return getWrappedElement().isEnabled();
-    }
-
-    @Override
-    public boolean isEnabled(long timeout) {
-        try {
-            waitUntilEnabled(timeout);
-        } catch (Exception ignore) {
-            return false;
-        }
-        return getWrappedElement().isEnabled();
-    }
-
-    @Override
-    public boolean hasFocus() {
-        return getWrappedElement().equals(getBrowser().switchTo().activeElement());
-    }
-
-    @Override
-    public boolean hasFocus(long timeout) {
-        try {
-            waitUntilVisible(timeout);
-        } catch (Exception ignore) {
-            return false;
-        }
-        return getWrappedElement().equals(getBrowser().switchTo().activeElement());
-    }
-
-    @Override
-    public boolean isInViewport() {
-        Dimension elemDim = getWrappedElement().getSize();
-        Point point = getWrappedElement().getLocation();
-
-        int elemY = elemDim.getHeight() + point.getY();
-        long browserHeight = getBrowser().getJsExecutor().getJsClientHeight();
-        long scrollHeight = getBrowser().getJsExecutor().getScrollHeight();
-
-        return elemY >= scrollHeight && elemY <= scrollHeight + browserHeight;
-    }
-
-    @Override
-    public boolean isInViewport(long timeout) {
-        try {
-            waitUntilIsInViewport(timeout);
-        } catch (Exception ignore) {
-            return false;
-        }
-        return isInViewport();
     }
 
     @Override
@@ -310,90 +240,5 @@ public class Element extends LazySearchContext implements WebElement, WrapsEleme
 
     public LazyLocator getLocator() {
         return this.locator;
-    }
-
-    @Override
-    public void waitUntilPresent() {
-        getBrowser().waitUntilPresent(getLocator());
-    }
-
-    @Override
-    public void waitUntilPresent(long timeout) {
-        getBrowser().waitUntilPresent(getLocator(), timeout);
-    }
-
-    @Override
-    public void waitUntilVisible() {
-        getBrowser().waitUntilVisible(getLocator());
-    }
-
-    @Override
-    public void waitUntilVisible(long timeout) {
-        getBrowser().waitUntilVisible(getLocator(), timeout);
-    }
-
-    @Override
-    public void waitUntilDisappear() {
-        getBrowser().waitUntilDisappear(getLocator());
-    }
-
-    @Override
-    public void waitUntilDisappear(long timeout) {
-        getBrowser().waitUntilDisappear(getLocator(), timeout);
-    }
-
-    @Override
-    public void waitUntilEnabled() {
-        getBrowser().waitUntilEnabled(getLocator());
-    }
-
-    @Override
-    public void waitUntilEnabled(long timeout) {
-        getBrowser().waitUntilEnabled(getLocator(), timeout);
-    }
-
-    @Override
-    public void waitUntilDisabled() {
-        getBrowser().waitUntilDisabled(getLocator());
-    }
-
-    @Override
-    public void waitUntilDisabled(long timeout) {
-        getBrowser().waitUntilDisabled(getLocator(), timeout);
-    }
-
-    @Override
-    public void waitUntilAttributeChange(String attributeName, String expectedValue) {
-        getBrowser().waitUntilAttributeChange(getLocator(), attributeName, expectedValue);
-    }
-
-    @Override
-    public void waitUntilAttributeChangeFrom(String attributeName, String startValue) {
-        getBrowser().waitUntilAttributeFrom(getLocator(), attributeName, startValue);
-    }
-
-    @Override
-    public void waitUntilAttributeChange(String attributeName, String expectedValue, long timeout) {
-        getBrowser().waitUntilAttributeChange(getLocator(), attributeName, expectedValue, timeout);
-    }
-
-    @Override
-    public void waitUntilIsInViewport() {
-        getBrowser().waitUntilIsInViewport(getLocator());
-    }
-
-    @Override
-    public void waitUntilIsInViewport(long timeout) {
-        getBrowser().waitUntilIsInViewport(getLocator(), timeout);
-    }
-
-    @Override
-    public void waitUntilIsClickable() {
-        getBrowser().waitUntilIsClickable(getLocator());
-    }
-
-    @Override
-    public void waitUntilIsClickable(long timeout) {
-        getBrowser().waitUntilIsClickable(getLocator(), timeout);
     }
 }

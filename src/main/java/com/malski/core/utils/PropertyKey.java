@@ -8,6 +8,7 @@ public enum PropertyKey {
     MIN_TIMEOUT("minTimeout"),
     TIMEOUT("timeout"),
     MAX_TIMEOUT("maxTimeout"),
+    SCRIPT_TIMEOUT("scriptTimeout"),
     DRIVER_SLEEP_MS("driverSleepMs"),
     IMPLICITLY_TIMEOUT_MS("implicitlyTimeoutMs"),
     EXPLICITLY_TIMEOUT("explicitlyTimeout"),
@@ -21,7 +22,12 @@ public enum PropertyKey {
     PROXY("proxy"),
     PROXY_URL("proxyUrl"),
     RETRY_COUNT("retryCount"),
-    VIDEO_RECORDING("videoRecording");
+    VIDEO_RECORDING("videoRecording"),
+    VIDEO_RECORDING_FAIL("videoRecordingOnFail"),
+    VIDEO_MIME_TYPE("videoMimeType"),
+    VIDEO_FRAME_RATE("videoFrameRate"),
+    VIDEO_QUALITY("videoQuality"),
+    VIDEO_DESTINATION_PATH("videoDestinationPath");
 
     private String key;
 

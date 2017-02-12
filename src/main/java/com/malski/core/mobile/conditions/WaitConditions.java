@@ -272,8 +272,8 @@ public class WaitConditions {
                 Point point = webElement.getLocation();
 
                 int elemY = elemDim.getHeight() + point.getY();
-                long browserHeight = getBrowser().getJsExecutor().getJsClientHeight();
-                long scrollHeight = getBrowser().getJsExecutor().getScrollHeight();
+                long browserHeight = getBrowser().jsExecutor().getJsClientHeight();
+                long scrollHeight = getBrowser().jsExecutor().getScrollHeight();
 
                 return elemY >= scrollHeight && elemY <= scrollHeight + browserHeight;
             }

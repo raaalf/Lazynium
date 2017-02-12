@@ -1,25 +1,21 @@
 package com.malski.core.web.view;
 
-import com.malski.core.utils.TestContext;
 import com.malski.core.web.annotations.PageCheck;
-import com.malski.core.web.control.Browser;
 import com.malski.core.web.control.LazySearchContext;
 import com.malski.core.web.factory.LazyPageFactory;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.FluentWait;
 
 /**
  * Class which is representing displayed page and allow to performing basic actions on it
  */
-public abstract class Page extends LazySearchContext implements View {
+public abstract class Page implements LazySearchContext, View {
     protected final Logger log = Logger.getLogger(getClass());
     private String url;
     private boolean isOpened = true;
 
     public Page() {
-        getBrowser().waitForPageToLoad();
+        getBrowser().waitUntilPageLoaded();
         initElements();
         this.handlePageInfo();
     }
@@ -45,16 +41,6 @@ public abstract class Page extends LazySearchContext implements View {
 
     public String getUrl() {
         return url;
-    }
-
-    @Override
-    public Browser getBrowser() {
-        return TestContext.getBrowser();
-    }
-
-    @Override
-    public FluentWait<WebDriver> getWait() {
-        return getBrowser().getWait();
     }
 
     public <T extends Page> T cast(Class<T> cls) {
