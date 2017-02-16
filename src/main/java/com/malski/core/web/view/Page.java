@@ -9,7 +9,7 @@ import org.openqa.selenium.SearchContext;
 /**
  * Class which is representing displayed page and allow to performing basic actions on it
  */
-public abstract class Page implements LazySearchContext, View {
+public class Page implements LazySearchContext, View {
     protected final Logger log = Logger.getLogger(getClass());
     private String url;
     private boolean isOpened = true;

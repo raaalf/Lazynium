@@ -24,7 +24,7 @@
 
     <test name="Tests runner">
         <classes>
-            <class name="com.malski.core.cucumber.CucumberNG" />
+            <class name="com.malski.core.cucumber.LazyCucumber" />
         </classes>
     </test>
 

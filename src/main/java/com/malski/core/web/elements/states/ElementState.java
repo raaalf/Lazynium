@@ -1,21 +1,16 @@
 package com.malski.core.web.elements.states;
 
 import com.malski.core.web.elements.waits.ElementWait;
-import com.malski.core.web.factory.LazyLocator;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.internal.WrapsElement;
 
 import static com.malski.core.utils.TestContext.getBrowser;
 
-public interface ElementState extends ElementWait {
+public interface ElementState extends ElementWait, WrapsElement {
 
     boolean isStaleness();
-
-    LazyLocator getLocator();
-
-    WebElement getWrappedElement();
 
     default boolean isDisplayed(long timeout) {
         try {

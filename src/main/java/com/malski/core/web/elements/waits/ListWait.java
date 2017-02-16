@@ -10,7 +10,7 @@ import static com.malski.core.utils.TestContext.getBrowser;
 import static com.malski.core.web.conditions.WaitConditions.*;
 import static org.openqa.selenium.support.ui.ExpectedConditions.not;
 
-public interface ElementsWait<E extends Element> {
+public interface ListWait<E extends Element> {
 
     LazyLocator getLocator();
 

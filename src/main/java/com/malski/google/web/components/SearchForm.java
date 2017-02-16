@@ -1,11 +1,11 @@
-package com.malski.google.web.modules;
+package com.malski.google.web.components;
 
 import com.malski.core.web.elements.Element;
 import com.malski.core.web.elements.Input;
-import com.malski.core.web.view.Module;
+import com.malski.core.web.view.Component;
 import org.openqa.selenium.support.FindBy;
 
-public class SearchForm extends Module {
+public class SearchForm extends Component {
 
     @FindBy(id = "lst-ib")
     private Input searchInput;

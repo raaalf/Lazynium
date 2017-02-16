@@ -112,6 +112,11 @@
             <artifactId>java-client</artifactId>
             <version>5.0.0-BETA2</version>
         </dependency>
+        <dependency>
+            <groupId>com.paulhammant</groupId>
+            <artifactId>ngwebdriver</artifactId>
+            <version>0.9.6</version>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>
@@ -140,5 +145,4 @@
             <url>https://mvnrepository.com/artifact/io.appium/</url>
         </repository>
     </repositories>
-
 </project>

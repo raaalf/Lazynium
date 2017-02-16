@@ -1,19 +1,19 @@
 package com.malski.core.web.factory;
 
-import com.malski.core.web.view.Module;
+import com.malski.core.web.view.Component;
 
 import java.lang.reflect.Constructor;
 
-public class ModuleHandler<T extends Module> extends LazyInterceptor<T> {
+public class ComponentHandler<T extends Component> extends LazyInterceptor<T> {
 
-    public ModuleHandler(Class<T> type, LazyLocator locator) {
+    public ComponentHandler(Class<T> type, LazyLocator locator) {
         super(type, locator);
     }
 
     @Override
     protected void init(Class<T> type) {
-        if (!Module.class.isAssignableFrom(type)) {
-            throw new RuntimeException("interface not assignable to Module.");
+        if (!Component.class.isAssignableFrom(type)) {
+            throw new RuntimeException("interface not assignable to IComponent.");
         }
         setWrapper(type);
     }
@@ -23,10 +23,10 @@ public class ModuleHandler<T extends Module> extends LazyInterceptor<T> {
     public T getImplementation() {
         try {
             Constructor cons = getWrapper().getConstructor();
-            T module = (T) cons.newInstance();
-            module.setRoot(getLocator());
-            module.initElements();
-            return module;
+            T component = (T) cons.newInstance();
+            component.setRoot(getLocator());
+            component.initElements();
+            return component;
         } catch (Throwable e) {
             throw new RuntimeException("Not able to create object of type: " + getWrapper().getSimpleName(), e);
         }

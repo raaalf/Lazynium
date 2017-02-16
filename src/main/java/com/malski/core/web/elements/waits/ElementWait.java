@@ -1,15 +1,12 @@
 package com.malski.core.web.elements.waits;
 
 import com.malski.core.web.factory.LazyLocator;
-import org.openqa.selenium.WebElement;
 
 import static com.malski.core.utils.TestContext.getBrowser;
 
 public interface ElementWait {
 
     LazyLocator getLocator();
-
-    WebElement getWrappedElement();
 
     default void waitUntilPresent() {
         getBrowser().waitUntilPresent(getLocator());

@@ -9,12 +9,13 @@ import com.malski.core.web.factory.Selector;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.internal.Locatable;
-import org.openqa.selenium.internal.WrapsElement;
+
+import java.util.List;
 
 import static com.malski.core.utils.TestContext.getBrowser;
 import static com.malski.core.utils.TestContext.getConfig;
 
-public class Element implements LazySearchContext, WebElement, WrapsElement, Locatable, ElementState {
+public class Element implements LazySearchContext, Locatable, ElementState, WebElement {
 
     private WebElement element;
     private LazyLocator locator;
@@ -48,6 +49,16 @@ public class Element implements LazySearchContext, WebElement, WrapsElement, Loc
     }
 
     @Override
+    public List<WebElement> findElements(By by) {
+        return LazySearchContext.super.findElements(by);
+    }
+
+    @Override
+    public WebElement findElement(By by) {
+        return LazySearchContext.super.findElement(by);
+    }
+
+    @Override
     public void click() {
         waitUntilIsClickable(getConfig().getMinTimeout());
         getWrappedElement().click();
@@ -72,27 +83,16 @@ public class Element implements LazySearchContext, WebElement, WrapsElement, Loc
                 .perform();
     }
 
-    public void dragAndDrop(Element elementToDrop) {
+    public void dragTo(Element elementToDrop) {
         getBrowser().actions().dragAndDrop(this, elementToDrop).perform();
     }
 
-    public void dragAndDropByOffset(Element elementToDrop, int x, int y) {
+    public void dragToBy(Element elementToDrop, int x, int y) {
         getBrowser().actions().dragAndDropBy(this, elementToDrop.getLocation().getX() + x, elementToDrop.getLocation().getY() + y).perform();
     }
 
-    public void dragAndDropBy(int x, int y) {
+    public void dragBy(int x, int y) {
         getBrowser().actions().dragAndDropBy(this, x, y).perform();
-    }
-
-    public void dragAndDropWithOffset(Element elementToDrop, int xOffset, int yOffset) {
-        WebElement thisElem = getWrappedElement();
-        WebElement toDropElem = elementToDrop.getWrappedElement();
-        getBrowser().actions()
-                .clickAndHold(thisElem)
-                .moveToElement(toDropElem, xOffset, yOffset)
-                .release(toDropElem)
-                .build()
-                .perform();
     }
 
     public void mouseOver() {
@@ -238,6 +238,7 @@ public class Element implements LazySearchContext, WebElement, WrapsElement, Loc
         }
     }
 
+    @Override
     public LazyLocator getLocator() {
         return this.locator;
     }

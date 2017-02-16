@@ -1,10 +1,10 @@
 package com.malski.core.web.control;
 
 import com.malski.core.web.elements.Element;
-import com.malski.core.web.elements.Elements;
+import com.malski.core.web.elements.LazyList;
 import com.malski.core.web.factory.*;
 import com.malski.core.web.view.Frame;
-import com.malski.core.web.view.Module;
+import com.malski.core.web.view.Component;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -88,79 +88,79 @@ public interface LazySearchContext extends SearchContext {
         return getElement(By.className(className), clazz);
     }
 
-    default <T extends Element> Elements<T> getEmptyElementsList() {
-        return new Elements<>();
+    default <T extends Element> LazyList<T> getEmptyElementsList() {
+        return new LazyList<>();
     }
 
-    default Elements<Element> getElements(By by) {
+    default LazyList<Element> getElements(By by) {
         return getElements(by, Element.class);
     }
 
-    default <T extends Element> Elements<T> getElements(By by, Class<T> clazz) {
+    default <T extends Element> LazyList<T> getElements(By by, Class<T> clazz) {
         return new ElementListHandler<>(clazz, by, this).getImplementation();
     }
 
-    default Elements<Element> getElements(LazyLocator locator) {
+    default LazyList<Element> getElements(LazyLocator locator) {
         return getElements(locator, Element.class);
     }
 
-    default <T extends Element> Elements<T> getElements(LazyLocator locator, Class<T> clazz) {
+    default <T extends Element> LazyList<T> getElements(LazyLocator locator, Class<T> clazz) {
         return new ElementListHandler<>(clazz, locator).getImplementation();
     }
 
-    default Elements<Element> getElements(Selector selector) {
+    default LazyList<Element> getElements(Selector selector) {
         return getElements(selector, Element.class);
     }
 
-    default <T extends Element> Elements<T> getElements(Selector selector, Class<T> clazz) {
+    default <T extends Element> LazyList<T> getElements(Selector selector, Class<T> clazz) {
         return new ElementListHandler<>(clazz, selector, this).getImplementation();
     }
 
-    default Elements<Element> $$(String css) {
+    default LazyList<Element> $$(String css) {
         return getElements(By.cssSelector(css));
     }
 
-    default <T extends Element> Elements<T> $$(String css, Class<T> clazz) {
+    default <T extends Element> LazyList<T> $$(String css, Class<T> clazz) {
         return getElements(By.cssSelector(css), clazz);
     }
 
-    default Elements<Element> $$i(String id) {
+    default LazyList<Element> $$i(String id) {
         return getElements(By.id(id));
     }
 
-    default <T extends Element> Elements<T> $$i(String id, Class<T> clazz) {
+    default <T extends Element> LazyList<T> $$i(String id, Class<T> clazz) {
         return getElements(By.id(id), clazz);
     }
 
-    default Elements<Element> $$n(String name) {
+    default LazyList<Element> $$n(String name) {
         return getElements(By.name(name));
     }
 
-    default <T extends Element> Elements<T> $$n(String name, Class<T> clazz) {
+    default <T extends Element> LazyList<T> $$n(String name, Class<T> clazz) {
         return getElements(By.name(name), clazz);
     }
 
-    default Elements<Element> $$x(String xpath) {
+    default LazyList<Element> $$x(String xpath) {
         return getElements(By.xpath(xpath));
     }
 
-    default <T extends Element> Elements<T> $$x(String xpath, Class<T> clazz) {
+    default <T extends Element> LazyList<T> $$x(String xpath, Class<T> clazz) {
         return getElements(By.xpath(xpath), clazz);
     }
 
-    default Elements<Element> $$t(String tagName) {
+    default LazyList<Element> $$t(String tagName) {
         return getElements(By.tagName(tagName));
     }
 
-    default <T extends Element> Elements<T> $$t(String tagName, Class<T> clazz) {
+    default <T extends Element> LazyList<T> $$t(String tagName, Class<T> clazz) {
         return getElements(By.tagName(tagName), clazz);
     }
 
-    default Elements<Element> $$c(String className) {
+    default LazyList<Element> $$c(String className) {
         return getElements(By.className(className));
     }
 
-    default <T extends Element> Elements<T> $$c(String className, Class<T> clazz) {
+    default <T extends Element> LazyList<T> $$c(String className, Class<T> clazz) {
         return getElements(By.className(className), clazz);
     }
 
@@ -184,20 +184,20 @@ public interface LazySearchContext extends SearchContext {
         }
     }
 
-    default <T extends Module> T getModule(Class<T> iface) {
-        return getModule(iface, new LazyLocator(this, new LazyAnnotations(iface)));
+    default <T extends Component> T getComponent(Class<T> iface) {
+        return getComponent(iface, new LazyLocator(this, new LazyAnnotations(iface)));
     }
 
-    default <T extends Module> T getModule(Class<T> iface, By by) {
-        return getModule(iface, new LazyLocator(this, by));
+    default <T extends Component> T getComponent(Class<T> iface, By by) {
+        return getComponent(iface, new LazyLocator(this, by));
     }
 
-    default <T extends Module> T getModule(Class<T> iface, Selector selector) {
-        return getModule(iface, new LazyLocator(this, selector));
+    default <T extends Component> T getComponent(Class<T> iface, Selector selector) {
+        return getComponent(iface, new LazyLocator(this, selector));
     }
 
-    default <T extends Module> T getModule(Class<T> iface, LazyLocator locator) {
-        ModuleHandler<T> handler = new ModuleHandler<>(iface, locator);
+    default <T extends Component> T getComponent(Class<T> iface, LazyLocator locator) {
+        ComponentHandler<T> handler = new ComponentHandler<>(iface, locator);
         try {
             return handler.getImplementation();
         } catch (Throwable e) {

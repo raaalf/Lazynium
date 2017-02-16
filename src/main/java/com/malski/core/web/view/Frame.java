@@ -2,9 +2,8 @@ package com.malski.core.web.view;
 
 import com.malski.core.web.control.LazySearchContext;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebElement;
 
-public abstract class Frame extends Module {
+public class Frame extends Component {
     private boolean inFrame = false;
     private LazySearchContext frameContext;
 
@@ -19,8 +18,7 @@ public abstract class Frame extends Module {
     }
 
     public void forceSwitchIn() {
-        WebElement root = getRoot().getWrappedElement();
-        getBrowser().switchTo().frame(root);
+        getBrowser().switchTo().frame(root().getWrappedElement());
         frameContext = getBrowser();
         inFrame = true;
     }
@@ -33,7 +31,7 @@ public abstract class Frame extends Module {
 
     public void forceSwitchOut() {
         getBrowser().switchTo().parentFrame();
-        frameContext = getRoot();
+        frameContext = root();
         inFrame = false;
     }
 

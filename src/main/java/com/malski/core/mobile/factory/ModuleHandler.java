@@ -13,7 +13,7 @@ public class ModuleHandler<T extends Module> extends LazyInterceptor<T> {
     @Override
     protected void init(Class<T> type) {
         if (!Module.class.isAssignableFrom(type)) {
-            throw new RuntimeException("interface not assignable to Module.");
+            throw new RuntimeException("interface not assignable to Component.");
         }
         setWrapper(type);
     }

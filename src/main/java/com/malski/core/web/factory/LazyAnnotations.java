@@ -1,11 +1,12 @@
 package com.malski.core.web.factory;
 
-import com.malski.core.web.annotations.IFrame;
-import com.malski.core.web.annotations.IModule;
-import com.malski.core.web.view.Module;
+import com.malski.core.web.annotations.*;
 import org.openqa.selenium.By;
-import org.openqa.selenium.support.*;
+import org.openqa.selenium.support.ByIdOrName;
+import org.openqa.selenium.support.CacheLookup;
 import org.openqa.selenium.support.pagefactory.AbstractAnnotations;
+import org.openqa.selenium.support.pagefactory.ByAll;
+import org.openqa.selenium.support.pagefactory.ByChained;
 
 import java.lang.reflect.Field;
 
@@ -27,48 +28,42 @@ public class LazyAnnotations extends AbstractAnnotations {
 
     public By buildBy() {
         if (field == null) {
-            return buildByFromClassForModule();
-        } else if (Module.class.isAssignableFrom(field.getType())) {
-            return buildByFromFieldForModule();
+            return buildByFromClassForComponent();
+        } else if (com.malski.core.web.view.Component.class.isAssignableFrom(field.getType())) {
+            return buildByFromFieldForComponent();
         } else {
             return buildByForElement();
         }
     }
 
-    private By buildByFromFieldForModule() {
+    private By buildByFromFieldForComponent() {
         FindBy findBy = null;
-        if (this.field.isAnnotationPresent(IModule.class)) {
-            IModule module = this.field.getAnnotation(IModule.class);
-            findBy = module.value();
+        if (this.field.isAnnotationPresent(IComponent.class)) {
+            IComponent component = this.field.getAnnotation(IComponent.class);
+            findBy = component.value();
         } else if (this.field.isAnnotationPresent(IFrame.class)) {
             IFrame frame = this.field.getAnnotation(IFrame.class);
             findBy = frame.value();
         }
-        if (findBy == null || isFindByUnset(findBy)) {
+        if (findBy == null || AnnotationFactory.isFindByUnset(findBy)) {
             if (field != null) {
                 this.clazz = field.getType();
             }
-            return buildByFromClassForModule();
+            return buildByFromClassForComponent();
         } else {
-            return handleFindByForModule(findBy);
+            return handleFindByForComponent(findBy);
         }
     }
 
-    private boolean isFindByUnset(FindBy findBy) {
-        return "".equals(findBy.className()) && "".equals(findBy.css()) && "".equals(findBy.id()) && "".equals(findBy.linkText())
-                && "".equals(findBy.name()) && "".equals(findBy.partialLinkText()) && "".equals(findBy.tagName())
-                && "".equals(findBy.xpath()) && How.UNSET.equals(findBy.how());
-    }
-
-    private By buildByFromClassForModule() {
+    private By buildByFromClassForComponent() {
         if (clazz.isAnnotationPresent(FindBy.class)) {
             FindBy findBy = (FindBy) clazz.getAnnotation(FindBy.class);
-            return handleFindByForModule(findBy);
+            return handleFindByForComponent(findBy);
         }
-        throw new IllegalArgumentException("\'@FindBy\' annotation has to be specified either in interface definition or in field declaration using \'@WebModuleImpl\' or \'@IFrame\' !");
+        throw new IllegalArgumentException("\'@FindBy\' annotation has to be specified either in interface definition or in field declaration using \'@IComponent\' or \'@IFrame\' !");
     }
 
-    private By handleFindByForModule(FindBy findBy) {
+    private By handleFindByForComponent(FindBy findBy) {
         By ans = null;
         if (findBy != null) {
             ans = this.buildByFromFindBy(findBy);
@@ -78,7 +73,7 @@ public class LazyAnnotations extends AbstractAnnotations {
         }
 
         if (ans == null) {
-            throw new IllegalArgumentException("Cannot determine how to locate module root element.");
+            throw new IllegalArgumentException("Cannot determine how to locate component root element.");
         } else {
             return ans;
         }
@@ -93,7 +88,7 @@ public class LazyAnnotations extends AbstractAnnotations {
     }
 
     private By buildByForElement() {
-        this.assertValidAnnotationsForElement();
+        AnnotationValidator.assertValidAnnotationsForElement(this.field);
         By ans = null;
         FindBys findBys = this.field.getAnnotation(FindBys.class);
         if (findBys != null) {
@@ -121,16 +116,32 @@ public class LazyAnnotations extends AbstractAnnotations {
         }
     }
 
-    private void assertValidAnnotationsForElement() {
-        FindBys findBys = this.field.getAnnotation(FindBys.class);
-        FindAll findAll = this.field.getAnnotation(FindAll.class);
-        FindBy findBy = this.field.getAnnotation(FindBy.class);
-        if (findBys != null && findBy != null) {
-            throw new IllegalArgumentException("If you use a \'@FindBys\' annotation, you must not also use a \'@FindBy\' annotation");
-        } else if (findAll != null && findBy != null) {
-            throw new IllegalArgumentException("If you use a \'@FindAll\' annotation, you must not also use a \'@FindBy\' annotation");
-        } else if (findAll != null && findBys != null) {
-            throw new IllegalArgumentException("If you use a \'@FindAll\' annotation, you must not also use a \'@FindBys\' annotation");
+    protected By buildByFromFindBys(FindBys findBys) {
+        AnnotationValidator.assertValidFindBys(findBys);
+        FindBy[] findByArray = findBys.value();
+        By[] byArray = new By[findByArray.length];
+
+        for(int i = 0; i < findByArray.length; ++i) {
+            byArray[i] = this.buildByFromFindBy(findByArray[i]);
         }
+
+        return new ByChained(byArray);
+    }
+
+    protected By buildBysFromFindByOneOf(FindAll findBys) {
+        AnnotationValidator.assertValidFindAll(findBys);
+        FindBy[] findByArray = findBys.value();
+        By[] byArray = new By[findByArray.length];
+
+        for(int i = 0; i < findByArray.length; ++i) {
+            byArray[i] = this.buildByFromFindBy(findByArray[i]);
+        }
+
+        return new ByAll(byArray);
+    }
+
+    protected By buildByFromFindBy(FindBy findBy) {
+        AnnotationValidator.assertValidFindBy(findBy);
+        return AnnotationFactory.buildByFromShortFindBy(findBy);
     }
 }

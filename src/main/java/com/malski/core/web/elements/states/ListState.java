@@ -4,7 +4,7 @@ import com.malski.core.web.elements.Element;
 
 import java.util.List;
 
-public interface ElementsState<E extends Element> {
+public interface ListState<E extends Element> {
 
     List<E> getWrappedElements();
 

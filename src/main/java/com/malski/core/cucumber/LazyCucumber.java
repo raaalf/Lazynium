@@ -19,10 +19,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @CucumberOptions(features = "*", glue = "*", tags = "*", format = {"pretty"})
-public class CucumberNG extends AbstractTestNGCucumberTests {
+public class LazyCucumber extends AbstractTestNGCucumberTests {
     private TestNGCucumberRunner testNGCucumberRunner;
 
-    public CucumberNG() {
+    public LazyCucumber() {
     }
 
     @BeforeClass(

@@ -1,19 +1,14 @@
 package com.malski.core.mobile.factory;
 
-import com.malski.core.web.annotations.IFrame;
-import com.malski.core.web.annotations.IModule;
+import com.malski.core.web.annotations.IComponent;
 import com.malski.core.web.elements.Element;
-import com.malski.core.web.elements.Elements;
-import com.malski.core.web.factory.FrameHandler;
-import com.malski.core.web.view.Frame;
-import com.malski.core.web.view.Module;
+import com.malski.core.web.elements.LazyList;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
-import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -46,7 +41,7 @@ public class LazyFieldDecorator {
         if (locator == null) {
             return null;
         }
-        if (Module.class.isAssignableFrom(fieldType)) {
+        if (com.malski.core.web.view.Component.class.isAssignableFrom(fieldType)) {
             return proxyForModule(fieldType ,locator);
         } else {
             return null;
@@ -94,8 +89,8 @@ public class LazyFieldDecorator {
     }
 
     private boolean isDecorableModule(Class clazz, Field field) {
-        return !(clazz == null || !Module.class.isAssignableFrom(clazz)) &&
-                field.getAnnotation(IModule.class) != null;
+        return !(clazz == null || !com.malski.core.web.view.Component.class.isAssignableFrom(clazz)) &&
+                field.getAnnotation(IComponent.class) != null;
     }
 
     /* Generate a type-parameterized locator proxy for the element in question. */
@@ -109,10 +104,10 @@ public class LazyFieldDecorator {
     @SuppressWarnings("unchecked")
     private <T> List<T> proxyForListLocator(Class<T> type, LazyLocator locator) {
         MethodInterceptor handler = new ElementListHandler(type, locator);
-        return (List<T>) Enhancer.create(Elements.class, handler);
+        return (List<T>) Enhancer.create(LazyList.class, handler);
     }
 
-    /* Generate a type-parametrized locator proxy for the Module in question. */
+    /* Generate a type-parametrized locator proxy for the IComponent in question. */
     @SuppressWarnings("unchecked")
     private <T> T proxyForModule(Class<T> type, LazyLocator locator) {
         MethodInterceptor handler = new ModuleHandler(type, locator);

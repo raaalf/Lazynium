@@ -1,11 +1,11 @@
 package com.malski.core.web.factory;
 
+import com.malski.core.web.annotations.IComponent;
 import com.malski.core.web.annotations.IFrame;
-import com.malski.core.web.annotations.IModule;
 import com.malski.core.web.elements.Element;
-import com.malski.core.web.elements.Elements;
+import com.malski.core.web.elements.LazyList;
+import com.malski.core.web.view.Component;
 import com.malski.core.web.view.Frame;
-import com.malski.core.web.view.Module;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import org.openqa.selenium.WebElement;
@@ -29,23 +29,23 @@ public class LazyFieldDecorator {
     public Object decorate(Field field) {
         if(isDecorableFrame(field.getType(), field)) {
             return decorateFrame(field);
-        } else if(isDecorableWebModule(field.getType(), field)) {
-            return decorateWebModule(field);
-        } else if (isDecorable(field.getType(), field) || isDecorableList(field)) {
+        } else if(isDecorableComponent(field.getType(), field)) {
             return decorateComponent(field);
+        } else if (isDecorable(field.getType(), field) || isDecorableList(field)) {
+            return decorateElements(field);
         } else {
             return null;
         }
     }
 
-    private Object decorateWebModule(Field field) {
+    private Object decorateComponent(Field field) {
         Class<?> fieldType = field.getType();
         LazyLocator locator = (LazyLocator)factory.createLocator(field);
         if (locator == null) {
             return null;
         }
-        if (Module.class.isAssignableFrom(fieldType)) {
-            return proxyForWebModule(fieldType ,locator);
+        if (Component.class.isAssignableFrom(fieldType)) {
+            return proxyForComponent(fieldType ,locator);
         } else {
             return null;
         }
@@ -64,7 +64,7 @@ public class LazyFieldDecorator {
         }
     }
 
-    private Object decorateComponent(Field field) {
+    private Object decorateElements(Field field) {
         Class<?> fieldType = field.getType();
         LazyLocator locator = (LazyLocator)factory.createLocator(field);
         if (locator == null) {
@@ -104,9 +104,9 @@ public class LazyFieldDecorator {
                 !(field.getAnnotation(FindBy.class) == null && field.getAnnotation(FindBys.class) == null);
     }
 
-    private boolean isDecorableWebModule(Class clazz, Field field) {
-        return !(clazz == null || !Module.class.isAssignableFrom(clazz)) &&
-                field.getAnnotation(IModule.class) != null;
+    private boolean isDecorableComponent(Class clazz, Field field) {
+        return !(clazz == null || !com.malski.core.web.view.Component.class.isAssignableFrom(clazz)) &&
+                field.getAnnotation(IComponent.class) != null;
     }
 
     private boolean isDecorableFrame(Class clazz, Field field) {
@@ -125,13 +125,13 @@ public class LazyFieldDecorator {
     @SuppressWarnings("unchecked")
     private <T> List<T> proxyForListLocator(Class<T> type, LazyLocator locator) {
         MethodInterceptor handler = new ElementListHandler(type, locator);
-        return (List<T>) Enhancer.create(Elements.class, handler);
+        return (List<T>) Enhancer.create(LazyList.class, handler);
     }
 
-    /* Generate a type-parametrized locator proxy for the Module in question. */
+    /* Generate a type-parametrized locator proxy for the IComponent in question. */
     @SuppressWarnings("unchecked")
-    private <T> T proxyForWebModule(Class<T> type, LazyLocator locator) {
-        MethodInterceptor handler = new ModuleHandler(type, locator);
+    private <T> T proxyForComponent(Class<T> type, LazyLocator locator) {
+        MethodInterceptor handler = new ComponentHandler(type, locator);
         return (T) Enhancer.create(type, handler);
     }
 

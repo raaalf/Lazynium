@@ -80,8 +80,8 @@ public class Select extends Element implements SelectWait, SelectState {
         getWrappedSelect().deselectAll();
     }
 
-    public Elements<Element> getAllSelectedOptions() {
-        Elements<Element> toReturn = getEmptyElementsList();
+    public LazyList<Element> getAllSelectedOptions() {
+        LazyList<Element> toReturn = getEmptyElementsList();
         this.getOptions().forEach( option -> {
             if(option.isSelected()) {
                 toReturn.add(option);
@@ -90,7 +90,7 @@ public class Select extends Element implements SelectWait, SelectState {
         return toReturn;
     }
 
-    public Elements<Element> getOptions() {
+    public LazyList<Element> getOptions() {
         return getElements(By.tagName("option"));
     }
 
@@ -103,7 +103,7 @@ public class Select extends Element implements SelectWait, SelectState {
     }
 
     public int getSelectedIndex() {
-        Elements<Element> options = getOptions();
+        LazyList<Element> options = getOptions();
         for(int i = 0; i < options.size(); ++i) {
             Element option = options.get(i);
             if(option.isSelected()) {

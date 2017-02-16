@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.BuildInfo;
+import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -19,7 +20,7 @@ import static com.malski.core.utils.TestContext.getConfig;
 /**
  * Browser class is implementation of WebDriver to execute basic actions using it
  */
-public class Browser implements LazySearchContext, WebDriver, BrowserWait {
+public class Browser implements WebDriver, BrowserWait, WrapsDriver, LazySearchContext {
     private WebDriver driver;
     private JsExecutor jsExecutor;
     private ScreenShooter shooter;
@@ -37,13 +38,13 @@ public class Browser implements LazySearchContext, WebDriver, BrowserWait {
 
     public JsExecutor jsExecutor() {
         if(this.jsExecutor == null) {
-            this.jsExecutor = new JsExecutor(getWebDriver());
+            this.jsExecutor = new JsExecutor(getWrappedDriver());
         }
         return this.jsExecutor;
     }
 
     public void initVideoRecorder() {
-        this.videoRecorder = new VideoRecorder(getWebDriver());
+        this.videoRecorder = new VideoRecorder(getWrappedDriver());
     }
 
     public VideoRecorder videoRecorder() {
@@ -52,21 +53,21 @@ public class Browser implements LazySearchContext, WebDriver, BrowserWait {
 
     public ScreenShooter screenShooter() {
         if(this.shooter == null) {
-            this.shooter = new ScreenShooter(getWebDriver());
+            this.shooter = new ScreenShooter(getWrappedDriver());
         }
         return this.shooter;
     }
 
     public Actions actions() {
         if(this.actions == null) {
-            this.actions = new Actions(getWebDriver());
+            this.actions = new Actions(getWrappedDriver());
         }
         return this.actions;
     }
 
     @Override
     public boolean refresh() {
-        if (getWebDriver().toString().contains("null")) {
+        if (getWrappedDriver().toString().contains("null")) {
             initialize();
             return true;
         }
@@ -87,17 +88,27 @@ public class Browser implements LazySearchContext, WebDriver, BrowserWait {
 
     @Override
     public SearchContext getContext() {
-        return getWebDriver();
+        return getWrappedDriver();
+    }
+
+    @Override
+    public List<WebElement> findElements(By by) {
+        return LazySearchContext.super.findElements(by);
+    }
+
+    @Override
+    public WebElement findElement(By by) {
+        return LazySearchContext.super.findElement(by);
     }
 
     @Override
     public String getPageSource() {
-        return getWebDriver().getPageSource();
+        return getWrappedDriver().getPageSource();
     }
 
     @Override
     public void get(String url) {
-        getWebDriver().get(url);
+        getWrappedDriver().get(url);
     }
 
     public void navigateTo(String url) {
@@ -107,41 +118,41 @@ public class Browser implements LazySearchContext, WebDriver, BrowserWait {
 
     @Override
     public String getCurrentUrl() {
-        return getWebDriver().getCurrentUrl();
+        return getWrappedDriver().getCurrentUrl();
     }
 
     @Override
     public String getTitle() {
-        return getWebDriver().getTitle();
+        return getWrappedDriver().getTitle();
     }
 
     @Override
     public void close() {
-        getWebDriver().close();
+        getWrappedDriver().close();
     }
 
     @Override
     public void quit() {
-        getWebDriver().quit();
+        getWrappedDriver().quit();
     }
 
     @Override
     public Set<String> getWindowHandles() {
-        return getWebDriver().getWindowHandles();
+        return getWrappedDriver().getWindowHandles();
     }
 
     public int getWindowsCount() {
-        return getWebDriver().getWindowHandles().size();
+        return getWrappedDriver().getWindowHandles().size();
     }
 
     @Override
     public String getWindowHandle() {
-        return getWebDriver().getWindowHandle();
+        return getWrappedDriver().getWindowHandle();
     }
 
     @Override
     public TargetLocator switchTo() {
-        return getWebDriver().switchTo();
+        return getWrappedDriver().switchTo();
     }
 
     public void switchToNewWindow() {
@@ -165,34 +176,35 @@ public class Browser implements LazySearchContext, WebDriver, BrowserWait {
 
     @Override
     public Navigation navigate() {
-        return getWebDriver().navigate();
+        return getWrappedDriver().navigate();
     }
 
     @Override
     public Options manage() {
-        return getWebDriver().manage();
+        return getWrappedDriver().manage();
     }
 
-    public WebDriver getWebDriver() {
+    @Override
+    public WebDriver getWrappedDriver() {
         return driver;
     }
 
     public RemoteWebDriver getRemoteDriver() {
-        return (RemoteWebDriver) getWebDriver();
+        return (RemoteWebDriver) getWrappedDriver();
     }
 
     public void setImplicitlyWait(long time, TimeUnit timeUnit) {
-        getWebDriver().manage().timeouts().implicitlyWait(time, timeUnit);
+        getWrappedDriver().manage().timeouts().implicitlyWait(time, timeUnit);
     }
 
     @Override
     public FluentWait<WebDriver> getWait() {
-        return new WebDriverWait(getWebDriver(), getConfig().getExplicitlyTimeout(), getConfig().getDriverSleepMs());
+        return new WebDriverWait(getWrappedDriver(), getConfig().getExplicitlyTimeout(), getConfig().getDriverSleepMs());
     }
 
     @Override
     public FluentWait<WebDriver> getWait(long seconds) {
-        return new WebDriverWait(getWebDriver(), seconds, getConfig().getDriverSleepMs());
+        return new WebDriverWait(getWrappedDriver(), seconds, getConfig().getDriverSleepMs());
     }
 
     @Override
@@ -265,12 +277,12 @@ public class Browser implements LazySearchContext, WebDriver, BrowserWait {
 
 
     public Alert getActiveAlert() {
-        return getWebDriver().switchTo().alert();
+        return getWrappedDriver().switchTo().alert();
     }
 
     public boolean isAlertPresent() {
         try {
-            getWebDriver().switchTo().alert();
+            getWrappedDriver().switchTo().alert();
             return true;
         } catch (NoAlertPresentException ignore) {
             return false;

@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
-public class FrameHandler<T extends Frame> extends ModuleHandler<T> {
+public class FrameHandler<T extends Frame> extends ComponentHandler<T> {
     private final List<String> generalMethodNames = Arrays.asList("getBrowser", "switchIn", "switchOut", "getRoot",
             "setRoot", "initElements", "findElement", "findElements");
 

@@ -1,7 +1,7 @@
 package com.malski.core.web.elements;
 
-import com.malski.core.web.elements.states.ElementsState;
-import com.malski.core.web.elements.waits.ElementsWait;
+import com.malski.core.web.elements.states.ListState;
+import com.malski.core.web.elements.waits.ListWait;
 import com.malski.core.web.factory.ElementHandler;
 import com.malski.core.web.factory.LazyLocator;
 import org.apache.log4j.Logger;
@@ -14,24 +14,24 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Elements<E extends Element> implements List<E>, ElementsWait<E>, ElementsState<E> {
+public class LazyList<E extends Element> implements List<E>, ListWait<E>, ListState<E> {
     private LazyLocator locator;
     private List<E> elements = null;
     private Class<E> elementInterface = null;
-    private static Logger log = Logger.getLogger(Elements.class);
+    private static Logger log = Logger.getLogger(LazyList.class);
 
-    public Elements(LazyLocator locator, final Class<E> elementInterface) {
+    public LazyList(LazyLocator locator, final Class<E> elementInterface) {
         this.locator = locator;
         this.elementInterface = elementInterface;
     }
 
-    public Elements(final Class<E> elementInterface) {
+    public LazyList(final Class<E> elementInterface) {
         this.locator = null;
         this.elementInterface = elementInterface;
     }
 
     @SuppressWarnings("unchecked")
-    public Elements() {
+    public LazyList() {
         this((Class<E>) Element.class);
     }
 

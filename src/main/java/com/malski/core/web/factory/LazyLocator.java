@@ -2,7 +2,7 @@ package com.malski.core.web.factory;
 
 import com.malski.core.web.control.LazySearchContext;
 import com.malski.core.web.elements.Element;
-import com.malski.core.web.elements.Elements;
+import com.malski.core.web.elements.LazyList;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.pagefactory.AbstractAnnotations;
@@ -53,7 +53,7 @@ public class LazyLocator implements ElementLocator {
         return (T) new ElementHandler(clazz, this).getImplementation();
     }
 
-    public <T extends Element> Elements<T> getElements(Class<T> clazz) {
+    public <T extends Element> LazyList<T> getElements(Class<T> clazz) {
         return new ElementListHandler<>(clazz, this).getImplementation();
     }
 

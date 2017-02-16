@@ -1,7 +1,6 @@
 package com.malski.core.mobile.factory;
 
-import com.malski.core.web.annotations.IModule;
-import com.malski.core.web.view.Module;
+import com.malski.core.web.annotations.IComponent;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.*;
 import org.openqa.selenium.support.pagefactory.AbstractAnnotations;
@@ -27,7 +26,7 @@ public class LazyAnnotations extends AbstractAnnotations {
     public By buildBy() {
         if (field == null) {
             return buildByFromClassForModule();
-        } else if (Module.class.isAssignableFrom(field.getType())) {
+        } else if (com.malski.core.web.view.Component.class.isAssignableFrom(field.getType())) {
             return buildByFromFieldForModule();
         } else {
             return buildByForElement();
@@ -36,8 +35,8 @@ public class LazyAnnotations extends AbstractAnnotations {
 
     private By buildByFromFieldForModule() {
         FindBy findBy = null;
-        if (this.field.isAnnotationPresent(IModule.class)) {
-            IModule module = this.field.getAnnotation(IModule.class);
+        if (this.field.isAnnotationPresent(IComponent.class)) {
+            IComponent module = this.field.getAnnotation(IComponent.class);
             findBy = module.value();
         }
         if (findBy == null || isFindByUnset(findBy)) {
@@ -61,7 +60,7 @@ public class LazyAnnotations extends AbstractAnnotations {
             FindBy findBy = (FindBy) clazz.getAnnotation(FindBy.class);
             return handleFindByForModule(findBy);
         }
-        throw new IllegalArgumentException("\'@FindBy\' annotation has to be specified either in interface definition or in field declaration using \'@Module\'!");
+        throw new IllegalArgumentException("\'@FindBy\' annotation has to be specified either in interface definition or in field declaration using \'@IComponent\'!");
     }
 
     private By handleFindByForModule(FindBy findBy) {

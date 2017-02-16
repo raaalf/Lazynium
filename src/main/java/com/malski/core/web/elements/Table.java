@@ -30,7 +30,7 @@ public class Table extends Element {
         }
     }
 
-    public Elements<Element> getColumnHeaders() {
+    public LazyList<Element> getColumnHeaders() {
         return $$x("./*[self::thead or self::tbody]/tr/th");
     }
 
@@ -48,7 +48,7 @@ public class Table extends Element {
     }
 
     public int getColumnHeaderIndex(String headerText) {
-        Elements<Element> headers = getColumnHeaders();
+        LazyList<Element> headers = getColumnHeaders();
         for (int i = 0; i < headers.size(); ++i) {
             if (headerText.equalsIgnoreCase(headers.get(i).getText().trim())) {
                 return i;
@@ -58,7 +58,7 @@ public class Table extends Element {
     }
 
     public int getColumnIndex(String firstRowText) {
-        Elements<Element> firstRow = getRowCells(0);
+        LazyList<Element> firstRow = getRowCells(0);
         for (int i = 0; i < firstRow.size(); ++i) {
             if (firstRowText.equalsIgnoreCase(firstRow.get(i).getText().trim())) {
                 return i;
@@ -67,43 +67,43 @@ public class Table extends Element {
         throw new NoSuchElementException("No first row with text: " + firstRowText);
     }
 
-    public Elements<Element> getRows() {
+    public LazyList<Element> getRows() {
         return getRows(Element.class);
     }
 
-    public <T extends Element> Elements<T> getRows(Class<T> clazz) {
+    public <T extends Element> LazyList<T> getRows(Class<T> clazz) {
         return $$x("./tbody/tr[./td]", clazz);
     }
 
-    public Elements<Element> getRows(String text) {
+    public LazyList<Element> getRows(String text) {
         return getRows(text, Element.class);
     }
 
-    public <T extends Element> Elements<T> getRows(String text, Class<T> clazz) {
-        Elements<T> rows = getEmptyElementsList();
+    public <T extends Element> LazyList<T> getRows(String text, Class<T> clazz) {
+        LazyList<T> rows = getEmptyElementsList();
         rows.addAll(getRows(clazz).stream().filter(row -> StringUtils.containsIgnoreCase(row.getText(), text)).collect(Collectors.toList()));
         return rows;
     }
 
-    public Elements<Element> getRows(String text, int colIndex) {
+    public LazyList<Element> getRows(String text, int colIndex) {
         return getRows(text, colIndex, Element.class);
     }
 
-    public <T extends Element> Elements<T> getRows(String text, int colIndex, Class<T> clazz) {
+    public <T extends Element> LazyList<T> getRows(String text, int colIndex, Class<T> clazz) {
         int headersSize = getColumnHeaders().size();
         if (headersSize <= colIndex) {
             throw new NoSuchElementException("No column with index: " + colIndex + ". Max index: " + headersSize);
         }
-        Elements<T> rowsWitText = getEmptyElementsList();
+        LazyList<T> rowsWitText = getEmptyElementsList();
         rowsWitText.addAll(getRows(clazz).stream().filter(row -> StringUtils.containsIgnoreCase(getCells(row).get(colIndex).getText(), text)).collect(Collectors.toList()));
         return rowsWitText;
     }
 
-    public Elements<Element> getRows(String text, String columnName) {
+    public LazyList<Element> getRows(String text, String columnName) {
         return getRows(text, columnName, Element.class);
     }
 
-    public <T extends Element> Elements<T> getRows(String text, String columnName, Class<T> clazz) {
+    public <T extends Element> LazyList<T> getRows(String text, String columnName, Class<T> clazz) {
         int colIndex = getColumnHeaderIndex(columnName);
         return getRows(text, colIndex, clazz);
     }
@@ -113,7 +113,7 @@ public class Table extends Element {
     }
 
     public <T extends Element> T getRow(int rowIdx, Class<T> clazz) {
-        Elements<T> rows = getRows(clazz);
+        LazyList<T> rows = getRows(clazz);
         if (rows.size() <= rowIdx) {
             throw new NoSuchElementException("No row with index: " + rowIdx + ". Max row: " + rows.size());
         }
@@ -152,7 +152,7 @@ public class Table extends Element {
             throw new NoSuchElementException("No column with index: " + colIndex + ". Max index: " + headersSize);
         }
         for (T row : getRows(clazz)) {
-            Elements<Element> cells = getCells(row);
+            LazyList<Element> cells = getCells(row);
             if (cells.size() > colIndex && StringUtils.containsIgnoreCase(cells.get(colIndex).getText(), rowText)) {
                 return row;
             }
@@ -171,36 +171,36 @@ public class Table extends Element {
         throw new NoSuchElementException("No row with text: " + text);
     }
 
-    public Elements<Element> getRowCells(int index) {
+    public LazyList<Element> getRowCells(int index) {
         return getRowCells(index, Element.class);
     }
 
-    public <T extends Element> Elements<T> getRowCells(int index, Class<T> clazz) {
+    public <T extends Element> LazyList<T> getRowCells(int index, Class<T> clazz) {
         return getCells(getRow(index), clazz);
     }
 
-    public Elements<Element> getRowCells(String text) {
+    public LazyList<Element> getRowCells(String text) {
         return getRowCells(text, Element.class);
     }
 
-    public <T extends Element> Elements<T> getRowCells(String text, Class<T> clazz) {
+    public <T extends Element> LazyList<T> getRowCells(String text, Class<T> clazz) {
         return getCells(getRow(text), clazz);
     }
 
-    public Elements<Element> getRowCells(String rowText, String columnName) {
+    public LazyList<Element> getRowCells(String rowText, String columnName) {
         return getRowCells(rowText, columnName, Element.class);
     }
 
-    public <T extends Element> Elements<T> getRowCells(String rowText, String columnName, Class<T> clazz) {
+    public <T extends Element> LazyList<T> getRowCells(String rowText, String columnName, Class<T> clazz) {
         int colIndex = getColumnHeaderIndex(columnName);
         return getRowCells(rowText, colIndex, clazz);
     }
 
-    public Elements<Element> getRowCells(String rowText, int columnIndex) {
+    public LazyList<Element> getRowCells(String rowText, int columnIndex) {
         return getRowCells(rowText, columnIndex, Element.class);
     }
 
-    public <T extends Element> Elements<T> getRowCells(String rowText, int colIndex, Class<T> clazz) {
+    public <T extends Element> LazyList<T> getRowCells(String rowText, int colIndex, Class<T> clazz) {
         return getCells(getRow(rowText, colIndex), clazz);
     }
 
@@ -209,7 +209,7 @@ public class Table extends Element {
     }
 
     public <T extends Element> T getCell(int rowIndex, int colIndex, Class<T> clazz) {
-        Elements<T> cells = getRowCells(rowIndex, clazz);
+        LazyList<T> cells = getRowCells(rowIndex, clazz);
         if (cells.size() <= colIndex) {
             throw new NoSuchElementException("No column with index: " + colIndex + ". Max index: " + cells.size());
         }
@@ -221,7 +221,7 @@ public class Table extends Element {
     }
 
     public <T extends Element> T getCell(int rowIndex, String columnName, Class<T> clazz) {
-        Elements<T> cells = getRowCells(rowIndex, clazz);
+        LazyList<T> cells = getRowCells(rowIndex, clazz);
         int colIndex = getColumnHeaderIndex(columnName);
         return cells.get(colIndex);
     }
@@ -231,7 +231,7 @@ public class Table extends Element {
     }
 
     public <T extends Element> T getCell(String rowText, int colIndex, Class<T> clazz) {
-        Elements<T> cells = getRowCells(rowText, clazz);
+        LazyList<T> cells = getRowCells(rowText, clazz);
         if (cells.size() <= colIndex) {
             throw new NoSuchElementException("No column with index: " + colIndex + ". Max index: " + cells.size());
         }
@@ -243,7 +243,7 @@ public class Table extends Element {
     }
 
     public <T extends Element> T getCell(String rowText, String columnName, Class<T> clazz) {
-        Elements<T> cells = getRowCells(rowText, clazz);
+        LazyList<T> cells = getRowCells(rowText, clazz);
         int colIndex = getColumnHeaderIndex(columnName);
         return cells.get(colIndex);
     }
@@ -288,7 +288,7 @@ public class Table extends Element {
     public List<String> getColumnTexts(int columnIndex) {
         List<String> rowList = new ArrayList<>();
         for (Element w : getRows()) {
-            Elements<Element> cells = getCells(w);
+            LazyList<Element> cells = getCells(w);
             if (cells.size() > 0)
                 rowList.add(cells.get(columnIndex).getText().trim());
         }
@@ -299,7 +299,7 @@ public class Table extends Element {
         List<String> rowList = new ArrayList<>();
         int columnIndex = getColumnHeaderIndex(columnName);
         for (Element w : getRows()) {
-            Elements<Element> cells = getCells(w);
+            LazyList<Element> cells = getCells(w);
             if (cells.size() > 0 && cells.size() > columnIndex)
                 rowList.add(cells.get(columnIndex).getText().trim());
         }
@@ -310,7 +310,7 @@ public class Table extends Element {
         List<String> rowList = new ArrayList<>();
         int columnIndex = getColumnIndex(firstRowText);
         for (Element w : getRows()) {
-            Elements<Element> cells = getCells(w);
+            LazyList<Element> cells = getCells(w);
             if (cells.size() > 0 && cells.size() > columnIndex)
                 rowList.add(cells.get(columnIndex).getText().trim());
         }
@@ -321,11 +321,11 @@ public class Table extends Element {
         return getCell(rowText, columnName).getText();
     }
 
-    private Elements<Element> getCells(Element row) {
+    private LazyList<Element> getCells(Element row) {
         return getCells(row, Element.class);
     }
 
-    private <T extends Element> Elements<T> getCells(Element row, Class<T> clazz) {
+    private <T extends Element> LazyList<T> getCells(Element row, Class<T> clazz) {
         return row.$$x("./td", clazz);
     }
 }
