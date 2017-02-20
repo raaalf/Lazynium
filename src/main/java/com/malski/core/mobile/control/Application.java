@@ -16,7 +16,7 @@ import static com.malski.core.mobile.conditions.WaitConditions.elementToBeClicka
 import static com.malski.core.mobile.conditions.WaitConditions.invisibilityOfElementLocated;
 import static com.malski.core.mobile.conditions.WaitConditions.presenceOfElementLocated;
 import static com.malski.core.mobile.conditions.WaitConditions.visibilityOfElementLocated;
-import static com.malski.core.utils.TestContext.getConfig;
+import static com.malski.core.utils.TestContext.config;
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
 import static org.openqa.selenium.support.ui.ExpectedConditions.invisibilityOfElementLocated;
@@ -68,11 +68,11 @@ public class Application extends LazyMobileContext {
     }
 
     public FluentWait<WebDriver> getWait() {
-        return new WebDriverWait(getWrappedDriver(), getConfig().getExplicitlyTimeout(), getConfig().getDriverSleepMs());
+        return new WebDriverWait(getWrappedDriver(), config().explicitlyTimeout(), config().driverSleepMs());
     }
 
     public FluentWait<WebDriver> getWait(long seconds) {
-        return new WebDriverWait(getWrappedDriver(), seconds, getConfig().getDriverSleepMs());
+        return new WebDriverWait(getWrappedDriver(), seconds, config().driverSleepMs());
     }
 
     public void waitUntilPresent(By by) {

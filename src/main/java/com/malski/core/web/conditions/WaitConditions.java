@@ -1,9 +1,9 @@
 package com.malski.core.web.conditions;
 
+import com.malski.core.utils.TestContext;
 import com.malski.core.web.elements.Element;
 import com.malski.core.web.elements.Select;
 import com.malski.core.web.factory.LazyLocator;
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.malski.core.utils.TestContext.getBrowser;
+import static com.malski.core.utils.TestContext.browser;
 
 public class WaitConditions {
 
@@ -60,9 +60,7 @@ public class WaitConditions {
             public Boolean apply(WebDriver driver) {
                 try {
                     return !locator.findElement().isDisplayed();
-                } catch (NoSuchElementException var3) {
-                    return true;
-                } catch (StaleElementReferenceException var4) {
+                } catch (NoSuchElementException | StaleElementReferenceException var3) {
                     return true;
                 }
             }
@@ -116,17 +114,74 @@ public class WaitConditions {
         return new ExpectedCondition<Boolean>() {
             public Boolean apply(WebDriver driver) {
                 JavascriptExecutor executor = (JavascriptExecutor) driver;
-                String state = StringUtils.EMPTY;
                 try {
-                    state = executor.executeScript("return document.readyState").toString();
+                    String state = executor.executeScript(TestContext.getInMemoryJsScript("pageLoaded")).toString();
+                    return Boolean.parseBoolean(state);
                 } catch (NoSuchWindowException e) {
                     driver.switchTo().window(driver.getWindowHandles().iterator().next());
+                    return false;
                 }
-                return (state.equalsIgnoreCase("complete") || state.equalsIgnoreCase("loaded"));
             }
 
             public String toString() {
                 return "pageLoaded";
+            }
+        };
+    }
+
+    public static ExpectedCondition<Boolean> pageStateReady() {
+        return new ExpectedCondition<Boolean>() {
+            public Boolean apply(WebDriver driver) {
+                JavascriptExecutor executor = (JavascriptExecutor) driver;
+                try {
+                    String state = executor.executeScript("return document.readyState").toString();
+                    return (state.equalsIgnoreCase("complete") || state.equalsIgnoreCase("loaded"));
+                } catch (NoSuchWindowException e) {
+                    driver.switchTo().window(driver.getWindowHandles().iterator().next());
+                    return false;
+                }
+            }
+
+            public String toString() {
+                return "pageStateReady";
+            }
+        };
+    }
+
+    public static ExpectedCondition<Boolean> jQueryReady() {
+        return new ExpectedCondition<Boolean>() {
+            public Boolean apply(WebDriver driver) {
+                JavascriptExecutor executor = (JavascriptExecutor) driver;
+                try {
+                    String state = executor.executeScript(TestContext.getInMemoryJsScript("jQueryLoaded")).toString();
+                    return Boolean.parseBoolean(state);
+                } catch (NoSuchWindowException e) {
+                    driver.switchTo().window(driver.getWindowHandles().iterator().next());
+                    return false;
+                }
+            }
+
+            public String toString() {
+                return "pageStateReady";
+            }
+        };
+    }
+
+    public static ExpectedCondition<Boolean> angularReady() {
+        return new ExpectedCondition<Boolean>() {
+            public Boolean apply(WebDriver driver) {
+                JavascriptExecutor executor = (JavascriptExecutor) driver;
+                try {
+                    String state = executor.executeScript(TestContext.getInMemoryJsScript("angularLoaded")).toString();
+                    return Boolean.parseBoolean(state);
+                } catch (NoSuchWindowException e) {
+                    driver.switchTo().window(driver.getWindowHandles().iterator().next());
+                    return false;
+                }
+            }
+
+            public String toString() {
+                return "angularReady";
             }
         };
     }
@@ -271,8 +326,8 @@ public class WaitConditions {
                 Point point = webElement.getLocation();
 
                 int elemY = elemDim.getHeight() + point.getY();
-                long browserHeight = getBrowser().jsExecutor().getJsClientHeight();
-                long scrollHeight = getBrowser().jsExecutor().getScrollHeight();
+                long browserHeight = browser().jsExecutor().getJsClientHeight();
+                long scrollHeight = browser().jsExecutor().getScrollHeight();
 
                 return elemY >= scrollHeight && elemY <= scrollHeight + browserHeight;
             }
@@ -296,7 +351,7 @@ public class WaitConditions {
             }
 
             public String toString() {
-                return "attributeChanged: attr:" + attributeName + " expectedValue: " + expectedValue + " element: " + element.getLocator().toString();
+                return "attributeChanged: attr:" + attributeName + " expectedValue: " + expectedValue + " element: " + element.locator().toString();
             }
         };
     }
@@ -308,7 +363,7 @@ public class WaitConditions {
             }
 
             public String toString() {
-                return "optionSelectedByIndex: " + select.getLocator().toString() + " visibleText: " + visibleText;
+                return "optionSelectedByIndex: " + select.locator().toString() + " visibleText: " + visibleText;
             }
         };
     }
@@ -320,7 +375,7 @@ public class WaitConditions {
             }
 
             public String toString() {
-                return "optionSelectedByIndex: " + select.getLocator().toString() + " value: " + value;
+                return "optionSelectedByIndex: " + select.locator().toString() + " value: " + value;
             }
         };
     }
@@ -332,7 +387,7 @@ public class WaitConditions {
             }
 
             public String toString() {
-                return "optionSelectedByIndex: " + select.getLocator().toString() + " index: " + index;
+                return "optionSelectedByIndex: " + select.locator().toString() + " index: " + index;
             }
         };
     }

@@ -58,10 +58,10 @@ public class JsExecutor {
         try {
             String dndScript = loadScriptFromFile("dnd.js");
             injectScript(dndScript);
-            String sourceSelector = getSelectorForJs(source.getSelector());
-            String targetSelector = getSelectorForJs(target.getSelector());
-            String sourceSelectorType = getExecutorType(source.getSelector());
-            String targetSelectorType = getExecutorType(target.getSelector());
+            String sourceSelector = getSelectorForJs(source.selector());
+            String targetSelector = getSelectorForJs(target.selector());
+            String sourceSelectorType = getExecutorType(source.selector());
+            String targetSelectorType = getExecutorType(target.selector());
             String script = String.format("DndSimulator.simulate(\"%s\", \"%s\", \"%s\", \"%s\")", sourceSelector, targetSelector, sourceSelectorType, targetSelectorType);
             executeScript(script);
         } catch (IOException e) {
@@ -78,8 +78,8 @@ public class JsExecutor {
     }
 
     public void hover(Element element) {
-        String jsSelector = getSelectorForJs(element.getSelector());
-        if (useCssExecutor(element.getSelector())) {
+        String jsSelector = getSelectorForJs(element.selector());
+        if (useCssExecutor(element.selector())) {
             callCssSelector(jsSelector, "hover()");
         } else {
             String script = "var element = arguments[0];"
@@ -95,8 +95,8 @@ public class JsExecutor {
     }
 
     public void setValue(Element element, String value) {
-        String script = element.getSelector().getHow().equals(CSS) ? String.format("value=%s", value) : String.format("val('%s').change()", value);
-        performAction(element.getSelector(), script);
+        String script = element.selector().getHow().equals(CSS) ? String.format("value=%s", value) : String.format("val('%s').change()", value);
+        performAction(element.selector(), script);
     }
 
     public void moveBack() {
@@ -159,7 +159,7 @@ public class JsExecutor {
     }
 
     public String loadScriptFromFile(String fileName) throws IOException {
-        return new String(Files.readAllBytes(Paths.get(TestContext.getConfig().getResourceDirPath() + File.separator + "js" + File.separator + fileName)));
+        return new String(Files.readAllBytes(Paths.get(TestContext.config().resourceDirPath() + File.separator + "js" + File.separator + fileName)));
     }
 
     public void injectScript(String script) throws IOException {

@@ -2,77 +2,77 @@ package com.malski.core.web.elements.waits;
 
 import com.malski.core.web.factory.LazyLocator;
 
-import static com.malski.core.utils.TestContext.getBrowser;
+import static com.malski.core.utils.TestContext.browser;
 
 public interface ElementWait {
 
-    LazyLocator getLocator();
+    LazyLocator locator();
 
     default void waitUntilPresent() {
-        getBrowser().waitUntilPresent(getLocator());
+        browser().waitUntilPresent(locator());
     }
 
     default void waitUntilPresent(long timeout) {
-        getBrowser().waitUntilPresent(getLocator(), timeout);
+        browser().waitUntilPresent(locator(), timeout);
     }
 
     default void waitUntilVisible() {
-        getBrowser().waitUntilVisible(getLocator());
+        browser().waitUntilVisible(locator());
     }
 
     default void waitUntilVisible(long timeout) {
-        getBrowser().waitUntilVisible(getLocator(), timeout);
+        browser().waitUntilVisible(locator(), timeout);
     }
 
     default void waitUntilDisappear() {
-        getBrowser().waitUntilDisappear(getLocator());
+        browser().waitUntilDisappear(locator());
     }
 
     default void waitUntilDisappear(long timeout) {
-        getBrowser().waitUntilDisappear(getLocator(), timeout);
+        browser().waitUntilDisappear(locator(), timeout);
     }
 
     default void waitUntilEnabled() {
-        getBrowser().waitUntilEnabled(getLocator());
+        browser().waitUntilEnabled(locator());
     }
 
     default void waitUntilEnabled(long timeout) {
-        getBrowser().waitUntilEnabled(getLocator(), timeout);
+        browser().waitUntilEnabled(locator(), timeout);
     }
 
     default void waitUntilDisabled() {
-        getBrowser().waitUntilDisabled(getLocator());
+        browser().waitUntilDisabled(locator());
     }
 
     default void waitUntilDisabled(long timeout) {
-        getBrowser().waitUntilDisabled(getLocator(), timeout);
+        browser().waitUntilDisabled(locator(), timeout);
     }
 
     default void waitUntilAttributeChange(String attributeName, String expectedValue) {
-        getBrowser().waitUntilAttributeChange(getLocator(), attributeName, expectedValue);
+        browser().waitUntilAttributeChange(locator(), attributeName, expectedValue);
     }
 
     default void waitUntilAttributeChangeFrom(String attributeName, String startValue) {
-        getBrowser().waitUntilAttributeFrom(getLocator(), attributeName, startValue);
+        browser().waitUntilAttributeFrom(locator(), attributeName, startValue);
     }
 
     default void waitUntilAttributeChange(String attributeName, String expectedValue, long timeout) {
-        getBrowser().waitUntilAttributeChange(getLocator(), attributeName, expectedValue, timeout);
+        browser().waitUntilAttributeChange(locator(), attributeName, expectedValue, timeout);
     }
 
     default void waitUntilIsInViewport() {
-        getBrowser().waitUntilIsInViewport(getLocator());
+        browser().waitUntilIsInViewport(locator());
     }
 
     default void waitUntilIsInViewport(long timeout) {
-        getBrowser().waitUntilIsInViewport(getLocator(), timeout);
+        browser().waitUntilIsInViewport(locator(), timeout);
     }
 
     default void waitUntilIsClickable() {
-        getBrowser().waitUntilIsClickable(getLocator());
+        browser().waitUntilIsClickable(locator());
     }
 
     default void waitUntilIsClickable(long timeout) {
-        getBrowser().waitUntilIsClickable(getLocator(), timeout);
+        browser().waitUntilIsClickable(locator(), timeout);
     }
 }

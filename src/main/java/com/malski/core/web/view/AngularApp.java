@@ -1,7 +1,8 @@
 package com.malski.core.web.view;
 
+import com.malski.core.utils.TestContext;
+import com.malski.core.web.conditions.WaitConditions;
 import com.malski.core.web.elements.Element;
-import com.paulhammant.ngwebdriver.ByAngular;
 import com.paulhammant.ngwebdriver.VariableNotInScopeException;
 import org.openqa.selenium.support.FindBy;
 
@@ -9,16 +10,16 @@ import org.openqa.selenium.support.FindBy;
 public class AngularApp extends Component {
 
     public AngularApp() {
-
+        initElements();
     }
 
     public void mutate(Element element, final String variable, final String value) {
-        getBrowser().jsExecutor().executeScript("angular.element(arguments[0]).scope()." + variable + " = " + value + ";" +
+        browser().jsExecutor().executeScript("angular.element(arguments[0]).scope()." + variable + " = " + value + ";" +
                 "angular.element(arguments[1]).injector().get('$rootScope').$apply();", element, root());
     }
 
     public String retrieveJson(Element element, final String variable) {
-        return (String) check(variable, getBrowser().jsExecutor().executeScript(
+        return (String) check(variable, browser().jsExecutor().executeScript(
                 "return angular.toJson(angular.element(arguments[0]).scope()." + variable + ");", element));
     }
 
@@ -30,7 +31,7 @@ public class AngularApp extends Component {
     }
 
     public Object retrieve(Element element, final String variable) {
-        return check(variable, getBrowser().jsExecutor().executeScript(
+        return check(variable, browser().jsExecutor().executeScript(
                 "return angular.element(arguments[0]).scope()." + variable + ";", element));
     }
 
@@ -46,28 +47,24 @@ public class AngularApp extends Component {
         return (Long) rv;
     }
 
-    public void waitForAngularRequestsToFinish() {
-        getBrowser().jsExecutor().executeAsyncScript("var callback = arguments[arguments.length - 1];\n" +
-                "var rootSelector = '"+rootSelector+"';\n" +
-                "\n" +
-                ByAngular.functions.get("waitForAngular"));
+    public void waitForAngular() {
+        if (browser().isAlertPresent()) {
+            return;
+        }
+        getWait(TestContext.config().angularTimeout()).until(WaitConditions.angularReady());
     }
 
-    public void waitForAngular2RequestsToFinish() {
-        getBrowser().jsExecutor().executeAsyncScript("var callback = arguments[arguments.length - 1];\n" +
-                "\n" +
-                ByAngular.functions.get("waitForAllAngular2"));
-    }
-
-    public String getLocationAbsUrl() {
-        return getBrowser().jsExecutor().executeScript(
-                "var selector = '"+rootSelector+"';\n" +
-                        "\n" +
-                        ByAngular.functions.get("getLocationAbsUrl"));
+    public String locationAbsUrl() {
+        // TODO
+//        return browser().jsExecutor().executeScript(
+//                "var selector = '" + rootSelector + "';\n" +
+//                        "\n" +
+//                        ByAngular.functions.get("getLocationAbsUrl"));
+        return null;
     }
 
     public Object evaluateScript(Element element, String script) {
         script = script.replace("$scope", "angular.element(arguments[0]).scope()");
-        return getBrowser().jsExecutor().executeScript(script, element);
+        return browser().jsExecutor().executeScript(script, element);
     }
 }

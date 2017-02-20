@@ -5,8 +5,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.support.ByIdOrName;
 import org.openqa.selenium.support.CacheLookup;
 import org.openqa.selenium.support.pagefactory.AbstractAnnotations;
-import org.openqa.selenium.support.pagefactory.ByAll;
-import org.openqa.selenium.support.pagefactory.ByChained;
 
 import java.lang.reflect.Field;
 
@@ -27,6 +25,10 @@ public class LazyAnnotations extends AbstractAnnotations {
     }
 
     public By buildBy() {
+        return buildSelector().getBy();
+    }
+
+    public Selector buildSelector() {
         if (field == null) {
             return buildByFromClassForComponent();
         } else if (com.malski.core.web.view.Component.class.isAssignableFrom(field.getType())) {
@@ -36,7 +38,7 @@ public class LazyAnnotations extends AbstractAnnotations {
         }
     }
 
-    private By buildByFromFieldForComponent() {
+    private Selector buildByFromFieldForComponent() {
         FindBy findBy = null;
         if (this.field.isAnnotationPresent(IComponent.class)) {
             IComponent component = this.field.getAnnotation(IComponent.class);
@@ -45,7 +47,7 @@ public class LazyAnnotations extends AbstractAnnotations {
             IFrame frame = this.field.getAnnotation(IFrame.class);
             findBy = frame.value();
         }
-        if (findBy == null || AnnotationFactory.isFindByUnset(findBy)) {
+        if (findBy == null || Selector.isFindByUnset(findBy)) {
             if (field != null) {
                 this.clazz = field.getType();
             }
@@ -55,7 +57,7 @@ public class LazyAnnotations extends AbstractAnnotations {
         }
     }
 
-    private By buildByFromClassForComponent() {
+    private Selector buildByFromClassForComponent() {
         if (clazz.isAnnotationPresent(FindBy.class)) {
             FindBy findBy = (FindBy) clazz.getAnnotation(FindBy.class);
             return handleFindByForComponent(findBy);
@@ -63,85 +65,79 @@ public class LazyAnnotations extends AbstractAnnotations {
         throw new IllegalArgumentException("\'@FindBy\' annotation has to be specified either in interface definition or in field declaration using \'@IComponent\' or \'@IFrame\' !");
     }
 
-    private By handleFindByForComponent(FindBy findBy) {
-        By ans = null;
+    private Selector handleFindByForComponent(FindBy findBy) {
+        Selector selector = null;
         if (findBy != null) {
-            ans = this.buildByFromFindBy(findBy);
+            selector = this.buildByFromFindBy(findBy);
         }
-        if (ans == null) {
-            ans = this.buildByFromDefault();
+        if (selector == null) {
+            selector = this.buildByFromDefault();
         }
-
-        if (ans == null) {
+        if (selector == null) {
             throw new IllegalArgumentException("Cannot determine how to locate component root element.");
         } else {
-            return ans;
+            return selector;
         }
     }
 
-    private By buildByFromDefault() {
+    private Selector buildByFromDefault() {
         if (this.field == null) {
-            return new ByIdOrName(this.clazz.getName());
+            return new Selector(new ByIdOrName(this.clazz.getName()));
         } else {
-            return new ByIdOrName(this.field.getName());
+            return new Selector(new ByIdOrName(this.field.getName()));
         }
     }
 
-    private By buildByForElement() {
+    private Selector buildByForElement() {
         AnnotationValidator.assertValidAnnotationsForElement(this.field);
-        By ans = null;
+        Selector selector = null;
         FindBys findBys = this.field.getAnnotation(FindBys.class);
         if (findBys != null) {
-            ans = this.buildByFromFindBys(findBys);
+            selector = this.buildByFromFindBys(findBys);
         }
-
         FindAll findAll = this.field.getAnnotation(FindAll.class);
-        if (ans == null && findAll != null) {
-            ans = this.buildBysFromFindByOneOf(findAll);
+        if (selector == null && findAll != null) {
+            selector = this.buildBysFromFindByOneOf(findAll);
         }
-
         FindBy findBy = this.field.getAnnotation(FindBy.class);
-        if (ans == null && findBy != null) {
-            ans = this.buildByFromFindBy(findBy);
+        if (selector == null && findBy != null) {
+            selector = this.buildByFromFindBy(findBy);
         }
-
-        if (ans == null) {
-            ans = this.buildByFromDefault();
+        if (selector == null) {
+            selector = this.buildByFromDefault();
         }
-
-        if (ans == null) {
+        if (selector == null) {
             throw new IllegalArgumentException("Cannot determine how to locate element " + this.field);
         } else {
-            return ans;
+            return selector;
         }
     }
 
-    protected By buildByFromFindBys(FindBys findBys) {
+    protected Selector buildByFromFindBys(FindBys findBys) {
         AnnotationValidator.assertValidFindBys(findBys);
         FindBy[] findByArray = findBys.value();
-        By[] byArray = new By[findByArray.length];
+        Selector[] selectorArray = new Selector[findByArray.length];
 
         for(int i = 0; i < findByArray.length; ++i) {
-            byArray[i] = this.buildByFromFindBy(findByArray[i]);
+            selectorArray[i] = this.buildByFromFindBy(findByArray[i]);
         }
 
-        return new ByChained(byArray);
+        return new SelectorChained(selectorArray);
     }
 
-    protected By buildBysFromFindByOneOf(FindAll findBys) {
+    protected Selector buildBysFromFindByOneOf(FindAll findBys) {
         AnnotationValidator.assertValidFindAll(findBys);
         FindBy[] findByArray = findBys.value();
-        By[] byArray = new By[findByArray.length];
+        Selector[] selectorArray = new Selector[findByArray.length];
 
         for(int i = 0; i < findByArray.length; ++i) {
-            byArray[i] = this.buildByFromFindBy(findByArray[i]);
+            selectorArray[i] = this.buildByFromFindBy(findByArray[i]);
         }
-
-        return new ByAll(byArray);
+        return new SelectorAll(selectorArray);
     }
 
-    protected By buildByFromFindBy(FindBy findBy) {
+    protected Selector buildByFromFindBy(FindBy findBy) {
         AnnotationValidator.assertValidFindBy(findBy);
-        return AnnotationFactory.buildByFromShortFindBy(findBy);
+        return new Selector(findBy);
     }
 }

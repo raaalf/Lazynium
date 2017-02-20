@@ -219,7 +219,7 @@ public class LazyList<E extends Element> implements List<E>, ListWait<E>, ListSt
     }
 
     public List<String> getValues() {
-        return stream().map(Element::getValue).collect(Collectors.toList());
+        return stream().map(Element::value).collect(Collectors.toList());
     }
 
     public List<String> getAttributes(String attributeName) {
@@ -227,7 +227,7 @@ public class LazyList<E extends Element> implements List<E>, ListWait<E>, ListSt
     }
 
     public List<String> getIds() {
-        return stream().map(Element::getId).collect(Collectors.toList());
+        return stream().map(Element::id).collect(Collectors.toList());
     }
 
     public List<E> getWrappedElements() {

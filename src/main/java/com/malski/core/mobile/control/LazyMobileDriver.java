@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static com.malski.core.utils.TestContext.getConfig;
+import static com.malski.core.utils.TestContext.config;
 
 public class LazyMobileDriver extends LazyMobileContext implements MobileDriver {
     private AppiumDriver<? extends MobileElement> driver;
@@ -383,26 +383,26 @@ public class LazyMobileDriver extends LazyMobileContext implements MobileDriver 
         try {
             switch (osType) {
                 case "ios":
-                    File app = new File(getConfig().getApp());
+                    File app = new File(config().app());
                     DesiredCapabilities capabilities = new DesiredCapabilities();
                     capabilities.setCapability(MobileCapabilityType.BROWSER_NAME, "");
-                    capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, getConfig().getOsVersion());
-                    capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, getConfig().getDevice());
+                    capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, config().osVersion());
+                    capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, config().device());
                     capabilities.setCapability(MobileCapabilityType.APP, app.getAbsolutePath());
                     driver = new IOSDriver<IOSElement>(capabilities);
                     break;
                 case "android":
-                    app = new File(getConfig().getApp());
+                    app = new File(config().app());
                     capabilities = new DesiredCapabilities();
-                    capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, getConfig().getOsVersion());
-                    capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, getConfig().getDevice());
+                    capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, config().osVersion());
+                    capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, config().device());
                     capabilities.setCapability(MobileCapabilityType.APP, app.getAbsolutePath());
                     driver = new AndroidDriver<AndroidElement>(capabilities);
                     break;
                 default:
                     throw new PendingException("OS not implemented: " + osType);
             }
-            driver.manage().timeouts().implicitlyWait(TestContext.getConfig().getImplicitlyTimeoutMs(), TimeUnit.MILLISECONDS);
+            driver.manage().timeouts().implicitlyWait(TestContext.config().implicitlyTimeoutMs(), TimeUnit.MILLISECONDS);
         } catch (IllegalArgumentException ex) {
             throw new RuntimeException("Problem during driver initialization.", ex);
         }

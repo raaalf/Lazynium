@@ -12,8 +12,8 @@ import org.openqa.selenium.internal.Locatable;
 
 import java.util.List;
 
-import static com.malski.core.utils.TestContext.getBrowser;
-import static com.malski.core.utils.TestContext.getConfig;
+import static com.malski.core.utils.TestContext.browser;
+import static com.malski.core.utils.TestContext.config;
 
 public class Element implements LazySearchContext, Locatable, ElementState, WebElement {
 
@@ -31,20 +31,20 @@ public class Element implements LazySearchContext, Locatable, ElementState, WebE
     }
 
     @Override
-    public SearchContext getContext() {
+    public SearchContext searchContext() {
         return getWrappedElement();
     }
 
     public void lightOn() {
         if (!isStaleness()) {
-            cssStyle = getBrowser().jsExecutor().getStyle(this);
-            getBrowser().jsExecutor().setStyle(this, "color: red; border: 3px solid red;");
+            cssStyle = browser().jsExecutor().getStyle(this);
+            browser().jsExecutor().setStyle(this, "color: red; border: 3px solid red;");
         }
     }
 
     public void lightOff() {
         if (!isStaleness()) {
-            getBrowser().jsExecutor().setStyle(this, cssStyle);
+            browser().jsExecutor().setStyle(this, cssStyle);
         }
     }
 
@@ -60,53 +60,53 @@ public class Element implements LazySearchContext, Locatable, ElementState, WebE
 
     @Override
     public void click() {
-        waitUntilIsClickable(getConfig().getMinTimeout());
+        waitUntilIsClickable(config().minTimeout());
         getWrappedElement().click();
     }
 
     public void clickAndWait() {
         click();
-        getBrowser().waitUntilPageLoaded();
+        browser().waitUntilPageLoaded();
     }
 
     public void doubleClick() {
         WebElement thisElem = getWrappedElement();
-        getBrowser().actions()
+        browser().actions()
                 .doubleClick(thisElem)
                 .perform();
     }
 
     public void rightClick() {
         WebElement thisElem = getWrappedElement();
-        getBrowser().actions()
+        browser().actions()
                 .contextClick(thisElem)
                 .perform();
     }
 
     public void dragTo(Element elementToDrop) {
-        getBrowser().actions().dragAndDrop(this, elementToDrop).perform();
+        browser().actions().dragAndDrop(this, elementToDrop).perform();
     }
 
     public void dragToBy(Element elementToDrop, int x, int y) {
-        getBrowser().actions().dragAndDropBy(this, elementToDrop.getLocation().getX() + x, elementToDrop.getLocation().getY() + y).perform();
+        browser().actions().dragAndDropBy(this, elementToDrop.getLocation().getX() + x, elementToDrop.getLocation().getY() + y).perform();
     }
 
     public void dragBy(int x, int y) {
-        getBrowser().actions().dragAndDropBy(this, x, y).perform();
+        browser().actions().dragAndDropBy(this, x, y).perform();
     }
 
     public void mouseOver() {
         WebElement thisElem = getWrappedElement();
-        getBrowser().actions()
+        browser().actions()
                 .moveToElement(thisElem)
                 .perform();
     }
 
     public void scrollIntoView() {
         if (!isInViewport()) {
-            getBrowser().waitUntilPageLoaded();
-            getBrowser().jsExecutor().scrollIntoView(this);
-            getBrowser().waitUntilPageLoaded();
+            browser().waitUntilPageLoaded();
+            browser().jsExecutor().scrollIntoView(this);
+            browser().waitUntilPageLoaded();
         }
     }
 
@@ -127,11 +127,19 @@ public class Element implements LazySearchContext, Locatable, ElementState, WebE
 
     @Override
     public String getTagName() {
+        return tagName();
+    }
+
+    public String tagName() {
         return getWrappedElement().getTagName();
     }
 
     @Override
     public String getAttribute(String s) {
+        return attribute(s);
+    }
+
+    public String attribute(String s) {
         return getWrappedElement().getAttribute(s);
     }
 
@@ -152,6 +160,10 @@ public class Element implements LazySearchContext, Locatable, ElementState, WebE
 
     @Override
     public String getText() {
+        return text();
+    }
+
+    public String text() {
         return getWrappedElement().getText();
     }
 
@@ -172,11 +184,15 @@ public class Element implements LazySearchContext, Locatable, ElementState, WebE
 
     @Override
     public String getCssValue(String s) {
+        return cssValue(s);
+    }
+
+    public String cssValue(String s) {
         return getWrappedElement().getCssValue(s);
     }
 
-    public Selector getSelector() {
-        return getLocator().getSelector();
+    public Selector selector() {
+        return locator().getSelector();
     }
 
     @Override
@@ -209,37 +225,37 @@ public class Element implements LazySearchContext, Locatable, ElementState, WebE
 
     @Override
     public boolean refresh() {
-        boolean result = getLocator().refresh();
+        boolean result = locator().refresh();
         setWebElement();
         return result;
     }
 
     private void setWebElement() {
-        element = getLocator().findElement();
+        element = locator().findElement();
     }
 
-    public String getValue() {
+    public String value() {
         return this.getAttribute("value");
     }
 
-    public String getId() {
+    public String id() {
         return this.getAttribute("id");
     }
 
-    public String getCssClass() {
+    public String cssClass() {
         return this.getAttribute("class");
     }
 
     public <T extends Element> T as(Class<T> iface) {
         try {
-            return new ElementHandler<>(iface, getLocator()).getImplementation();
+            return new ElementHandler<>(iface, locator()).getImplementation();
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public LazyLocator getLocator() {
+    public LazyLocator locator() {
         return this.locator;
     }
 }

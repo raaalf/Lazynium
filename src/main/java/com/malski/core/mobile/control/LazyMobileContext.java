@@ -12,7 +12,7 @@ import org.openqa.selenium.WebDriverException;
 
 import java.util.List;
 
-import static com.malski.core.utils.TestContext.getApplication;
+import static com.malski.core.utils.TestContext.application;
 
 public abstract class LazyMobileContext extends MobileElement implements LazySearchContext {
 
@@ -20,7 +20,7 @@ public abstract class LazyMobileContext extends MobileElement implements LazySea
     }
 
     public MobileElement findElementByOsAutomation(String using) throws WebDriverException {
-        switch (getApplication().getOsType()) {
+        switch (application().getOsType()) {
             case "ios":
                 return ((IOSElement) getSearchContext()).findElementByIosUIAutomation(using);
             case "android":
@@ -31,7 +31,7 @@ public abstract class LazyMobileContext extends MobileElement implements LazySea
     }
 
     public List<MobileElement> findElementsByOsAutomation(String using) throws WebDriverException {
-        switch (getApplication().getOsType()) {
+        switch (application().getOsType()) {
             case "ios":
                 return ((IOSElement) getSearchContext()).findElementsByIosUIAutomation(using);
             case "android":

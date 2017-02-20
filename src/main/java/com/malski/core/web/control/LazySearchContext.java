@@ -14,7 +14,7 @@ import java.util.List;
 
 public interface LazySearchContext extends SearchContext {
 
-    SearchContext getContext();
+    SearchContext searchContext();
 
     default Element getElement(By by) {
         return getElement(by, Element.class);
@@ -167,20 +167,20 @@ public interface LazySearchContext extends SearchContext {
     @Override
     default List<WebElement> findElements(By by) {
         try {
-            return getContext().findElements(by);
+            return searchContext().findElements(by);
         } catch (StaleElementReferenceException ignore) {
             refresh();
-            return getContext().findElements(by);
+            return searchContext().findElements(by);
         }
     }
 
     @Override
     default WebElement findElement(By by) {
         try {
-            return getContext().findElement(by);
+            return searchContext().findElement(by);
         } catch (StaleElementReferenceException ignore) {
             refresh();
-            return getContext().findElement(by);
+            return searchContext().findElement(by);
         }
     }
 

@@ -23,11 +23,14 @@ public class TestContext {
             if (container == null) {
                 container = new HashMap<>();
             }
+            if (inMemoryJsScripts == null) {
+                loadInMemoryJsScripts();
+            }
             initiated = false;
         }
     }
 
-    public static Browser getBrowser() {
+    public static Browser browser() {
         Browser browser = TestContext.browser;
         if (browser == null) {
             throw new IllegalStateException("Browser not set on the TestContext");
@@ -39,7 +42,7 @@ public class TestContext {
         browser = new Browser(driver);
     }
 
-    public static Application getApplication() {
+    public static Application application() {
         Application app = TestContext.app;
         if (app == null) {
             throw new IllegalStateException("Application not set on the TestContext");
@@ -54,7 +57,7 @@ public class TestContext {
 
     private static Map<ContainerKey, Object> container;
 
-    public static Map<ContainerKey, Object> getContainer() {
+    public static Map<ContainerKey, Object> container() {
         return container;
     }
 
@@ -68,15 +71,15 @@ public class TestContext {
     }
 
     public static boolean containerContainsKey(ContainerKey key) {
-        return getContainer().containsKey(key);
+        return container().containsKey(key);
     }
 
     public static boolean containerContainsValue(Object value) {
-        return getContainer().containsValue(value);
+        return container().containsValue(value);
     }
 
     public static Object removeFromContainer(ContainerKey key) {
-        return getContainer().remove(key);
+        return container().remove(key);
     }
 
     //properties for running tests
@@ -87,7 +90,17 @@ public class TestContext {
         return properties.get(key.toString());
     }
 
-    public static TestConfig getConfig() {
+    public static TestConfig config() {
         return config;
+    }
+
+    private static Map<String, String> inMemoryJsScripts;
+
+    public static String getInMemoryJsScript(String key){
+        return inMemoryJsScripts.get(key);
+    }
+
+    private static void loadInMemoryJsScripts() {
+        inMemoryJsScripts = CustomProperties.readPropertiesFromFile("js_to_load.properties");
     }
 }

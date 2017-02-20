@@ -6,11 +6,15 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.internal.WrapsElement;
 
-import static com.malski.core.utils.TestContext.getBrowser;
+import static com.malski.core.utils.TestContext.browser;
 
 public interface ElementState extends ElementWait, WrapsElement {
 
     boolean isStaleness();
+
+    default boolean isDisplayed() {
+        return getWrappedElement().isDisplayed();
+    }
 
     default boolean isDisplayed(long timeout) {
         try {
@@ -36,7 +40,7 @@ public interface ElementState extends ElementWait, WrapsElement {
 
     default boolean isPresent() {
         try {
-            return getLocator().findElement() != null;
+            return locator().findElement() != null;
         } catch (NoSuchElementException e) {
             return false;
         }
@@ -61,7 +65,7 @@ public interface ElementState extends ElementWait, WrapsElement {
     }
 
     default boolean hasFocus() {
-        return getWrappedElement().equals(getBrowser().switchTo().activeElement());
+        return getWrappedElement().equals(browser().switchTo().activeElement());
     }
 
     default boolean hasFocus(long timeout) {
@@ -70,7 +74,7 @@ public interface ElementState extends ElementWait, WrapsElement {
         } catch (Exception ignore) {
             return false;
         }
-        return getWrappedElement().equals(getBrowser().switchTo().activeElement());
+        return getWrappedElement().equals(browser().switchTo().activeElement());
     }
 
     default boolean isInViewport() {
@@ -78,8 +82,8 @@ public interface ElementState extends ElementWait, WrapsElement {
         Point point = getWrappedElement().getLocation();
 
         int elemY = elemDim.getHeight() + point.getY();
-        long browserHeight = getBrowser().jsExecutor().getJsClientHeight();
-        long scrollHeight = getBrowser().jsExecutor().getScrollHeight();
+        long browserHeight = browser().jsExecutor().getJsClientHeight();
+        long scrollHeight = browser().jsExecutor().getScrollHeight();
 
         return elemY >= scrollHeight && elemY <= scrollHeight + browserHeight;
     }

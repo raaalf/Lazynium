@@ -17,7 +17,7 @@ public class LazyLocator implements ElementLocator {
 
     public LazyLocator(LazySearchContext searchContext, AbstractAnnotations annotations) {
         this.searchContext = searchContext;
-        this.selector = new Selector(annotations.buildBy());
+        this.selector = ((LazyAnnotations) annotations).buildSelector();
     }
 
     public LazyLocator(LazySearchContext searchContext, By by) {
@@ -81,6 +81,6 @@ public class LazyLocator implements ElementLocator {
 
     @Override
     public String toString() {
-        return selector == null ? "null" : "Located by: " + selector.toString() + "["+index+"]";
+        return selector == null ? "null" : "Located by: " + selector.toString() + "[" + index + "]";
     }
 }

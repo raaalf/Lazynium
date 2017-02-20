@@ -99,7 +99,7 @@ public class Select extends Element implements SelectWait, SelectState {
     }
 
     public String getSelectedValue() {
-        return getFirstSelectedOption().getValue();
+        return getFirstSelectedOption().value();
     }
 
     public int getSelectedIndex() {

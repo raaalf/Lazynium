@@ -16,31 +16,31 @@ public class DefaultHooks {
 
     @Before(order = 1)
     public void init(Scenario scenario) {
-        TestContext.setBrowser(TestContext.getConfig().getDriver());
-        log.info("###### Running scenario on browser: " + TestContext.getConfig().getDriver());
-        if (TestContext.getConfig().isVideoRecording()) {
-            TestContext.getBrowser().initVideoRecorder();
-            TestContext.getBrowser().videoRecorder().start(scenario.getName());
+        TestContext.setBrowser(TestContext.config().driver());
+        log.info("###### Running scenario on browser: " + TestContext.config().driver());
+        if (TestContext.config().isVideoRecording()) {
+            TestContext.browser().initVideoRecorder();
+            TestContext.browser().videoRecorder().start(scenario.getName());
         }
     }
 
     @Before(order = 2)
     public void deleteAllCookies() {
-        TestContext.getBrowser().manage().deleteAllCookies();
+        TestContext.browser().manage().deleteAllCookies();
     }
 
     @After(order = 2)
     public void afterScenario(Scenario scenario) {
         if (scenario.isFailed()) {
             try {
-                byte[] screenshot = TestContext.getBrowser().screenShooter().getScreenshotAsByteArray();
+                byte[] screenshot = TestContext.browser().screenShooter().getScreenshotAsByteArray();
                 scenario.embed(screenshot, "image/png");
             } catch (WebDriverException somePlatformsDontSupportScreenshots) {
                 log.error(somePlatformsDontSupportScreenshots.getMessage());
             }
             //get page alert if exist
-            if (TestContext.getBrowser().isAlertPresent()) {
-                log.error("There was an alert on page: " + TestContext.getBrowser().getActiveAlert().getText());
+            if (TestContext.browser().isAlertPresent()) {
+                log.error("There was an alert on page: " + TestContext.browser().activeAlert().getText());
             }
         }
     }
@@ -48,21 +48,21 @@ public class DefaultHooks {
     @After(order = 1)
     public void quitBrowser(Scenario scenario) {
         //quit browser
-        if (TestContext.getConfig().isVideoRecording()) {
+        if (TestContext.config().isVideoRecording()) {
             addVideoToReport(scenario);
         }
-        if (TestContext.getBrowser() != null) {
-            TestContext.getBrowser().quit();
+        if (TestContext.browser() != null) {
+            TestContext.browser().quit();
         }
     }
 
     private void addVideoToReport(Scenario scenario) {
-        TestContext.getBrowser().videoRecorder().stop();
-        if(TestContext.getConfig().isVideoRecordingOnFail() && !scenario.isFailed()) {
-            TestContext.getBrowser().videoRecorder().removeVideo();
+        TestContext.browser().videoRecorder().stop();
+        if(TestContext.config().isVideoRecordingOnFail() && !scenario.isFailed()) {
+            TestContext.browser().videoRecorder().removeVideo();
         } else {
-            String videoPath =  TestContext.getBrowser().videoRecorder().getVideoFilePath();
-            String mimeType =  TestContext.getBrowser().videoRecorder().getMimeType();
+            String videoPath =  TestContext.browser().videoRecorder().getVideoFilePath();
+            String mimeType =  TestContext.browser().videoRecorder().getMimeType();
             scenario.embed(videoPath.getBytes(), mimeType);
         }
     }

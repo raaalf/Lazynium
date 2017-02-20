@@ -27,7 +27,10 @@ public enum PropertyKey {
     VIDEO_MIME_TYPE("videoMimeType"),
     VIDEO_FRAME_RATE("videoFrameRate"),
     VIDEO_QUALITY("videoQuality"),
-    VIDEO_DESTINATION_PATH("videoDestinationPath");
+    VIDEO_DESTINATION_PATH("videoDestinationPath"),
+
+    ANGULAR_VERSION("angularVersion"),
+    ANGULAR_TIMEOUT("angularTimeout");
 
     private String key;
 

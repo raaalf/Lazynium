@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.malski.core.utils.TestContext.getConfig;
+import static com.malski.core.utils.TestContext.config;
 import static com.malski.core.utils.TestContext.getPropertyByKey;
 
 public class CapabilitiesFactory {
@@ -44,7 +44,7 @@ public class CapabilitiesFactory {
         chromePrefs.put("profile.default_content_settings.geolocation", 2);
         chromePrefs.put("download.prompt_for_download", false);
         chromePrefs.put("download.directory_upgrade", true);
-        chromePrefs.put("download.default_directory", getConfig().getDownloadDirPath());
+        chromePrefs.put("download.default_directory", config().downloadDirPath());
         chromePrefs.put("password_manager_enabled", false);
         chromePrefs.put("safebrowsing.enabled", "true");
         options.setExperimentalOption("prefs", chromePrefs);
@@ -90,7 +90,7 @@ public class CapabilitiesFactory {
         FirefoxProfile ffProfile = new FirefoxProfile();
         ffProfile.setPreference("browser.download.folderList", 2);
         ffProfile.setPreference("browser.download.manager.showWhenStarting", false);
-        ffProfile.setPreference("browser.download.dir", getConfig().getDownloadDirPath());
+        ffProfile.setPreference("browser.download.dir", config().downloadDirPath());
         ffProfile.setPreference("browser.helperApps.neverAsk.saveToDisk", "application/zip;application/octet-stream;application/x-zip;application/x-zip-compressed;text/css;text/html;text/plain;text/xml;text/comma-separated-values");
         ffProfile.setPreference("browser.helperApps.neverAsk.openFile", "application/zip;application/octet-stream;application/x-zip;application/x-zip-compressed;text/css;text/html;text/plain;text/xml;text/comma-separated-values");
         ffProfile.setPreference("browser.helperApps.alwaysAsk.force", false);

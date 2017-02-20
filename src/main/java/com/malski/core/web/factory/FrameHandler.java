@@ -8,15 +8,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public class FrameHandler<T extends Frame> extends ComponentHandler<T> {
-    private final List<String> generalMethodNames = Arrays.asList("getBrowser", "switchIn", "switchOut", "getRoot",
-            "setRoot", "initElements", "findElement", "findElements");
+    private final List<String> generalMethodNames = Arrays.asList("browser", "switchIn", "switchOut", "root",
+            "setRoot", "initElements", "findElement", "findElements", "locator", "getWrappedElement");
 
-    private final List<String> onFrameMethodNames = Arrays.asList("isDisplayed", "isDisplayed", "isVisible", "isVisible",
-            "isPresent", "isPresent", "isEnabled", "isEnabled", "hasFocus", "hasFocus", "isInViewport", "isInViewport",
-            "isStaleness", "waitUntilPresent", "waitUntilPresent", "waitUntilVisible", "waitUntilVisible", "waitUntilDisappear",
-            "waitUntilDisappear", "waitUntilEnabled", "waitUntilEnabled", "waitUntilDisabled", "waitUntilDisabled",
-            "waitUntilAttributeChange", "waitUntilAttributeChange", "waitUntilIsInViewport", "waitUntilIsInViewport",
-            "refresh", "finalize");
+    private final List<String> onFrameMethodNames = Arrays.asList("isStaleness", "isDisplayed", "isVisible", "isPresent",
+            "isEnabled", "hasFocus", "isInViewport", "waitUntilPresent", "waitUntilVisible", "waitUntilDisappear",
+            "waitUntilEnabled", "waitUntilDisabled", "waitUntilAttributeChange", "waitUntilAttributeChangeFrom",
+            "waitUntilIsInViewport", "waitUntilIsClickable", "refresh", "finalize");
 
     public FrameHandler(Class<T> type, LazyLocator locator) {
         super(type, locator);

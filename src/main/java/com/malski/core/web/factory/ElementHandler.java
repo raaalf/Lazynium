@@ -15,12 +15,12 @@ public class ElementHandler<T extends Element> extends LazyInterceptor<T> {
 
     private String[] highlightActions = {"doubleClick", "click", "rightClick", "dragAndDrop", "dragAndDropWithOffset",
             "mouseOver", "scrollIntoView", "clickWithoutWait", "clickWithOffset", "sendKeys", "clear", "getAttribute",
-            "getText", "getCssValue", "isEnabled", "isSelected", "getAlt", "getSrc", "fill", "getHref", "getTarget",
-            "check", "isChecked", "selectByIndex", "selectByVisibleText", "selectByVisibleTextIgnoreCases", "selectByContainingVisibleText",
-            "selectByValue", "selectOption", "selectAll", "getOptions", "getSelectedVisibleText", "getSelectedValue",
-            "getSelectedIndex", "getOptionsValues", "getOptionsVisibleTexts", "isSelected", "isMultiple", "selectAll",
-            "deselectByIndex", "deselectByVisibleText", "deselectByValue", "deselectOption", "deselectAll", "getFirstSelectedOption",
-            "getAllSelectedOptions"};
+            "attribute", "getText", "text", "value", "cssClass", "cssValue", "getCssValue", "cssValue", "isEnabled",
+            "isSelected", "alt", "src", "fill", "href", "target", "check", "isChecked", "selectByIndex", "selectByVisibleText",
+            "selectByVisibleTextIgnoreCases", "selectByContainingVisibleText", "selectByValue", "selectOption", "selectAll",
+            "getOptions", "getSelectedVisibleText", "getSelectedValue", "getSelectedIndex", "getOptionsValues", "getOptionsVisibleTexts",
+            "isSelected", "isMultiple", "selectAll", "deselectByIndex", "deselectByVisibleText", "deselectByValue", "deselectOption",
+            "deselectAll", "getFirstSelectedOption", "getAllSelectedOptions"};
 
     public ElementHandler(Class<T> interfaceType, LazyLocator locator) {
         super(interfaceType, locator);
@@ -71,7 +71,7 @@ public class ElementHandler<T extends Element> extends LazyInterceptor<T> {
 
     @Override
     protected Object invoke(T thing, Object object, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
-        boolean highlight = TestContext.getConfig().isVideoRecording() && ArrayUtils.contains(highlightActions, method.getName());
+        boolean highlight = TestContext.config().isVideoRecording() && ArrayUtils.contains(highlightActions, method.getName());
         if(highlight) {
             thing.lightOn();
         }

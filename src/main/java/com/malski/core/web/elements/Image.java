@@ -13,11 +13,11 @@ public class Image extends Element {
         super(locator, element);
     }
 
-    public String getAlt() {
+    public String alt() {
         return this.getAttribute("alt");
     }
 
-    public String getSrc() {
+    public String src() {
         return this.getAttribute("src");
     }
 }

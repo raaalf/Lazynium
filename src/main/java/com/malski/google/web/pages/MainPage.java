@@ -5,8 +5,6 @@ import com.malski.core.web.elements.Input;
 import com.malski.core.web.view.Page;
 import org.openqa.selenium.support.FindBy;
 
-import static com.malski.core.utils.TestContext.getBrowser;
-
 @PageCheck(url = "https://www.google.com")
 public class MainPage extends Page {
     @FindBy(id = "lst-ib")
@@ -16,7 +14,7 @@ public class MainPage extends Page {
     private Input searchButton;
 
     public MainPage open() {
-        getBrowser().get(getUrl());
+        browser().get(url());
         return this;
     }
 

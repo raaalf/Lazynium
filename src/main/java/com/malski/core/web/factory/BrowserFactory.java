@@ -11,12 +11,11 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
-import static com.malski.core.utils.TestContext.getConfig;
+import static com.malski.core.utils.TestContext.config;
 import static com.malski.core.utils.TestContext.getPropertyByKey;
 
 public class BrowserFactory {
@@ -57,7 +56,7 @@ public class BrowserFactory {
             }
             moveBrowserToAnotherScreen(driver);
             driver.manage().window().maximize();
-            driver.manage().timeouts().implicitlyWait(getConfig().getImplicitlyTimeoutMs(), TimeUnit.MILLISECONDS);
+            driver.manage().timeouts().implicitlyWait(config().implicitlyTimeoutMs(), TimeUnit.MILLISECONDS);
             return driver;
         } catch (IllegalArgumentException ex) {
             return null;

@@ -63,41 +63,32 @@ public class AnnotationValidator {
         if (!StringUtils.isBlank(findBy.xpath())) {
             finders.add("xpath: " + findBy.xpath());
         }
-        if (!StringUtils.isBlank(findBy.xpath())) {
+        if (!StringUtils.isBlank(findBy.model())) {
             finders.add("model: " + findBy.model());
         }
-        if (!StringUtils.isBlank(findBy.xpath())) {
+        if (!StringUtils.isBlank(findBy.binding())) {
             finders.add("binding: " + findBy.binding());
         }
-        if (!StringUtils.isBlank(findBy.xpath())) {
+        if (!StringUtils.isBlank(findBy.buttonText())) {
             finders.add("buttonText: " + findBy.buttonText());
         }
-        if (!StringUtils.isBlank(findBy.xpath())) {
-            finders.add("cssContainingText: " + findBy.cssContainingText());
+        if (!StringUtils.isBlank(findBy.cssContainingText()[0])) {
+            finders.add("cssContainingText: " + findBy.cssContainingText()[0]);
         }
-        if (!StringUtils.isBlank(findBy.xpath())) {
+        if (!StringUtils.isBlank(findBy.deepCss())) {
             finders.add("deepCss: " + findBy.deepCss());
         }
-        if (!StringUtils.isBlank(findBy.xpath())) {
+        if (!StringUtils.isBlank(findBy.exactBinding())) {
             finders.add("exactBinding: " + findBy.exactBinding());
         }
-        if (!StringUtils.isBlank(findBy.xpath())) {
+        if (!StringUtils.isBlank(findBy.options())) {
             finders.add("options: " + findBy.options());
         }
-        if (!StringUtils.isBlank(findBy.xpath())) {
+        if (!StringUtils.isBlank(findBy.partialButtonText())) {
             finders.add("partialButtonText: " + findBy.partialButtonText());
         }
-        if (!StringUtils.isBlank(findBy.xpath())) {
+        if (!StringUtils.isBlank(findBy.repeater())) {
             finders.add("repeater: " + findBy.repeater());
-        }
-        if (!StringUtils.isBlank(findBy.xpath())) {
-            finders.add("repeaterCell: " + findBy.repeaterCell());
-        }
-        if (!StringUtils.isBlank(findBy.xpath())) {
-            finders.add("repeaterColumn: " + findBy.repeaterColumn());
-        }
-        if (!StringUtils.isBlank(findBy.xpath())) {
-            finders.add("repeaterRow: " + findBy.repeaterRow());
         }
         if (finders.size() > 1) {
             throw new IllegalArgumentException(String.format("You must specify at most one location strategy. Number found: %d (%s)", new Object[]{Integer.valueOf(finders.size()), finders.toString()}));

@@ -16,7 +16,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.internal.Locatable;
 
-import static com.malski.core.utils.TestContext.getApplication;
+import static com.malski.core.utils.TestContext.application;
 
 public class Element extends LazyMobileContext implements TouchableElement<MobileElement>, ElementStates, ElementWait {
 
@@ -40,13 +40,13 @@ public class Element extends LazyMobileContext implements TouchableElement<Mobil
 
     @Override
     public void click() {
-        waitUntilEnabled(TestContext.getConfig().getTimeout());
+        waitUntilEnabled(TestContext.config().timeout());
         getWrappedElement().click();
     }
 
     public void clickAndWait() {
         click();
-        getApplication().waitForScreenToLoad();
+        application().waitForScreenToLoad();
     }
 
     @Override
@@ -81,26 +81,26 @@ public class Element extends LazyMobileContext implements TouchableElement<Mobil
 
     public void doubleClick() {
         WebElement thisElem = getWrappedElement();
-        getApplication().getActions()
+        application().getActions()
                 .doubleClick(thisElem)
                 .perform();
     }
 
     public void rightClick() {
         WebElement thisElem = getWrappedElement();
-        getApplication().getActions()
+        application().getActions()
                 .contextClick(thisElem)
                 .perform();
     }
 
     public void dragAndDrop(Element elementToDrop) {
-        getApplication().getActions().dragAndDrop(this, elementToDrop).perform();
+        application().getActions().dragAndDrop(this, elementToDrop).perform();
     }
 
     public void dragAndDropWithOffset(Element elementToDrop, int xOffset, int yOffset) {
         WebElement thisElem = getWrappedElement();
         WebElement toDropElem = elementToDrop.getWrappedElement();
-        getApplication().getActions()
+        application().getActions()
                 .clickAndHold(thisElem)
                 .moveToElement(toDropElem, xOffset, yOffset)
                 .release(toDropElem)
@@ -110,16 +110,16 @@ public class Element extends LazyMobileContext implements TouchableElement<Mobil
 
     public void mouseOver() {
         WebElement thisElem = getWrappedElement();
-        getApplication().getActions()
+        application().getActions()
                 .moveToElement(thisElem)
                 .perform();
     }
 
     public void scrollIntoView() {
         if (!isInViewport()) {
-//            getApplication().waitUntilPageLoaded();
-//            getApplication().jsExecutor().scrollIntoView(this);
-//            getApplication().waitUntilPageLoaded();
+//            application().waitUntilPageLoaded();
+//            application().jsExecutor().scrollIntoView(this);
+//            application().waitUntilPageLoaded();
             throw new RuntimeException("Scrolling into view not implemented in mobile");
         }
     }
@@ -220,7 +220,7 @@ public class Element extends LazyMobileContext implements TouchableElement<Mobil
 
     @Override
     public boolean hasFocus() {
-        return getWrappedElement().equals(getApplication().getDriver().switchTo().activeElement());
+        return getWrappedElement().equals(application().getDriver().switchTo().activeElement());
     }
 
     @Override
@@ -230,7 +230,7 @@ public class Element extends LazyMobileContext implements TouchableElement<Mobil
         } catch (Exception ignore) {
             return false;
         }
-        return getWrappedElement().equals(getApplication().getDriver().switchTo().activeElement());
+        return getWrappedElement().equals(application().getDriver().switchTo().activeElement());
     }
 
     @Override
@@ -239,8 +239,8 @@ public class Element extends LazyMobileContext implements TouchableElement<Mobil
 //        Point point = getWrappedElement().getLocation();
 //
 //        int elemY = elemDim.getHeight() + point.getY();
-//        long browserHeight = getApplication().jsExecutor().getJsClientHeight();
-//        long scrollHeight = getApplication().jsExecutor().getScrollHeight();
+//        long browserHeight = application().jsExecutor().getJsClientHeight();
+//        long scrollHeight = application().jsExecutor().getScrollHeight();
 //
 //        return elemY >= scrollHeight && elemY <= scrollHeight + browserHeight;
         // TODO
@@ -350,76 +350,76 @@ public class Element extends LazyMobileContext implements TouchableElement<Mobil
 
     @Override
     public void waitUntilPresent() {
-        getApplication().waitUntilPresent(getLocator());
+        application().waitUntilPresent(getLocator());
     }
 
     @Override
     public void waitUntilPresent(long timeout) {
-        getApplication().waitUntilPresent(getLocator(), timeout);
+        application().waitUntilPresent(getLocator(), timeout);
     }
 
     @Override
     public void waitUntilVisible() {
-        getApplication().waitUntilVisible(getLocator());
+        application().waitUntilVisible(getLocator());
     }
 
     @Override
     public void waitUntilVisible(long timeout) {
-        getApplication().waitUntilVisible(getLocator(), timeout);
+        application().waitUntilVisible(getLocator(), timeout);
     }
 
     @Override
     public void waitUntilDisappear() {
-        getApplication().waitUntilDisappear(getLocator());
+        application().waitUntilDisappear(getLocator());
     }
 
     @Override
     public void waitUntilDisappear(long timeout) {
-        getApplication().waitUntilDisappear(getLocator(), timeout);
+        application().waitUntilDisappear(getLocator(), timeout);
     }
 
     @Override
     public void waitUntilEnabled() {
-        getApplication().waitUntilEnabled(getLocator());
+        application().waitUntilEnabled(getLocator());
     }
 
     @Override
     public void waitUntilEnabled(long timeout) {
-        getApplication().waitUntilEnabled(getLocator(), timeout);
+        application().waitUntilEnabled(getLocator(), timeout);
     }
 
     @Override
     public void waitUntilDisabled() {
-        getApplication().waitUntilDisabled(getLocator());
+        application().waitUntilDisabled(getLocator());
     }
 
     @Override
     public void waitUntilDisabled(long timeout) {
-        getApplication().waitUntilDisabled(getLocator(), timeout);
+        application().waitUntilDisabled(getLocator(), timeout);
     }
 
     @Override
     public void waitUntilAttributeChange(String attributeName, String expectedValue) {
-        getApplication().waitUntilAttributeChange(getLocator(), attributeName, expectedValue);
+        application().waitUntilAttributeChange(getLocator(), attributeName, expectedValue);
     }
 
     @Override
     public void waitUntilAttributeChangeFrom(String attributeName, String startValue) {
-        getApplication().waitUntilAttributeFrom(getLocator(), attributeName, startValue);
+        application().waitUntilAttributeFrom(getLocator(), attributeName, startValue);
     }
 
     @Override
     public void waitUntilAttributeChange(String attributeName, String expectedValue, long timeout) {
-        getApplication().getWait(timeout).until(WaitConditions.attributeChanged(this, attributeName, expectedValue));
+        application().getWait(timeout).until(WaitConditions.attributeChanged(this, attributeName, expectedValue));
     }
 
     @Override
     public void waitUntilIsInViewport() {
-        getApplication().waitUntilIsInViewport(getLocator());
+        application().waitUntilIsInViewport(getLocator());
     }
 
     @Override
     public void waitUntilIsInViewport(long timeout) {
-        getApplication().waitUntilIsInViewport(getLocator(), timeout);
+        application().waitUntilIsInViewport(getLocator(), timeout);
     }
 }

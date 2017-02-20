@@ -18,8 +18,8 @@ public class Frame extends Component {
     }
 
     public void forceSwitchIn() {
-        getBrowser().switchTo().frame(root().getWrappedElement());
-        frameContext = getBrowser();
+        browser().switchTo().frame(root().getWrappedElement());
+        frameContext = browser();
         inFrame = true;
     }
 
@@ -30,13 +30,13 @@ public class Frame extends Component {
     }
 
     public void forceSwitchOut() {
-        getBrowser().switchTo().parentFrame();
+        browser().switchTo().parentFrame();
         frameContext = root();
         inFrame = false;
     }
 
     @Override
-    public SearchContext getContext() {
+    public SearchContext searchContext() {
         return frameContext;
     }
 }

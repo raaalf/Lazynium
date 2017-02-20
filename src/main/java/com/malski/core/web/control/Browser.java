@@ -14,7 +14,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static com.malski.core.utils.TestContext.getConfig;
+import static com.malski.core.utils.TestContext.config;
 
 
 /**
@@ -83,11 +83,11 @@ public class Browser implements WebDriver, BrowserWait, WrapsDriver, LazySearchC
         this.jsExecutor = null;
         this.shooter = null;
         this.actions = null;
-        setImplicitlyWait(getConfig().getImplicitlyTimeoutMs(), TimeUnit.MILLISECONDS);
+        setImplicitlyWait(config().implicitlyTimeoutMs(), TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public SearchContext getContext() {
+    public SearchContext searchContext() {
         return getWrappedDriver();
     }
 
@@ -141,7 +141,7 @@ public class Browser implements WebDriver, BrowserWait, WrapsDriver, LazySearchC
         return getWrappedDriver().getWindowHandles();
     }
 
-    public int getWindowsCount() {
+    public int windowsCount() {
         return getWrappedDriver().getWindowHandles().size();
     }
 
@@ -189,7 +189,7 @@ public class Browser implements WebDriver, BrowserWait, WrapsDriver, LazySearchC
         return driver;
     }
 
-    public RemoteWebDriver getRemoteDriver() {
+    public RemoteWebDriver remoteDriver() {
         return (RemoteWebDriver) getWrappedDriver();
     }
 
@@ -199,12 +199,12 @@ public class Browser implements WebDriver, BrowserWait, WrapsDriver, LazySearchC
 
     @Override
     public FluentWait<WebDriver> getWait() {
-        return new WebDriverWait(getWrappedDriver(), getConfig().getExplicitlyTimeout(), getConfig().getDriverSleepMs());
+        return new WebDriverWait(getWrappedDriver(), config().explicitlyTimeout(), config().driverSleepMs());
     }
 
     @Override
     public FluentWait<WebDriver> getWait(long seconds) {
-        return new WebDriverWait(getWrappedDriver(), seconds, getConfig().getDriverSleepMs());
+        return new WebDriverWait(getWrappedDriver(), seconds, config().driverSleepMs());
     }
 
     @Override
@@ -276,7 +276,7 @@ public class Browser implements WebDriver, BrowserWait, WrapsDriver, LazySearchC
     }
 
 
-    public Alert getActiveAlert() {
+    public Alert activeAlert() {
         return getWrappedDriver().switchTo().alert();
     }
 
@@ -289,16 +289,16 @@ public class Browser implements WebDriver, BrowserWait, WrapsDriver, LazySearchC
         }
     }
 
-    public Capabilities getCapabilities() {
-        return getRemoteDriver().getCapabilities();
+    public Capabilities capabilities() {
+        return remoteDriver().getCapabilities();
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, String> getSystemInfo() {
+    public Map<String, String> systemInfo() {
         Map<String, String> systemInfo = new HashMap<>();
-        Capabilities cap = getCapabilities();
+        Capabilities cap = capabilities();
         systemInfo.put("browser_name", cap.getBrowserName());
-        systemInfo.put("browser_version", getBrowserVersion(cap));
+        systemInfo.put("browser_version", browserVersion(cap));
         systemInfo.put("selenium_version", new BuildInfo().getReleaseLabel());
         try {
             systemInfo.put("driver_version", ((Map<String, String>) cap.getCapability(cap.getBrowserName())).get(cap.getBrowserName() + "driverVersion"));
@@ -312,7 +312,7 @@ public class Browser implements WebDriver, BrowserWait, WrapsDriver, LazySearchC
         return systemInfo;
     }
 
-    private String getBrowserVersion(Capabilities cap) {
+    private String browserVersion(Capabilities cap) {
         String version;
         if ("internet explorer".equalsIgnoreCase(cap.getBrowserName())) {
             String uAgent = jsExecutor().executeScript("return navigator.userAgent;");

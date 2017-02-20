@@ -6,12 +6,16 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 
 public interface View {
-    default Browser getBrowser() {
-        return TestContext.getBrowser();
+    default Browser browser() {
+        return TestContext.browser();
     }
 
     default FluentWait<WebDriver> getWait() {
-        return getBrowser().getWait();
+        return browser().getWait();
+    }
+
+    default FluentWait<WebDriver> getWait(long timeout) {
+        return browser().getWait(timeout);
     }
 
     void initElements();

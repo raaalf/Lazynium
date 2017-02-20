@@ -25,13 +25,14 @@ public @interface FindBy {
 
     String xpath() default "";
 
+    //for angular
     String model() default "";
 
     String binding() default "";
 
     String buttonText() default "";
 
-    String cssContainingText() default "";
+    String[] cssContainingText() default {"", ""};
 
     String deepCss() default "";
 
@@ -42,10 +43,4 @@ public @interface FindBy {
     String partialButtonText() default "";
 
     String repeater() default "";
-
-    String repeaterCell() default "";
-
-    String repeaterColumn() default "";
-
-    String repeaterRow() default "";
 }

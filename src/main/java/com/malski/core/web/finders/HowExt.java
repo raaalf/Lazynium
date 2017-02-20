@@ -1,4 +1,4 @@
-package com.malski.core.web.annotations;
+package com.malski.core.web.finders;
 
 public enum HowExt {
     CLASS_NAME,
@@ -19,11 +19,8 @@ public enum HowExt {
     OPTIONS,
     PARTIAL_BUTTON_TEXT,
     REPEATER,
-    REPEATER_CELL,
-    REPEATER_COLUMN,
-    REPEATER_ROW,
     UNSET;
 
-    private HowExt() {
+    HowExt() {
     }
 }

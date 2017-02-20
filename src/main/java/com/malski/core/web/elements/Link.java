@@ -13,11 +13,11 @@ public class Link extends Element {
         super(locator, element);
     }
 
-    public String getHref() {
+    public String href() {
         return this.getAttribute("href");
     }
 
-    public String getTarget() {
+    public String target() {
         return this.getAttribute("target");
     }
 }

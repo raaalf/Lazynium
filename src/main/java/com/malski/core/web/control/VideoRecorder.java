@@ -1,6 +1,5 @@
 package com.malski.core.web.control;
 
-import com.malski.core.utils.CustomProperties;
 import com.malski.core.utils.TestContext;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.OutputType;
@@ -33,10 +32,10 @@ public class VideoRecorder implements Runnable {
 
     VideoRecorder(WebDriver driver) {
         this.screenShooter = (TakesScreenshot) driver;
-        divisor = getQualityDivisor(TestContext.getConfig().getVideQuality());
-        this.destinationPath = new File(TestContext.getConfig().getResourceDirPath() + "../../../" + TestContext.getConfig().getVideDestinationPath()).getAbsolutePath();
-        this.mimeType = TestContext.getConfig().getVideMimeType();
-        this.frameRate = TestContext.getConfig().getVideFrameRate();
+        divisor = getQualityDivisor(TestContext.config().videoQuality());
+        this.destinationPath = new File(TestContext.config().resourceDirPath() + "../../../" + TestContext.config().videoDestinationPath()).getAbsolutePath();
+        this.mimeType = TestContext.config().videMimeType();
+        this.frameRate = TestContext.config().videoFrameRate();
     }
 
     private String prepareFileName(String scenarioName) {

@@ -15,7 +15,7 @@ public class Page implements LazySearchContext, View {
     private boolean isOpened = true;
 
     public Page() {
-        getBrowser().waitUntilPageLoaded();
+        browser().waitUntilPageLoaded();
         initElements();
         this.handlePageInfo();
     }
@@ -26,20 +26,20 @@ public class Page implements LazySearchContext, View {
     }
 
     @Override
-    public SearchContext getContext() {
-        return getBrowser();
+    public SearchContext searchContext() {
+        return browser();
     }
 
     @Override
     public boolean refresh() {
-        if(getBrowser().refresh()) {
+        if(browser().refresh()) {
             initElements();
             return true;
         }
         return false;
     }
 
-    public String getUrl() {
+    public String url() {
         return url;
     }
 

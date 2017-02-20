@@ -7,7 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 
-import static com.malski.core.utils.TestContext.getConfig;
+import static com.malski.core.utils.TestContext.config;
 import static com.malski.core.web.conditions.WaitConditions.*;
 import static com.malski.core.web.conditions.WaitConditions.elementToBeClickable;
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
@@ -23,7 +23,7 @@ public interface BrowserWait {
     FluentWait<WebDriver> getWait(long seconds);
 
     default void waitUntilPageLoaded() {
-        waitUntilPageLoaded(getConfig().getMaxTimeout());
+        waitUntilPageLoaded(config().maxTimeout());
     }
 
     void waitUntilPageLoaded(long timePageLoad);

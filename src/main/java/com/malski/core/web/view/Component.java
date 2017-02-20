@@ -39,7 +39,7 @@ public class Component implements View, LazySearchContext, ElementState {
     }
 
     @Override
-    public SearchContext getContext() {
+    public SearchContext searchContext() {
         return root();
     }
 
@@ -52,8 +52,8 @@ public class Component implements View, LazySearchContext, ElementState {
         return root;
     }
 
-    public LazyLocator getLocator() {
-        return root().getLocator();
+    public LazyLocator locator() {
+        return root().locator();
     }
 
     @Override
@@ -71,10 +71,6 @@ public class Component implements View, LazySearchContext, ElementState {
         boolean result = root().refresh();
         initElements();
         return result;
-    }
-
-    public boolean isDisplayed() {
-        return getWrappedElement().isDisplayed();
     }
 
     public <T extends Element> T getElement(By by, Class<T> clazz) {

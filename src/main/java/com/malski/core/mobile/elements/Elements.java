@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.malski.core.mobile.conditions.WaitConditions.*;
-import static com.malski.core.utils.TestContext.getApplication;
+import static com.malski.core.utils.TestContext.application;
 import static org.openqa.selenium.support.ui.ExpectedConditions.not;
 
 public class Elements<E extends Element> implements List<E>, ElementsWait, ElementsStates {
@@ -255,53 +255,53 @@ public class Elements<E extends Element> implements List<E>, ElementsWait, Eleme
 
     @Override
     public void waitUntilAllPresent() {
-        getApplication().getWait().until(presenceOfAllElementsLocatedBy(getLocator()));
+        application().getWait().until(presenceOfAllElementsLocatedBy(getLocator()));
     }
 
     @Override
     public void waitUntilAnyPresent() {
-        getApplication().getWait().until(presenceOfElementLocated(getLocator()));
+        application().getWait().until(presenceOfElementLocated(getLocator()));
     }
 
     @Override
     public void waitUntilAllVisible() {
-        getApplication().getWait().until(visibilityOfAllElementsLocatedBy(getLocator()));
+        application().getWait().until(visibilityOfAllElementsLocatedBy(getLocator()));
     }
 
     @Override
     public void waitUntilAnyVisible() {
-        getApplication().getWait().until(visibilityOfElementLocated(getLocator()));
+        application().getWait().until(visibilityOfElementLocated(getLocator()));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void waitUntilAllDisappear() {
-        getApplication().getWait().until(invisibilityOfAllElements(getWrappedElements()));
+        application().getWait().until(invisibilityOfAllElements(getWrappedElements()));
     }
 
     @Override
     public void waitUntilAnyDisappear() {
-        getApplication().getWait().until(invisibilityOfElementLocated(getLocator()));
+        application().getWait().until(invisibilityOfElementLocated(getLocator()));
     }
 
     @Override
     public void waitUntilAllEnabled() {
-        getApplication().getWait().until(elementsToBeClickable(getLocator()));
+        application().getWait().until(elementsToBeClickable(getLocator()));
     }
 
     @Override
     public void waitUntilAnyEnabled() {
-        getApplication().getWait().until(elementToBeClickable(getLocator()));
+        application().getWait().until(elementToBeClickable(getLocator()));
     }
 
     @Override
     public void waitUntilAllDisabled() {
-        getApplication().getWait().until(not(elementsToBeClickable(getLocator())));
+        application().getWait().until(not(elementsToBeClickable(getLocator())));
     }
 
     @Override
     public void waitUntilAnyDisabled() {
-        getApplication().getWait().until(not(elementToBeClickable(getLocator())));
+        application().getWait().until(not(elementToBeClickable(getLocator())));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.malski.core.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -29,6 +30,8 @@ public class TestConfig {
     private Integer videoFrameRate;
     private String videoQuality;
     private String videoDestinationPath;
+    private int angularVersion = 1;
+    private long angularTimeout;
 
     protected final Logger log = Logger.getLogger(getClass());
 
@@ -53,13 +56,14 @@ public class TestConfig {
         setTestResourceDirPath();
         setResourceDirPath();
         setDriversDirPath();
+        setAngular();
     }
 
     private void setApp() {
         this.app = getPropertyByKey(PropertyKey.APP);
     }
 
-    public String getApp() {
+    public String app() {
         return app;
     }
 
@@ -67,7 +71,7 @@ public class TestConfig {
         this.device = getPropertyByKey(PropertyKey.DEVICE);
     }
 
-    public String getDevice() {
+    public String device() {
         return device;
     }
 
@@ -75,7 +79,7 @@ public class TestConfig {
         this.osVersion = getPropertyByKey(PropertyKey.OS_VERSION);
     }
 
-    public String getOsVersion() {
+    public String osVersion() {
         return osVersion;
     }
 
@@ -83,11 +87,11 @@ public class TestConfig {
         this.driver = getPropertyByKey(PropertyKey.DRIVER);
     }
 
-    public String getDriver() {
+    public String driver() {
         return driver;
     }
 
-    public long getTimeout() {
+    public long timeout() {
         return timeout;
     }
 
@@ -95,7 +99,7 @@ public class TestConfig {
         this.timeout = Long.parseLong(getPropertyByKey(PropertyKey.TIMEOUT));
     }
 
-    public long getMaxTimeout() {
+    public long maxTimeout() {
         return maxTimeout;
     }
 
@@ -103,7 +107,7 @@ public class TestConfig {
         this.scriptTimeout = Long.parseLong(getPropertyByKey(PropertyKey.SCRIPT_TIMEOUT));
     }
 
-    public long getScriptTimeout() {
+    public long scriptTimeout() {
         return scriptTimeout;
     }
 
@@ -111,7 +115,7 @@ public class TestConfig {
         this.maxTimeout = Long.parseLong(getPropertyByKey(PropertyKey.MAX_TIMEOUT));
     }
 
-    public long getImplicitlyTimeoutMs() {
+    public long implicitlyTimeoutMs() {
         return this.implicitlyTimeoutMs;
     }
 
@@ -119,7 +123,7 @@ public class TestConfig {
         this.implicitlyTimeoutMs = Long.parseLong(getPropertyByKey(PropertyKey.IMPLICITLY_TIMEOUT_MS));
     }
 
-    public long getExplicitlyTimeout() {
+    public long explicitlyTimeout() {
         return this.explicitlyTimeout;
     }
 
@@ -127,7 +131,7 @@ public class TestConfig {
         this.explicitlyTimeout = Long.parseLong(getPropertyByKey(PropertyKey.EXPLICITLY_TIMEOUT));
     }
 
-    public long getDriverSleepMs() {
+    public long driverSleepMs() {
         return this.driverSleepMs;
     }
 
@@ -135,7 +139,7 @@ public class TestConfig {
         this.driverSleepMs = Long.parseLong(getPropertyByKey(PropertyKey.DRIVER_SLEEP_MS));
     }
 
-    public long getMinTimeout() {
+    public long minTimeout() {
         return minTimeout;
     }
 
@@ -151,7 +155,7 @@ public class TestConfig {
         this.downloadDirPath = getPropertyByKey(PropertyKey.DOWNLOAD_DIR_PATH);
     }
 
-    public String getDownloadDirPath() {
+    public String downloadDirPath() {
         return downloadDirPath;
     }
 
@@ -159,7 +163,7 @@ public class TestConfig {
         this.testResourceDirPath = getPropertyByKey(PropertyKey.TEST_RESOURCE_DIR_PATH);
     }
 
-    public String getTestResourceDirPath() {
+    public String testResourceDirPath() {
         return testResourceDirPath;
     }
 
@@ -167,7 +171,7 @@ public class TestConfig {
         this.resourceDirPath = getPropertyByKey(PropertyKey.RESOURCE_DIR_PATH);
     }
 
-    public String getResourceDirPath() {
+    public String resourceDirPath() {
         return resourceDirPath;
     }
 
@@ -175,7 +179,7 @@ public class TestConfig {
         this.driversDirPath = resourceDirPath + File.separator + "drivers" + File.separator;
     }
 
-    public String getDriversDirPath() {
+    public String driversDirPath() {
         return driversDirPath;
     }
 
@@ -204,31 +208,46 @@ public class TestConfig {
         return videoRecordingOnFail;
     }
 
-    public String getVideMimeType() {
+    public String videMimeType() {
         if(videoMimeTyp == null) {
             this.videoMimeTyp = getPropertyByKey(PropertyKey.VIDEO_MIME_TYPE);
         }
         return videoMimeTyp;
     }
 
-    public int getVideFrameRate() {
+    public int videoFrameRate() {
         if(videoFrameRate == null) {
             this.videoFrameRate = Integer.parseInt(getPropertyByKey(PropertyKey.VIDEO_FRAME_RATE));
         }
         return videoFrameRate;
     }
 
-    public String getVideQuality() {
+    public String videoQuality() {
         if(videoQuality == null) {
             this.videoQuality = getPropertyByKey(PropertyKey.VIDEO_QUALITY);
         }
         return videoQuality;
     }
 
-    public String getVideDestinationPath() {
+    public String videoDestinationPath() {
         if(videoDestinationPath == null) {
             this.videoDestinationPath = getPropertyByKey(PropertyKey.VIDEO_DESTINATION_PATH);
         }
         return videoDestinationPath;
+    }
+
+    private void setAngular() {
+        String version = getPropertyByKey(PropertyKey.ANGULAR_VERSION);
+        this.angularVersion = StringUtils.isBlank(version) ? 1 : Integer.parseInt(version);
+        String timeout = getPropertyByKey(PropertyKey.ANGULAR_TIMEOUT);
+        this.angularTimeout = StringUtils.isBlank(timeout) ? maxTimeout() : Long.parseLong(timeout);
+    }
+
+    public int angularVersion() {
+        return angularVersion;
+    }
+
+    public long angularTimeout() {
+        return angularTimeout;
     }
 }
