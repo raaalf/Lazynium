@@ -81,7 +81,7 @@ public class Select extends Element implements SelectWait, SelectState {
     }
 
     public LazyList<Element> getAllSelectedOptions() {
-        LazyList<Element> toReturn = getEmptyElementsList();
+        LazyList<Element> toReturn = new LazyList<>();
         this.getOptions().forEach( option -> {
             if(option.isSelected()) {
                 toReturn.add(option);
@@ -91,7 +91,7 @@ public class Select extends Element implements SelectWait, SelectState {
     }
 
     public LazyList<Element> getOptions() {
-        return getElements(By.tagName("option"));
+        return $$e(By.tagName("option"));
     }
 
     public String getSelectedVisibleText() {

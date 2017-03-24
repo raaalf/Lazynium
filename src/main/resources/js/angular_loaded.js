@@ -1,4 +1,4 @@
-(function () {
+var angularLoaded = function(root) {
     try {
         if (document.readyState !== 'complete' && document.readyState !== "loaded") {
             return false; // Page not loaded yet
@@ -11,7 +11,7 @@
                 };
             }
             // Get the angular injector for this app (change element if necessary)
-            var injector = window.angular.element('body').injector();
+            var injector = window.angular.element(root).injector();
             // Store providers to use for these checks
             var $rootScope = injector.get('$rootScope');
             var $http = injector.get('$http');
@@ -33,4 +33,5 @@
     } catch (ex) {
         return false;
     }
-})();
+};
+return angularLoaded(argument[0]);

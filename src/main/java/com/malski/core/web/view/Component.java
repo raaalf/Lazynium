@@ -73,11 +73,11 @@ public class Component implements View, LazySearchContext, ElementState {
         return result;
     }
 
-    public <T extends Element> T getElement(By by, Class<T> clazz) {
+    public <T extends Element> T $e(By by, Class<T> clazz) {
         return new ElementHandler<>(clazz, by, root()).getImplementation();
     }
 
-    public <T extends Element> T getElement(Selector selector, Class<T> clazz) {
+    public <T extends Element> T $e(Selector selector, Class<T> clazz) {
         return new ElementHandler<>(clazz, selector, root()).getImplementation();
     }
 }

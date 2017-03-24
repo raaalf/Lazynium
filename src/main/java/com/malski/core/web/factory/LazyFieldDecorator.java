@@ -1,19 +1,19 @@
 package com.malski.core.web.factory;
 
+import com.malski.core.web.annotations.FindBy;
+import com.malski.core.web.annotations.FindBys;
 import com.malski.core.web.annotations.IComponent;
-import com.malski.core.web.annotations.IFrame;
 import com.malski.core.web.elements.Element;
 import com.malski.core.web.elements.LazyList;
 import com.malski.core.web.view.Component;
-import com.malski.core.web.view.Frame;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.pagefactory.ElementLocatorFactory;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 
 
@@ -27,9 +27,7 @@ public class LazyFieldDecorator {
     }
 
     public Object decorate(Field field) {
-        if(isDecorableFrame(field.getType(), field)) {
-            return decorateFrame(field);
-        } else if(isDecorableComponent(field.getType(), field)) {
+        if(isDecorableComponent(field.getType(), field)) {
             return decorateComponent(field);
         } else if (isDecorable(field.getType(), field) || isDecorableList(field)) {
             return decorateElements(field);
@@ -46,19 +44,6 @@ public class LazyFieldDecorator {
         }
         if (Component.class.isAssignableFrom(fieldType)) {
             return proxyForComponent(fieldType ,locator);
-        } else {
-            return null;
-        }
-    }
-
-    private Object decorateFrame(Field field) {
-        Class<?> fieldType = field.getType();
-        LazyLocator locator = (LazyLocator)factory.createLocator(field);
-        if (locator == null) {
-            return null;
-        }
-        if (Frame.class.isAssignableFrom(fieldType)) {
-            return proxyForFrame(fieldType ,locator);
         } else {
             return null;
         }
@@ -105,13 +90,8 @@ public class LazyFieldDecorator {
     }
 
     private boolean isDecorableComponent(Class clazz, Field field) {
-        return !(clazz == null || !com.malski.core.web.view.Component.class.isAssignableFrom(clazz)) &&
+        return !(clazz == null || !Component.class.isAssignableFrom(clazz)) &&
                 field.getAnnotation(IComponent.class) != null;
-    }
-
-    private boolean isDecorableFrame(Class clazz, Field field) {
-        return !(clazz == null || !Frame.class.isAssignableFrom(clazz)) &&
-                field.getAnnotation(IFrame.class) != null;
     }
 
     /* Generate a type-parameterized locator proxy for the element in question. */
@@ -132,13 +112,6 @@ public class LazyFieldDecorator {
     @SuppressWarnings("unchecked")
     private <T> T proxyForComponent(Class<T> type, LazyLocator locator) {
         MethodInterceptor handler = new ComponentHandler(type, locator);
-        return (T) Enhancer.create(type, handler);
-    }
-
-    /* Generate a type-parametrized locator proxy for the Frame in question. */
-    @SuppressWarnings("unchecked")
-    private <T> T proxyForFrame(Class<T> type, LazyLocator locator) {
-        MethodInterceptor handler = new FrameHandler(type, locator);
         return (T) Enhancer.create(type, handler);
     }
 }

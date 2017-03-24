@@ -26,7 +26,7 @@ public interface ElementState extends ElementWait, WrapsElement {
     }
 
     default boolean isVisible() {
-        return getWrappedElement().isDisplayed();
+        return isPresent() && getWrappedElement().isDisplayed();
     }
 
     default boolean isVisible(long timeout) {
@@ -35,7 +35,7 @@ public interface ElementState extends ElementWait, WrapsElement {
         } catch (Exception ignore) {
             return false;
         }
-        return getWrappedElement().isDisplayed();
+        return isPresent() && getWrappedElement().isDisplayed();
     }
 
     default boolean isPresent() {

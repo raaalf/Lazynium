@@ -34,8 +34,6 @@ public @interface FindBy {
 
     String[] cssContainingText() default {"", ""};
 
-    String deepCss() default "";
-
     String exactBinding() default "";
 
     String options() default "";

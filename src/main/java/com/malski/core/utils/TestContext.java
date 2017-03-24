@@ -2,7 +2,9 @@ package com.malski.core.utils;
 
 import com.malski.core.mobile.control.Application;
 import com.malski.core.web.control.Browser;
+import com.malski.core.web.control.JsExecutor;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -101,6 +103,13 @@ public class TestContext {
     }
 
     private static void loadInMemoryJsScripts() {
-        inMemoryJsScripts = CustomProperties.readPropertiesFromFile("js_to_load.properties");
+        try {
+            inMemoryJsScripts = CustomProperties.readPropertiesFromFile("js_to_load.properties");
+            for(String key : inMemoryJsScripts.keySet()) {
+                String fileName = getInMemoryJsScript(key);
+                String script = JsExecutor.loadScriptFromFile(fileName);
+                inMemoryJsScripts.put(key, script);
+            }
+        } catch (IOException ignore) { }
     }
 }

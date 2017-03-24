@@ -167,12 +167,12 @@ public class WaitConditions {
         };
     }
 
-    public static ExpectedCondition<Boolean> angularReady() {
+    public static ExpectedCondition<Boolean> angularReady(WebElement root) {
         return new ExpectedCondition<Boolean>() {
             public Boolean apply(WebDriver driver) {
                 JavascriptExecutor executor = (JavascriptExecutor) driver;
                 try {
-                    String state = executor.executeScript(TestContext.getInMemoryJsScript("angularLoaded")).toString();
+                    String state = executor.executeScript(TestContext.getInMemoryJsScript("angularLoaded"), root).toString();
                     return Boolean.parseBoolean(state);
                 } catch (NoSuchWindowException e) {
                     driver.switchTo().window(driver.getWindowHandles().iterator().next());

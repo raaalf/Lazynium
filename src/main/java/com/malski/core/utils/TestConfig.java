@@ -1,9 +1,16 @@
 package com.malski.core.utils;
 
+import com.malski.core.web.elements.states.ElementState;
+import com.malski.core.web.elements.waits.ElementWait;
+import com.malski.core.web.view.AngularApp;
+import com.malski.core.web.view.Frame;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.malski.core.utils.TestContext.getPropertyByKey;
 
@@ -16,6 +23,7 @@ public class TestConfig {
     private String device;
     private String osVersion;
     private String driver;
+    private boolean grid;
     private long minTimeout;
     private long timeout;
     private long maxTimeout;
@@ -32,6 +40,9 @@ public class TestConfig {
     private String videoDestinationPath;
     private int angularVersion = 1;
     private long angularTimeout;
+    private Set<String> onFrameMethods;
+    private Set<String> frameMethods;
+    private Set<String> angularMethods;
 
     protected final Logger log = Logger.getLogger(getClass());
 
@@ -43,6 +54,7 @@ public class TestConfig {
         setApp();
         setDevice();
         setOsVersion();
+        setGrid();
         setDriver();
         setMinTimeout();
         setTimeout();
@@ -85,6 +97,14 @@ public class TestConfig {
 
     private void setDriver() {
         this.driver = getPropertyByKey(PropertyKey.DRIVER);
+    }
+
+    private void setGrid() {
+        this.grid = Boolean.parseBoolean(getPropertyByKey(PropertyKey.GRID));
+    }
+
+    public boolean grid() {
+        return this.grid;
     }
 
     public String driver() {
@@ -249,5 +269,50 @@ public class TestConfig {
 
     public long angularTimeout() {
         return angularTimeout;
+    }
+
+    private void setOnFrameMethods() {
+        onFrameMethods = new HashSet<>();
+        for(Method method : ElementWait.class.getDeclaredMethods()) {
+            onFrameMethods.add(method.getName());
+        }
+        for(Method method : ElementState.class.getDeclaredMethods()) {
+            onFrameMethods.add(method.getName());
+        }
+    }
+
+    public Set<String> getOnFrameMethods() {
+        if(onFrameMethods == null) {
+            setOnFrameMethods();
+        }
+        return onFrameMethods;
+    }
+
+    private void setFrameMethods() {
+        frameMethods = new HashSet<>();
+        for(Method method : Frame.class.getDeclaredMethods()) {
+            frameMethods.add(method.getName());
+        }
+    }
+
+    public Set<String> getFrameMethods() {
+        if(frameMethods == null) {
+            setFrameMethods();
+        }
+        return frameMethods;
+    }
+
+    private void setAngularMethods() {
+        angularMethods = new HashSet<>();
+        for(Method method : AngularApp.class.getMethods()) {
+            angularMethods.add(method.getName());
+        }
+    }
+
+    public Set<String> getAngularMethods() {
+        if(angularMethods == null) {
+            setAngularMethods();
+        }
+        return angularMethods;
     }
 }

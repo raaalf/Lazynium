@@ -43,7 +43,7 @@ public class Selector extends By {
                 && StringUtils.isBlank(findBy.tagName()) && StringUtils.isBlank(findBy.xpath()) && StringUtils.isBlank(findBy.model())
                 && StringUtils.isBlank(findBy.binding()) && StringUtils.isBlank(findBy.repeater()) && StringUtils.isBlank(findBy.buttonText())
                 && StringUtils.isBlank(findBy.cssContainingText()[0]) && StringUtils.isBlank(findBy.exactBinding())
-                && StringUtils.isBlank(findBy.options()) && StringUtils.isBlank(findBy.partialButtonText()) && StringUtils.isBlank(findBy.deepCss());
+                && StringUtils.isBlank(findBy.options()) && StringUtils.isBlank(findBy.partialButtonText());
     }
 
     @Override
@@ -127,12 +127,6 @@ public class Selector extends By {
             setHowAndUsing(HowExt.PARTIAL_BUTTON_TEXT, findBy.partialButtonText());
             return ByAngular.partialButtonText(findBy.partialButtonText());
         }
-//        TODO
-//        if(!StringUtils.isBlank(findBy.deepCss())) {
-//            setHowAndUsing(HowExt.DEEP_CSS, findBy.deepCss());
-//            return ByAngular.deepCss(findBy.deepCss());
-//        }
-
         return null;
     }
 
@@ -181,10 +175,6 @@ public class Selector extends By {
         } else if (by instanceof ByAngularCssContainingText) {
             how = HowExt.CSS_CONTAINING_TEXT;
             using = getPrivateFieldValue(by, "cssContainingText");
-//          TODO
-//        } else if (by instanceof ByAngularDeepCss) {
-//            how = HowExt.DEEP_CSS;
-//            using = getPrivateFieldValue(by, "deepCss");
         } else if (by instanceof ByAngularExactBinding) {
             how = HowExt.EXACT_BINDING;
             using = getPrivateFieldValue(by, "exactBinding");
@@ -197,7 +187,6 @@ public class Selector extends By {
         } else if (by instanceof ByAngularRepeater) {
             how = HowExt.REPEATER;
             using = getPrivateFieldValue(by, "epeater");
-
         } else {
             how = HowExt.UNSET;
             using = "";

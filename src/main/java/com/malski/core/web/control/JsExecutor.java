@@ -158,7 +158,7 @@ public class JsExecutor {
         return executeScript("return document.documentElement.clientWidth;");
     }
 
-    public String loadScriptFromFile(String fileName) throws IOException {
+    public static String loadScriptFromFile(String fileName) throws IOException {
         return new String(Files.readAllBytes(Paths.get(TestContext.config().resourceDirPath() + File.separator + "js" + File.separator + fileName)));
     }
 

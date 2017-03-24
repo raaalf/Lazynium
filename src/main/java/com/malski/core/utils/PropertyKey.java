@@ -5,6 +5,9 @@ import java.lang.reflect.Field;
 public enum PropertyKey {
     DOWNLOAD_DIR("downloadDir"),
     DRIVER("driver"),
+    GRID("grid"),
+    GRID_HOST("gridHost"),
+    RESOLUTION("resolution"),
     MIN_TIMEOUT("minTimeout"),
     TIMEOUT("timeout"),
     MAX_TIMEOUT("maxTimeout"),

@@ -1,10 +1,16 @@
 package com.malski.core.web.view;
 
+import com.malski.core.web.control.Browser;
 import com.malski.core.web.control.LazySearchContext;
+import com.malski.core.web.factory.LazyLocator;
+import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebElement;
+
+import java.util.List;
 
 public class Frame extends Component {
-    private boolean inFrame = false;
+    private boolean isInside = false;
     private LazySearchContext frameContext;
 
     public Frame() {
@@ -12,7 +18,7 @@ public class Frame extends Component {
     }
 
     public void switchIn() {
-        if (!inFrame) {
+        if (!isInside) {
             forceSwitchIn();
         }
     }
@@ -20,11 +26,11 @@ public class Frame extends Component {
     public void forceSwitchIn() {
         browser().switchTo().frame(root().getWrappedElement());
         frameContext = browser();
-        inFrame = true;
+        isInside = true;
     }
 
     public void switchOut() {
-        if (inFrame) {
+        if (isInside) {
             forceSwitchOut();
         }
     }
@@ -32,7 +38,45 @@ public class Frame extends Component {
     public void forceSwitchOut() {
         browser().switchTo().parentFrame();
         frameContext = root();
-        inFrame = false;
+        isInside = false;
+    }
+
+    @Override
+    public WebElement findElement(By by) {
+        return super.findElement(by);
+    }
+
+    @Override
+    public List<WebElement> findElements(By by) {
+        return super.findElements(by);
+    }
+
+    @Override
+    public LazyLocator locator() {
+        return super.locator();
+    }
+
+    @Override
+    public Browser browser() {
+        return super.browser();
+    }
+
+    @Override
+    public void setRoot(LazyLocator locator) {
+        super.setRoot(locator);
+    }
+
+    @Override
+    public void initElements() {
+        super.initElements();
+    }
+
+    @Override
+    public boolean refresh() {
+        switchOut();
+        boolean result = super.refresh();
+        switchIn();
+        return result;
     }
 
     @Override

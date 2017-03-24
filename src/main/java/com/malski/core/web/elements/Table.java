@@ -80,7 +80,7 @@ public class Table extends Element {
     }
 
     public <T extends Element> LazyList<T> rows(String text, Class<T> clazz) {
-        LazyList<T> rows = getEmptyElementsList();
+        LazyList<T> rows = new LazyList<>();
         rows.addAll(rows(clazz).stream().filter(row -> StringUtils.containsIgnoreCase(row.getText(), text)).collect(Collectors.toList()));
         return rows;
     }
@@ -94,7 +94,7 @@ public class Table extends Element {
         if (headersSize <= colIndex) {
             throw new NoSuchElementException("No column with index: " + colIndex + ". Max index: " + headersSize);
         }
-        LazyList<T> rowsWitText = getEmptyElementsList();
+        LazyList<T> rowsWitText = new LazyList<>();
         rowsWitText.addAll(rows(clazz).stream().filter(row -> StringUtils.containsIgnoreCase(cells(row).get(colIndex).getText(), text)).collect(Collectors.toList()));
         return rowsWitText;
     }

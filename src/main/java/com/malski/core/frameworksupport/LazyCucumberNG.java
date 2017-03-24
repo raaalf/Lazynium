@@ -1,4 +1,4 @@
-package com.malski.core.cucumber;
+package com.malski.core.frameworksupport;
 
 import cucumber.api.CucumberOptions;
 import cucumber.api.SnippetType;
@@ -6,12 +6,8 @@ import cucumber.api.testng.AbstractTestNGCucumberTests;
 import cucumber.api.testng.CucumberFeatureWrapper;
 import cucumber.api.testng.TestNGCucumberRunner;
 import org.apache.commons.lang3.StringUtils;
-import org.testng.IHookCallBack;
-import org.testng.IHookable;
-import org.testng.ITestResult;
 import org.testng.annotations.*;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
@@ -19,10 +15,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @CucumberOptions(features = "*", glue = "*", tags = "*", format = {"pretty"})
-public class LazyCucumber extends AbstractTestNGCucumberTests {
+public class LazyCucumberNG extends AbstractTestNGCucumberTests {
     private TestNGCucumberRunner testNGCucumberRunner;
 
-    public LazyCucumber() {
+    public LazyCucumberNG() {
     }
 
     @BeforeClass(

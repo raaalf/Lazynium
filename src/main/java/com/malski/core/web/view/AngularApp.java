@@ -2,15 +2,32 @@ package com.malski.core.web.view;
 
 import com.malski.core.utils.TestContext;
 import com.malski.core.web.conditions.WaitConditions;
+import com.malski.core.web.control.Browser;
 import com.malski.core.web.elements.Element;
+import com.malski.core.web.factory.LazyLocator;
 import com.paulhammant.ngwebdriver.VariableNotInScopeException;
 import org.openqa.selenium.support.FindBy;
 
-@FindBy(css = "[ng-app]")
+@FindBy(css = "[ng-app],[ng:app],[ng-controller],[ng:controller]")
 public class AngularApp extends Component {
 
     public AngularApp() {
         initElements();
+    }
+
+    @Override
+    public LazyLocator locator() {
+        return super.locator();
+    }
+
+    @Override
+    public Browser browser() {
+        return super.browser();
+    }
+
+    @Override
+    public void setRoot(LazyLocator locator) {
+        super.setRoot(locator);
     }
 
     public void mutate(Element element, final String variable, final String value) {
@@ -51,16 +68,12 @@ public class AngularApp extends Component {
         if (browser().isAlertPresent()) {
             return;
         }
-        getWait(TestContext.config().angularTimeout()).until(WaitConditions.angularReady());
+        getWait(TestContext.config().angularTimeout()).until(WaitConditions.angularReady(root()));
     }
 
     public String locationAbsUrl() {
-        // TODO
-//        return browser().jsExecutor().executeScript(
-//                "var selector = '" + rootSelector + "';\n" +
-//                        "\n" +
-//                        ByAngular.functions.get("getLocationAbsUrl"));
-        return null;
+        waitForAngular();
+        return browser().getCurrentUrl();
     }
 
     public Object evaluateScript(Element element, String script) {

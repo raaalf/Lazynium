@@ -75,7 +75,7 @@ public class Browser implements WebDriver, BrowserWait, WrapsDriver, LazySearchC
     }
 
     private void initialize() {
-        initialize(BrowserFactory.initializeWebDriver(this.browserType));
+        initialize(BrowserFactory.initializeDriver(this.browserType));
     }
 
     private void initialize(WebDriver driver) {
@@ -228,51 +228,51 @@ public class Browser implements WebDriver, BrowserWait, WrapsDriver, LazySearchC
     }
 
     public boolean isDisplayed(By by) {
-        return getElement(by).isDisplayed();
+        return $e(by).isDisplayed();
     }
 
     public boolean isDisplayed(By by, long timeout) {
-        return getElement(by).isDisplayed(timeout);
+        return $e(by).isDisplayed(timeout);
     }
 
     public boolean isVisible(By by) {
-        return getElement(by).isVisible();
+        return $e(by).isVisible();
     }
 
     public boolean isVisible(By by, long timeout) {
-        return getElement(by).isVisible(timeout);
+        return $e(by).isVisible(timeout);
     }
 
     public boolean isPresent(By by) {
-        return getElement(by).isPresent();
+        return $e(by).isPresent();
     }
 
     public boolean isPresent(By by, long timeout) {
-        return getElement(by).isPresent(timeout);
+        return $e(by).isPresent(timeout);
     }
 
     public boolean isEnabled(By by) {
-        return getElement(by).isEnabled();
+        return $e(by).isEnabled();
     }
 
     public boolean isEnabled(By by, long timeout) {
-        return getElement(by).isEnabled(timeout);
+        return $e(by).isEnabled(timeout);
     }
 
     public boolean hasFocus(By by) {
-        return getElement(by).hasFocus();
+        return $e(by).hasFocus();
     }
 
     public boolean hasFocus(By by, long timeout) {
-        return getElement(by).hasFocus(timeout);
+        return $e(by).hasFocus(timeout);
     }
 
     public boolean isInViewport(By by) {
-        return getElement(by).isInViewport();
+        return $e(by).isInViewport();
     }
 
     public boolean isInViewport(By by, long timeout) {
-        return getElement(by).isInViewport(timeout);
+        return $e(by).isInViewport(timeout);
     }
 
 

@@ -12,7 +12,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 public class ElementHandler<T extends Element> extends LazyInterceptor<T> {
-
+    // TODO extract this to properties
     private String[] highlightActions = {"doubleClick", "click", "rightClick", "dragAndDrop", "dragAndDropWithOffset",
             "mouseOver", "scrollIntoView", "clickWithoutWait", "clickWithOffset", "sendKeys", "clear", "getAttribute",
             "attribute", "getText", "text", "value", "cssClass", "cssValue", "getCssValue", "cssValue", "isEnabled",
@@ -71,7 +71,7 @@ public class ElementHandler<T extends Element> extends LazyInterceptor<T> {
 
     @Override
     protected Object invoke(T thing, Object object, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
-        boolean highlight = TestContext.config().isVideoRecording() && ArrayUtils.contains(highlightActions, method.getName());
+        boolean highlight = shouldHighlightElement(method);
         if(highlight) {
             thing.lightOn();
         }
@@ -80,5 +80,9 @@ public class ElementHandler<T extends Element> extends LazyInterceptor<T> {
             thing.lightOff();
         }
         return result;
+    }
+
+    protected boolean shouldHighlightElement(Method method) {
+        return TestContext.config().isVideoRecording() && ArrayUtils.contains(highlightActions, method.getName());
     }
 }
